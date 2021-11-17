@@ -1,0 +1,1379 @@
+# Translation of Themes - Sydney in French (France)
+# This file is distributed under the same license as the Themes - Sydney package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2018-09-27 08:00:07+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: GlotPress/3.0.0-alpha.2\n"
+"Language: fr\n"
+"Project-Id-Version: Themes - Sydney\n"
+
+#. Theme Name of the theme
+#: inc/extras.php:332 inc/onboarding/theme-info.php:136
+#: inc/theme-dashboard-settings.php:21
+msgid "Sydney"
+msgstr "Sydney"
+
+#: inc/customizer/customizer.php:282 inc/customizer/customizer.php:1186
+msgid "Click the pencil icon to change this text"
+msgstr "Cliquez sur l’icône de crayon pour modifier ce texte"
+
+#: inc/customizer/customizer.php:300 inc/customizer/customizer.php:1202
+msgid "or go to the Customizer"
+msgstr "ou rendez-vous à l’outil de personnalisation"
+
+#. Template Name of the theme
+#: inc/integrations/learndash/customize.php:51
+#: inc/integrations/learndash/customize.php:84
+#: inc/integrations/learnpress/customize.php:31
+#: inc/integrations/learnpress/customize.php:53
+#: inc/integrations/lifter/customize.php:71
+#: inc/integrations/lifter/customize.php:125
+msgid "No sidebar"
+msgstr "Aucune colonne latérale"
+
+#. Template Name of the theme
+msgid "Page builder ready"
+msgstr "Constructeur de page prêt"
+
+#: inc/customizer/customizer.php:1086
+msgid "Classic (alternative)"
+msgstr "Classique (alternative)"
+
+#: inc/onboarding/theme-info.php:242
+msgid "Priority support"
+msgstr "Support Prioritaire"
+
+#: inc/onboarding/theme-info.php:207
+msgid "Extra widgets (timeline, latest news in carousel, pricing tables, a new employees widget and a new contact widget)"
+msgstr "Widgets supplémentaires (timeline, latest news in carousel, pricing tables, a new employees widget and a new contact widget)"
+
+#: inc/onboarding/theme-info.php:202
+msgid "Footer Credits option"
+msgstr "Option de crédits de pied de page"
+
+#: inc/onboarding/theme-info.php:197
+msgid "Background image support"
+msgstr "Possibilité d'image de fond"
+
+#: inc/onboarding/theme-info.php:192
+msgid "Widgetized footer"
+msgstr "Pied de page supportant les Widgets"
+
+#: inc/onboarding/theme-info.php:107 inc/onboarding/theme-info.php:182
+msgid "Color options"
+msgstr "Options de couleurs"
+
+#: inc/onboarding/theme-info.php:217
+msgid "Header support for Crelly Slider"
+msgstr "En-tête supportant Crelly Slider"
+
+#: inc/onboarding/theme-info.php:222 inc/theme-dashboard-settings.php:64
+msgid "Header support for shortcodes"
+msgstr "En-tête supportant les shortcodes"
+
+#: inc/onboarding/theme-info.php:227
+msgid "Single Post/Page Options"
+msgstr "Options \"Single Post/Page\""
+
+#: inc/onboarding/theme-info.php:172
+msgid "Translation ready"
+msgstr "Traduction prête"
+
+#: inc/onboarding/theme-info.php:157
+msgid "Social Icons"
+msgstr "Icônes de réseaux sociaux"
+
+#: inc/onboarding/theme-info.php:137 inc/theme-dashboard-settings.php:22
+msgid "Sydney Pro"
+msgstr "Sydney Pro"
+
+#: inc/onboarding/theme-info.php:119
+msgid "Visit our forums"
+msgstr "Visitez nos forums"
+
+#: inc/onboarding/theme-info.php:95
+msgid "Go to the automatic importer"
+msgstr "Importation automatique"
+
+#: inc/onboarding/theme-info.php:40
+msgid "Free vs Pro"
+msgstr "Gratuit vs Pro"
+
+#: inc/onboarding/theme-info.php:30
+msgid "Hello, %s,"
+msgstr "Bonjour, %s,"
+
+#: inc/onboarding/theme-info.php:135 inc/theme-dashboard-settings.php:20
+msgid "Feature"
+msgstr "Fonctionnalités"
+
+#: inc/onboarding/theme-info.php:127
+msgid "See the Documentation"
+msgstr "Voir la documentation"
+
+#: inc/onboarding/theme-info.php:121
+msgid "Visit the forums"
+msgstr "Visiter les forums"
+
+#: inc/onboarding/theme-info.php:38
+msgid "Getting started"
+msgstr "Commencer"
+
+#: inc/onboarding/theme-info.php:177
+msgid "Polylang integration"
+msgstr "Intégration Polylang"
+
+#: inc/onboarding/theme-info.php:167
+msgid "Front Page Blocks"
+msgstr "Blocs de page d’accueil"
+
+#: inc/onboarding/theme-info.php:162
+msgid "Slider, image or video header"
+msgstr "Diaporama, image ou vidéo d’en-tête"
+
+#: inc/onboarding/theme-info.php:152
+msgid "Parallax backgrounds"
+msgstr "Arrière-plans parallaxe"
+
+#: inc/onboarding/theme-info.php:126
+msgid "Our documentation can help you learn how to use the theme and also provides you with premade code snippets and answers to FAQs."
+msgstr "Notre documentation peut vous aider à apprendre à utiliser le thème et vous fournit également des extraits de code prédéfinis et des réponses aux questions fréquentes."
+
+#: inc/onboarding/theme-info.php:142 inc/theme-dashboard-settings.php:27
+msgid "Access to all Google Fonts"
+msgstr "Accès à toutes les polices Google"
+
+#: inc/onboarding/theme-info.php:120
+msgid "Need help? Go ahead and visit our support forums and we'll be happy to assist you with any theme related questions you might have"
+msgstr "Besoin d’aide ? Rendez-vous sur nos forums de support et nous serons heureux de vous aider pour toutes les questions liées au thème que vous pourriez avoir."
+
+#: inc/onboarding/theme-info.php:232
+msgid "WooCommerce compatible"
+msgstr "Compatible WooCommerce"
+
+#: inc/onboarding/theme-info.php:237
+msgid "5 Extra Page Templates (Contact, Featured Header - Default, Featured Header - Wide, No Header - Default, No Header - Wide)"
+msgstr "5 modèles de pages supplémentaires (Contact, En-tête mis en avant - par défaut, En-tête mis en avant - large, Aucun en-tête - par défaut, Aucun en-tête - large)"
+
+#: inc/onboarding/theme-info.php:212
+msgid "Extra Customizer Options (Front Page Section Titles, Single Employees, Single Projects, Header Contact Info, Buttons)"
+msgstr "Options supplémentaires de l’outil de personnalisation (titres de section de page de garde, employés uniques, projets uniques, infos de contact d’en-tête, boutons)"
+
+#: inc/customizer/customizer.php:206 inc/customizer/customizer.php:1102
+#: inc/onboarding/theme-info.php:147 inc/theme-dashboard-settings.php:32
+msgid "Responsive"
+msgstr "Responsive"
+
+#: inc/customizer/customizer.php:205 inc/customizer/customizer.php:1101
+msgid "Full screen"
+msgstr "Plein écran"
+
+#: inc/customizer/customizer.php:201
+msgid "Slider mobile behavior"
+msgstr "Comportement sur mobile du diaporama"
+
+#: widgets/video-widget.php:29
+msgid "Lightbox"
+msgstr "Lightbox"
+
+#: inc/customizer/options/typography.php:60
+#: inc/customizer/options/typography.php:512 widgets/video-widget.php:28
+msgid "Normal"
+msgstr "Normal"
+
+#: widgets/video-widget.php:26
+msgid "Video mode:"
+msgstr "Mode vidéo :"
+
+#: inc/customizer/options/colors.php:499 inc/customizer/options/header.php:827
+msgid "Menu items hover"
+msgstr "Survol des éléments du menu"
+
+#: inc/customizer/options/colors.php:554
+msgid "Mobile menu button"
+msgstr "Bouton du menu sur mobile"
+
+#: widgets/video-widget.php:32
+msgid "Text before the play button (only for lightbox mode):"
+msgstr "Texte avant le bouton lecture (uniquement pour le mode visionneuse) :"
+
+#: inc/customizer/customizer.php:151 inc/customizer/customizer.php:174
+#: inc/customizer/customizer.php:1033
+msgid "Video"
+msgstr "Vidéo"
+
+#: inc/page-builder.php:65 inc/so-page-builder.php:65
+msgid "Add a value in the field to change the top/bottom row padding, otherwise 100px will be applied by default"
+msgstr "Ajoutez une valeur dans le champ pour modifier la marge interne supérieure/inférieure, sinon 100px sera appliqué par défaut"
+
+#: widgets/fp-services-type-a.php:45 widgets/fp-services-type-b.php:53
+msgid "Full content"
+msgstr "Tout le contenu"
+
+#: inc/customizer/upsell/class-customize.php:77
+#: inc/theme-dashboard-settings.php:281
+msgid "Get Sydney Pro"
+msgstr "Passer à Sydney Pro"
+
+#: inc/page-builder.php:187 inc/so-page-builder.php:187
+msgid "Widget title color"
+msgstr "Couleur du titre du widget"
+
+#: inc/page-builder.php:174 inc/so-page-builder.php:174
+msgid "Content alignment"
+msgstr "Alignement du contenu"
+
+#: inc/customizer/options/blog-single.php:99
+#: inc/customizer/options/colors.php:402 inc/customizer/options/header.php:14
+msgid "Header"
+msgstr "En-tête"
+
+#: widgets/fp-services-type-a.php:46 widgets/fp-services-type-b.php:54
+msgid "Excerpt"
+msgstr "Extrait"
+
+#: inc/page-builder.php:198 inc/so-page-builder.php:198
+msgid "This applies to all headings in the widget, except the widget title"
+msgstr "Ceci s’applique à toutes les titrages du widget, à l’exception du titre du widget"
+
+#: inc/page-builder.php:194 inc/so-page-builder.php:194
+msgid "Headings color"
+msgstr "Couleur des titrages"
+
+#: inc/page-builder.php:183 inc/so-page-builder.php:183
+msgid "This setting depends on the content, it may or may not work"
+msgstr "Ce réglage dépend du contenu, il peut fonctionner ou non"
+
+#: inc/page-builder.php:113 inc/so-page-builder.php:113
+msgid "Overlay color"
+msgstr "Couleur de superposition"
+
+#: inc/page-builder.php:107 inc/so-page-builder.php:107
+msgid "Disable row overlay?"
+msgstr "Désactiver la superposition de ligne ?"
+
+#: widgets/fp-services-type-a.php:43 widgets/fp-services-type-b.php:51
+msgid "Content to display:"
+msgstr "Contenu à afficher :"
+
+#: inc/customizer/options/blog-single.php:69
+#: inc/customizer/options/blog-single.php:116
+#: inc/customizer/options/blog.php:121 inc/customizer/options/blog.php:206
+#: inc/customizer/options/general.php:282 inc/customizer/options/header.php:294
+#: inc/customizer/options/header.php:406
+#: inc/customizer/options/woocommerce.php:105 inc/page-builder.php:178
+#: inc/so-page-builder.php:178
+msgid "Left"
+msgstr "À gauche"
+
+#: inc/customizer/options/header.php:295 inc/page-builder.php:179
+#: inc/so-page-builder.php:179
+msgid "Center"
+msgstr "Centré"
+
+#: inc/customizer/options/blog-single.php:70
+#: inc/customizer/options/blog.php:122 inc/customizer/options/blog.php:207
+#: inc/customizer/options/general.php:283 inc/customizer/options/header.php:296
+#: inc/customizer/options/header.php:418
+#: inc/customizer/options/woocommerce.php:109 inc/page-builder.php:180
+#: inc/so-page-builder.php:180
+msgid "Right"
+msgstr "À droite"
+
+#: inc/customizer/upsell/class-customize.php:76
+msgid "Ready for more?"
+msgstr "Prêt·e pour plus ?"
+
+#: widgets/fp-portfolio.php:35 widgets/fp-portfolio.php:148
+msgid "Show all"
+msgstr "Tout afficher"
+
+#: widgets/fp-portfolio.php:160
+msgid "\"Show all\" text:"
+msgstr "Texte \"Tout afficher\" :"
+
+#: widgets/fp-portfolio.php:163
+msgid "Show project title?"
+msgstr "Afficher le titre du projet ?"
+
+#: widgets/fp-portfolio.php:154
+msgid "Number of projects to show (-1 shows all of them):"
+msgstr "Nombre de projets à afficher (-1 pour tout afficher) :"
+
+#: widgets/fp-portfolio.php:156
+msgid "Enter the slugs (comma separated) for your categories or leave empty to show all projects."
+msgstr "Saisissez les identifiants (séparées par des virgules) de vos catégories ou laissez vide pour tout afficher"
+
+#: widgets/fp-portfolio.php:159
+msgid "Show navigation filter? (Category slugs must be specified)."
+msgstr "Afficher les filtres de navigation ? (Les identifiants des catégories doivent être spécifiés)"
+
+#: widgets/fp-portfolio.php:12
+msgid "Display your projects in a grid."
+msgstr "Affiche vos projets dans une grille"
+
+#: widgets/fp-portfolio.php:13
+msgid "Sydney FP: Portfolio"
+msgstr "Sydney : Portfolio"
+
+#: inc/customizer/options/general.php:67
+msgid "Page wrapper - bottom padding"
+msgstr "Enrobeur de page - padding bas"
+
+#: widgets/fp-clients.php:35
+msgid "Open clients links in a new tab?"
+msgstr "Ouvrir les liens des clients dans un nouvel onglet?&nbsp;"
+
+#: inc/customizer/options/general.php:60
+msgid "100"
+msgstr "100"
+
+#: inc/customizer/options/general.php:37
+msgid "83"
+msgstr "83"
+
+#: inc/customizer/options/general.php:44
+msgid "Page wrapper - top padding"
+msgstr "Enrobeur de page - padding haut"
+
+#: inc/customizer/options/general.php:47
+msgid "Top padding for the page wrapper (the space between the header and the page title)"
+msgstr "Padding haut pour l’enrobeur de page (l’espace entre l’en-tête et le titre de page)"
+
+#: inc/customizer/options/general.php:70
+msgid "Bottom padding for the page wrapper (the space between the page content and the footer)"
+msgstr "Padding bas pour l’enrobeur de page (l’espace entre le contenu de la page et le pied)"
+
+#: inc/onboarding/theme-info.php:39
+#: theme-dashboard/class-theme-dashboard.php:615
+msgid "Support"
+msgstr "Support"
+
+#: widgets/fp-testimonials.php:33
+msgid "Autoplay time [ms]"
+msgstr "Temps de lecture auto [ms]"
+
+#: inc/onboarding/theme-info.php:125
+#: theme-dashboard/class-theme-dashboard.php:550
+msgid "Documentation"
+msgstr "Documentation"
+
+#: inc/onboarding/theme-info.php:21
+msgid "Sydney Info"
+msgstr "Info Sydney"
+
+#. Template Name of the theme
+#: inc/customizer/customizer.php:716
+msgid "Full width"
+msgstr "Pleine Largeur"
+
+#. Template Name of the theme
+msgid "Front Page"
+msgstr "Page d’accueil"
+
+#: widgets/video-widget.php:24
+msgid "Paste the URL of the video (only from a network that supports oEmbed, like Youtube, Vimeo etc.):"
+msgstr "Collez l'URL de la vidéo (uniquement depuis un réseau qui supporte oEmbed, comme Youtube, Vimeo, etc.) :"
+
+#: widgets/fp-testimonials.php:25
+msgid "Number of testimonials to show (-1 shows all of them):"
+msgstr "Nombre de témoignages à afficher (-1 les affiche tous)&nbsp;:"
+
+#: widgets/fp-testimonials.php:29
+msgid "The text for the button [Defaults to <em>See all our testimonials</em> if left empty]"
+msgstr "Le texte pour le bouton [par défaut <em>Voir tous nos témoignages</em> si laissé vide]"
+
+#: widgets/fp-testimonials.php:108
+msgid "See all our testimonials"
+msgstr "Voir tous nos témoignages"
+
+#: widgets/fp-testimonials.php:6
+msgid "Display your testimonials in a slider."
+msgstr "Affichez vos témoignages dans un diaporama."
+
+#: widgets/fp-testimonials.php:7
+msgid "Sydney FP: Testimonials"
+msgstr "Sydney PA : Témoignages"
+
+#: widgets/fp-testimonials.php:20
+msgid "In order to display this widget, you must first add some testimonials from your admin area."
+msgstr "Tout d’abord, pour afficher ce widget vous devez ajouter des témoignages dans l’administration."
+
+#: widgets/fp-testimonials.php:27
+msgid "The URL for your button [In case you want a button below your testimonials block]"
+msgstr "L’URL pour le bouton [si vous voulez un bouton en dessous de votre bloc de témoignages]"
+
+#: widgets/fp-testimonials.php:31
+msgid "Enter the slug for your category or leave empty to show all testimonials."
+msgstr "Entrez l’identifiant de votre catégorie ou laisser vide pour afficher tous vos témoignages."
+
+#: widgets/video-widget.php:6
+msgid "Display a video from Youtube, Vimeo etc."
+msgstr "Affiche une vidéo de Youtube, Vimeo, etc"
+
+#: widgets/video-widget.php:7
+msgid "Sydney: Video"
+msgstr "Sydney : Vidéo"
+
+#: widgets/fp-social.php:65
+msgid "&mdash; Select &mdash;"
+msgstr "&mdash; Sélectionner &mdash;"
+
+#: widgets/fp-social.php:61
+msgid "In order to display your social icons in a widget, all you need to do is go to <strong>Appearance > Menus</strong> and create a menu containing links to your social profiles, then assign that menu here. Supported networks: Facebook, Twitter, Google Plus, Instagram, Dribble, Vimeo, Linkedin, Youtube, Flickr, Pinterest, Tumblr, Foursquare, Behance."
+msgstr "Pour afficher vos icônes sociales dans un widget, tout ce que vous devez faire est d'aller dans <strong>Apparence > Menus </strong> et créer un menu contenant des liens vers vos profils sociaux, puis assignez ce menu ici. Réseaux supportés&nbsp;: Facebook, Twitter, Google Plus, Instagram, Dribble, Vimeo, Linkedin, YouTube, Flickr, Pinterest, Tumblr, Foursquare, Behance."
+
+#: widgets/fp-social.php:63
+msgid "Select your social menu:"
+msgstr "Sélectionnez votre menu social&nbsp;:"
+
+#: widgets/fp-skills.php:30
+msgid "First skill name"
+msgstr "Nom de la première compétence"
+
+#: widgets/fp-skills.php:41
+msgid "Second skill name"
+msgstr "Nom de la seconde compétence"
+
+#: widgets/fp-skills.php:63
+msgid "Fourth skill name"
+msgstr "Nom de la quatrième compétence"
+
+#: widgets/fp-skills.php:6
+msgid "Show your visitors some of your skills."
+msgstr "Montrez à vos visiteurs quelques compétences."
+
+#: widgets/fp-skills.php:7
+msgid "Sydney FP: Skills"
+msgstr "Sydney PA : Compétences"
+
+#: widgets/fp-skills.php:35
+msgid "First skill value"
+msgstr "Valeur de 1ère compétence"
+
+#: widgets/fp-skills.php:46
+msgid "Second skill value"
+msgstr "Valeur de 2nde compétence"
+
+#: widgets/fp-skills.php:52
+msgid "Third skill name"
+msgstr "Nom de la troisième compétence"
+
+#: widgets/fp-skills.php:68
+msgid "Fourth skill value"
+msgstr "Valeur de 4ème compétence"
+
+#: widgets/fp-social.php:5
+msgid "Display your social profile on your front page"
+msgstr "Afficher votre profil social sur votre page d’accueil"
+
+#: widgets/fp-social.php:6
+msgid "Sydney FP: Social Profile"
+msgstr "Sydney PA : Profil social"
+
+#: widgets/fp-social.php:53
+msgid "No menus have been created yet. <a href=\"%s\">Create some</a>."
+msgstr "Aucun menu n’a été créé pour le moment. <a href=\"%s\">En créer un</a>."
+
+#: widgets/fp-skills.php:57
+msgid "Third skill value"
+msgstr "Valeur de troisième compétence"
+
+#: widgets/fp-services-type-a.php:33 widgets/fp-services-type-b.php:32
+msgid "Number of services to show (-1 shows all of them):"
+msgstr "Nombre de services à afficher (-1 les affiche tous)&nbsp;:"
+
+#: widgets/fp-services-type-a.php:37 widgets/fp-services-type-b.php:36
+msgid "The text for the button [Defaults to <em>See all our services</em> if left empty]"
+msgstr "Le texte pour le bouton [par défaut <em>Voir tous nos services</em> si laissé vide]"
+
+#: widgets/fp-services-type-a.php:147 widgets/fp-services-type-b.php:162
+msgid "See all our services"
+msgstr "Voir tous nos services"
+
+#: widgets/fp-list.php:66
+msgid "Add a bit of text here. It will be displayed."
+msgstr "Ajoutez un peu de texte ici. Il sera affiché."
+
+#: widgets/fp-list.php:69
+msgid "Add your list items here. One item per row, start each row with <strong>^</strong>. Example: <strong>^ list item </strong>"
+msgstr "Ajoutez vos éléments de liste ici. Un élément par rangée,  commencez chaque rangée avec <strong>^</strong>. Exemple : <strong>^ élément de liste </strong>"
+
+#: widgets/fp-list.php:72
+msgid "Call to action button URL:"
+msgstr "URL du bouton d’appel à action :"
+
+#: widgets/fp-list.php:75
+msgid "Call to action button text:"
+msgstr "Texte de bouton d’appel à action :"
+
+#: widgets/fp-services-type-a.php:11 widgets/fp-services-type-b.php:11
+msgid "Show what services you are able to provide."
+msgstr "Affiche les services que vous êtes en mesure de fournir. "
+
+#: widgets/fp-services-type-a.php:12
+msgid "Sydney FP: Services Type A"
+msgstr "Sydney PA : Services de type A"
+
+#: widgets/fp-services-type-a.php:28 widgets/fp-services-type-b.php:27
+msgid "In order to display this widget, you must first add some services from your admin area."
+msgstr "Tout d’abord, pour afficher ce widget vous devez ajouter des services dans l’administration."
+
+#: widgets/fp-services-type-a.php:35 widgets/fp-services-type-b.php:34
+msgid "The URL for your button [In case you want a button below your services block]"
+msgstr "L’URL pour le bouton [si vous voulez un bouton en dessous de votre bloc de services]"
+
+#: widgets/fp-services-type-a.php:39 widgets/fp-services-type-b.php:38
+msgid "Enter the slug for your category or leave empty to show all services."
+msgstr "Entrez l’identifiant de votre catégorie ou laisser vide pour afficher tous vos services."
+
+#: widgets/fp-services-type-a.php:42
+msgid "Display services in two columns instead of three?"
+msgstr "Afficher les services en deux colonnes au lieu de trois ?"
+
+#: widgets/fp-services-type-b.php:12
+msgid "Sydney FP: Services type B"
+msgstr "Sydney PA : Services de type B"
+
+#: widgets/fp-services-type-b.php:41
+msgid "Number of columns:"
+msgstr "Nombre de colonnes :"
+
+#: widgets/fp-list.php:63 widgets/fp-portfolio.php:152 widgets/fp-social.php:58
+msgid "Title:"
+msgstr "Titre&nbsp;:"
+
+#: widgets/fp-employees.php:6
+msgid "Display your team members in a stylish way."
+msgstr "Afficher les membres de votre équipe d'une manière élégante."
+
+#: widgets/fp-employees.php:21
+msgid "In order to display this widget, you must first add some employees from the dashboard. Add as many as you want and the theme will automatically display them all."
+msgstr "Pour afficher ce widget, vous devez d'abord ajouter quelques employés à partir du tableau de bord. Ajoutez-en autant que vous voulez et le thème les affichera tous automatiquement."
+
+#: widgets/fp-employees.php:30
+msgid "The text for the button [Defaults to <em>See all our employees</em> if left empty]"
+msgstr "Le texte du bouton [par défaut <em>Voir tous nos employés</em> si laissé vide]"
+
+#: widgets/fp-employees.php:143
+msgid "See all our employees"
+msgstr "Voir tous nos employés"
+
+#: widgets/fp-facts.php:7
+msgid "Show your visitors some facts about your company."
+msgstr "Montrer à vos visiteurs quelques réalisations de votre entreprise."
+
+#: widgets/fp-facts.php:45
+msgid "First fact name"
+msgstr "Nom du premier fait"
+
+#: widgets/fp-facts.php:61
+msgid "Second fact name"
+msgstr "Nom du second fait"
+
+#: widgets/fp-facts.php:66
+msgid "Second fact value"
+msgstr "Contenu du second fait"
+
+#: widgets/fp-facts.php:77
+msgid "Third fact name"
+msgstr "Nom du troisième fait"
+
+#: widgets/fp-facts.php:82
+msgid "Third fact value"
+msgstr "Contenu du troisième fait"
+
+#: widgets/fp-facts.php:93
+msgid "Fourth fact name"
+msgstr "Nom du quatrième fait"
+
+#: widgets/fp-facts.php:98
+msgid "Fourth fact value"
+msgstr "Contenu du quatrième fait"
+
+#: widgets/fp-call-to-action.php:27
+msgid "Display the button inline with the text?"
+msgstr "Afficher le bouton aligné avec le texte ?"
+
+#: widgets/fp-clients.php:6
+msgid "Display your clients list."
+msgstr "Affiche une liste de vos clients."
+
+#: widgets/fp-clients.php:7
+msgid "Sydney FP: Clients"
+msgstr "Sydney PA : Clients"
+
+#: widgets/fp-clients.php:21
+msgid "In order to display this widget, you must first add some clients from your admin area. Set your client logos as featured images."
+msgstr "Tout d’abord, pour afficher ce widget vous devez ajouter quelques clients dans l’administration. Définissez les logos de vos clients comme images mises en avant."
+
+#: widgets/fp-clients.php:26
+msgid "Number of clients to show (-1 shows all of them):"
+msgstr "Nombre de clients à afficher (-1 les affiche tous) :"
+
+#: widgets/fp-clients.php:28
+msgid "The URL for your button [In case you want a button below your clients block]"
+msgstr "L’URL pour le bouton [si vous voulez un bouton en dessous du bloc de vos clients]"
+
+#: widgets/fp-clients.php:30
+msgid "The text for the button [Defaults to <em>See all our clients</em> if left empty]"
+msgstr "Le texte pour le bouton [par défaut <em>Voir tous nos clients</em> si laissé vide]"
+
+#: widgets/fp-clients.php:32
+msgid "Enter the slug for your category or leave empty to show all clients."
+msgstr "Saisissez l’identifiant de votre catégorie ou laissez vide pour afficher tous vos clients."
+
+#: widgets/fp-clients.php:111
+msgid "See all our clients"
+msgstr "Voir tous nos clients"
+
+#: widgets/fp-employees.php:7
+msgid "Sydney FP: Employees"
+msgstr "Sydney PA : Employés"
+
+#: widgets/fp-employees.php:26
+msgid "Number of employees to show (-1 shows all of them):"
+msgstr "Nombre d'employés à afficher (-1 pour les afficher tous)"
+
+#: widgets/fp-employees.php:28
+msgid "Enter an URL here if you want to section to link somewhere."
+msgstr "Saisissez une URL si vous souhaitez faire un lien sur la section."
+
+#: widgets/fp-employees.php:32
+msgid "Enter the slug for your category or leave empty to show all employees."
+msgstr "Entrez l’identifiant de votre catégorie ou laisser vide pour afficher tous vos employés."
+
+#: widgets/fp-employees.php:35
+msgid "Center the employees? (use only if you have 1 or 2 employees)"
+msgstr "Centrer les employés ? (utilisé seulement si vous avez 1 ou 2 employés)"
+
+#: widgets/fp-facts.php:8
+msgid "Sydney FP: Facts"
+msgstr "Sydney PA : Faits"
+
+#: widgets/fp-facts.php:30
+msgid "You can find a list of the available icons "
+msgstr "Vous pouvez trouver une liste des icônes disponibles"
+
+#: widgets/fp-facts.php:30
+msgid "here."
+msgstr "ici."
+
+#: widgets/fp-facts.php:35
+msgid "Usage example: <strong>fa-android</strong>"
+msgstr "Exemple d’utilisation : <strong>fa-android</strong>"
+
+#: widgets/fp-facts.php:50
+msgid "First fact value"
+msgstr "Valeur de 1ère compétence"
+
+#: widgets/fp-facts.php:55
+msgid "First fact icon"
+msgstr "1er Icône de fait"
+
+#: widgets/fp-facts.php:71
+msgid "Second fact icon"
+msgstr "2nd Icône de fait"
+
+#: widgets/fp-facts.php:103
+msgid "Fourth fact icon"
+msgstr "Icône du quatrième fait"
+
+#: widgets/fp-latest-news.php:6
+msgid "Show the latest news from your blog."
+msgstr "Affiche les dernières nouveutés de votre blog."
+
+#: widgets/fp-latest-news.php:7
+msgid "Sydney FP: Latest News"
+msgstr "Sydney PA : Dernières nouveautés"
+
+#: widgets/fp-latest-news.php:23
+msgid "Enter the slug for your category or leave empty to show posts from all categories."
+msgstr "Entrez l’identifiant pour votre catégorie ou laissez vide pour afficher tous les articles."
+
+#: widgets/fp-latest-news.php:26
+msgid "Add the text for the button here if you want to change the default <em>See all our news</em>"
+msgstr "Ajouter le texte du bouton ici si vous voulez changer le <em>Voir toutes les nouveautés</em>"
+
+#: widgets/fp-latest-news.php:51 widgets/fp-latest-news.php:53
+msgid "See all our news"
+msgstr "Voir toutes nos nouveautés"
+
+#: widgets/fp-list.php:11
+msgid "A simple list widget"
+msgstr "Un simple widget de liste"
+
+#: widgets/fp-list.php:13
+msgid "Sydney FP: List"
+msgstr "Sydney PA : Liste"
+
+#: widgets/fp-facts.php:87
+msgid "Third fact icon"
+msgstr "Troisième Icône de fait"
+
+#: widgets/contact-info.php:24
+msgid "Enter your address"
+msgstr "Entrez votre adresse"
+
+#: widgets/contact-info.php:27
+msgid "Enter your phone number"
+msgstr "Entrez votre numéro de téléphone"
+
+#: widgets/contact-info.php:30
+msgid "Enter your email address"
+msgstr "Entrez votre adresse e-mail"
+
+#: widgets/fp-call-to-action.php:24
+msgid "Title for the button"
+msgstr "Titre du bouton"
+
+#: widgets/fp-call-to-action.php:6
+msgid "Display a call to action block."
+msgstr "Afficher un bloc d'appel à l'action"
+
+#: widgets/fp-call-to-action.php:7
+msgid "Sydney FP: Call to action"
+msgstr "Sydney PA : Appel à action"
+
+#: widgets/fp-call-to-action.php:20
+msgid "Enter your call to action."
+msgstr "Entrez votre appel à action."
+
+#: widgets/fp-call-to-action.php:22
+msgid "Link for the button"
+msgstr "Lien pour le bouton"
+
+#: inc/customizer/options/woocommerce.php:303 widgets/contact-info.php:20
+#: widgets/fp-call-to-action.php:18 widgets/fp-clients.php:23
+#: widgets/fp-employees.php:23 widgets/fp-facts.php:39
+#: widgets/fp-latest-news.php:19 widgets/fp-services-type-a.php:30
+#: widgets/fp-services-type-b.php:29 widgets/fp-skills.php:24
+#: widgets/fp-testimonials.php:22 widgets/video-widget.php:20
+msgid "Title"
+msgstr "Titre"
+
+#: widgets/contact-info.php:6
+msgid "Display your contact info"
+msgstr "Affichez vos info de contact"
+
+#: widgets/contact-info.php:7
+msgid "Sydney: Contact info"
+msgstr "Sydney : Infos de contact"
+
+#: search.php:16
+msgid "Search Results for: %s"
+msgstr "Résultats de recherche pour : %s"
+
+#: inc/onboarding/plugins/class-sydney-recommended-plugins.php:92
+#: inc/onboarding/plugins/class-sydney-recommended-plugins.php:112
+msgid "Activate"
+msgstr "Activer"
+
+#: inc/customizer/options/general.php:173
+msgid "Type"
+msgstr "Type"
+
+#: inc/template-tags.php:241
+msgid "Archives"
+msgstr "Archives"
+
+#. translators: 1: Taxonomy singular name, 2: Current taxonomy term
+#: inc/template-tags.php:239
+msgid "%1$s: %2$s"
+msgstr "%1$s : %2$s"
+
+#: inc/template-tags.php:235
+msgid "Archives: %s"
+msgstr "Archives : %s"
+
+#: inc/template-tags.php:232
+msgctxt "post format archive title"
+msgid "Chats"
+msgstr "Discussions"
+
+#: inc/template-tags.php:230
+msgctxt "post format archive title"
+msgid "Audio"
+msgstr "Audio"
+
+#: inc/template-tags.php:228
+msgctxt "post format archive title"
+msgid "Statuses"
+msgstr "États"
+
+#: inc/template-tags.php:226
+msgctxt "post format archive title"
+msgid "Links"
+msgstr "Liens"
+
+#: inc/template-tags.php:224
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "Citations"
+
+#: inc/template-tags.php:222
+msgctxt "post format archive title"
+msgid "Videos"
+msgstr "Vidéos"
+
+#: inc/template-tags.php:220
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "Images"
+
+#: inc/template-tags.php:218
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "Galeries"
+
+#: inc/template-tags.php:216
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "En passant"
+
+#: inc/template-tags.php:213
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "j F Y"
+
+#: inc/template-tags.php:213
+msgid "Day: %s"
+msgstr "Jour : %s"
+
+#: inc/template-tags.php:211
+msgctxt "monthly archives date format"
+msgid "F Y"
+msgstr "F Y"
+
+#: inc/template-tags.php:211
+msgid "Month: %s"
+msgstr "Mois : %s"
+
+#: inc/template-tags.php:209
+msgctxt "yearly archives date format"
+msgid "Y"
+msgstr "Y"
+
+#: inc/template-tags.php:209
+msgid "Year: %s"
+msgstr "Année : %s"
+
+#: inc/template-tags.php:207
+msgid "Author: %s"
+msgstr "Auteur : %s"
+
+#: inc/template-tags.php:205
+msgid "Tag: %s"
+msgstr "Étiquettes : %s"
+
+#: inc/template-tags.php:160
+msgid " %1$s"
+msgstr " %1$s"
+
+#: inc/template-tags.php:203
+msgid "Category: %s"
+msgstr "Catégorie : %s"
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:171
+msgid ", "
+msgstr ", "
+
+#. translators: %s: post date.
+#: inc/template-tags.php:345
+msgctxt "post date"
+msgid "Posted on %s"
+msgstr "Publié le %s"
+
+#: inc/customizer/options/blog-single.php:389 inc/template-tags.php:61
+msgid "Post navigation"
+msgstr "Navigation d’article"
+
+#: inc/template-tags.php:31
+msgid "Newer posts"
+msgstr "Articles plus récents"
+
+#: inc/template-tags.php:27
+msgid "Older posts"
+msgstr "Articles plus anciens"
+
+#: inc/template-tags.php:23
+msgid "Posts navigation"
+msgstr "Navigation des articles"
+
+#: inc/page-builder.php:98 inc/so-page-builder.php:98
+msgid "0"
+msgstr "0"
+
+#: inc/page-builder.php:99 inc/so-page-builder.php:99
+msgid "15px"
+msgstr "15 pixels"
+
+#: inc/page-builder.php:100 inc/so-page-builder.php:100
+msgid "30px"
+msgstr "30 pixels"
+
+#: inc/page-builder.php:101 inc/so-page-builder.php:101
+msgid "45px"
+msgstr "45 pixels"
+
+#: inc/page-builder.php:93 inc/so-page-builder.php:93
+msgid "Mobile padding"
+msgstr "Padding mobile"
+
+#: inc/page-builder.php:97 inc/so-page-builder.php:97
+msgid "Default"
+msgstr "Par défaut"
+
+#: inc/page-builder.php:95 inc/so-page-builder.php:95
+msgid "Here you can select a top/bottom row padding for screen sizes < 1024px"
+msgstr "Ici vous pouvez choisir le padding haut / bas de rangée pour les tailles d’écran < 1024 pixels"
+
+#: inc/page-builder.php:87 inc/so-page-builder.php:87
+msgid "Background image of the row."
+msgstr "Image d’arrière-plan de la rangée."
+
+#: inc/page-builder.php:80 inc/so-page-builder.php:80
+msgid "Color of the row."
+msgstr "Couleur de la rangée"
+
+#: inc/page-builder.php:85 inc/so-page-builder.php:85
+msgid "Background Image"
+msgstr "Image d’arrière-plan"
+
+#: inc/customizer/options/header-mobile.php:359
+#: inc/customizer/options/woocommerce.php:888 inc/page-builder.php:78
+#: inc/so-page-builder.php:78
+msgid "Color"
+msgstr "Couleur"
+
+#: inc/page-builder.php:44 inc/so-page-builder.php:44
+msgid "Sydney Theme Widgets"
+msgstr "Widgets du thème Sydney"
+
+#: inc/page-builder.php:57 inc/so-page-builder.php:57
+msgid "Bottom Border Color"
+msgstr "Couleur de bord bas"
+
+#: inc/page-builder.php:63 inc/so-page-builder.php:63
+msgid "Top/bottom padding"
+msgstr "Padding haut / bas"
+
+#: inc/page-builder.php:70 inc/so-page-builder.php:70
+msgid "Center align the content?"
+msgstr "Alignement central du contenu ?"
+
+#: inc/page-builder.php:72 inc/so-page-builder.php:72
+msgid "This may or may not work. It depends on the widget styles."
+msgstr "Ceci peut fonctionner ou pas. Cela dépend des styles de widget."
+
+#: inc/customizer/customizer.php:1004
+msgid "Theme info"
+msgstr "Info du thème"
+
+#: inc/customizer/customizer.php:1006
+msgid "1. Documentation for Sydney can be found "
+msgstr "1. La documentation de Sydney peut être trouvée "
+
+#: inc/customizer/customizer.php:1006
+msgid "2. A full theme demo can be found "
+msgstr "2. Une démo du thème peut être trouvée "
+
+#: inc/customizer/customizer.php:1034
+msgid "Nothing (only menu)"
+msgstr "Rien (menu seulement)"
+
+#: inc/customizer/options/colors.php:41
+msgid "Primary color"
+msgstr "Couleur principale"
+
+#: inc/customizer/options/colors.php:481
+msgid "Top level menu items"
+msgstr "Éléments de menu de niveau haut"
+
+#: inc/customizer/options/colors.php:518
+msgid "Sub-menu items"
+msgstr "Éléments de sous-menu"
+
+#: inc/customizer/options/colors.php:61
+msgid "Body text"
+msgstr "Texte du corps"
+
+#: inc/customizer/options/colors.php:629
+msgid "Sidebar color"
+msgstr "Couleur de barre"
+
+#: inc/customizer/options/colors.php:421
+msgid "Menu background"
+msgstr "Arrière-plan du menu"
+
+#: inc/customizer/options/colors.php:536
+msgid "Sub-menu background"
+msgstr "Arrière-plan de sous-menu"
+
+#: inc/customizer/options/colors.php:609
+msgid "Sidebar background"
+msgstr "Arrière-plan de barre"
+
+#: inc/customizer/options/colors.php:461
+msgid "Site description"
+msgstr "Description du site"
+
+#: inc/customizer/options/colors.php:441
+msgid "Site title"
+msgstr "Titre du site"
+
+#: inc/customizer/controls/typography/class_sydney_typography.php:81
+msgid "Font family"
+msgstr "Famille des polices"
+
+#: inc/customizer/customizer.php:1061
+msgid "Three"
+msgstr "Trois"
+
+#: inc/customizer/customizer.php:1062
+msgid "Four"
+msgstr "Quatre"
+
+#: inc/customizer/customizer.php:1059
+msgid "One"
+msgstr "Un"
+
+#: inc/customizer/customizer.php:1060
+msgid "Two"
+msgstr "Deux"
+
+#: inc/customizer/options/footer.php:29
+msgid "Footer"
+msgstr "Pied"
+
+#: inc/customizer/options/blog-single.php:254
+#: inc/customizer/options/blog.php:428
+msgid "Meta"
+msgstr "Méta"
+
+#: inc/customizer/customizer.php:1088
+msgid "Full width (no sidebar)"
+msgstr "Largeur plein écran (pas de barre)"
+
+#: inc/customizer/customizer.php:1089
+msgid "Masonry (grid style)"
+msgstr "Maçonnerie (style en grille)"
+
+#: inc/customizer/options/blog.php:371
+msgid "Excerpt length"
+msgstr "Longueur de l’extrait"
+
+#: inc/customizer/customizer.php:1085 inc/customizer/options/blog.php:64
+msgid "Classic"
+msgstr "Classique"
+
+#: inc/customizer/options/blog.php:59
+msgid "Blog layout"
+msgstr "Style du blog"
+
+#: inc/customizer/customizer.php:940 inc/customizer/customizer.php:1048
+msgid "Contain"
+msgstr "Contient"
+
+#: inc/customizer/customizer.php:974
+msgid "Disable the overlay?"
+msgstr "Désactiver la couverture ?"
+
+#: inc/customizer/customizer.php:992
+msgid "Upload your logo"
+msgstr "Envoi de votre logo"
+
+#: inc/onboarding/theme-info.php:109 inc/onboarding/theme-info.php:187
+msgid "Blog options"
+msgstr "Options du blog"
+
+#: inc/customizer/options/header-mobile.php:54
+#: inc/customizer/options/header.php:246
+#: inc/customizer/options/woocommerce.php:57
+#: inc/customizer/options/woocommerce.php:383
+#: inc/customizer/options/woocommerce.php:488
+#: inc/customizer/options/woocommerce.php:581
+#: inc/customizer/options/woocommerce.php:661
+#: inc/integrations/learndash/customize.php:18
+msgid "Layout"
+msgstr "Style"
+
+#: inc/customizer/customizer.php:956
+msgid "Header height [default: 300px]"
+msgstr "Hauteur d’en-tête [par défaut&nbsp;: 300 pixels]"
+
+#: inc/customizer/customizer.php:939 inc/customizer/customizer.php:1047
+msgid "Cover"
+msgstr "Couverture"
+
+#: inc/customizer/customizer.php:674 inc/customizer/customizer.php:1074
+msgid "Static"
+msgstr "Statique"
+
+#: inc/customizer/customizer.php:694 inc/customizer/customizer.php:1113
+msgid "Inline"
+msgstr "Aligné"
+
+#: inc/customizer/customizer.php:695 inc/customizer/customizer.php:1114
+msgid "Centered (menu and site logo)"
+msgstr "Centré (menu et logo du site)"
+
+#: inc/customizer/customizer.php:936
+msgid "Header background size"
+msgstr "Taille d‘arrière-plan d'en-tête"
+
+#: inc/customizer/customizer.php:673 inc/customizer/customizer.php:1073
+msgid "Sticky"
+msgstr "Mis en avant"
+
+#: inc/customizer/customizer.php:341
+msgid "Upload your second image for the slider"
+msgstr "Envoi de la seconde image pour le diaporama"
+
+#: inc/customizer/customizer.php:361
+msgid "Title for the second slide"
+msgstr "Titre pour le 2nd panneau"
+
+#: inc/customizer/customizer.php:379
+msgid "Subtitle for the second slide"
+msgstr "Sous-titre pour le 2nd panneau"
+
+#: inc/customizer/customizer.php:393
+msgid "Third slide"
+msgstr "Troisième panneau"
+
+#: inc/customizer/customizer.php:412
+msgid "Upload your third image for the slider"
+msgstr "Envoi de la troisième image pour le diaporama"
+
+#: inc/customizer/customizer.php:464
+msgid "Fourth slide"
+msgstr "Quatrième panneau"
+
+#: inc/customizer/customizer.php:483
+msgid "Upload your fourth image for the slider"
+msgstr "Envoi de la quatrième image pour le diaporama"
+
+#: inc/customizer/customizer.php:503
+msgid "Title for the fourth slide"
+msgstr "Titre pour le 4ème panneau"
+
+#: inc/customizer/customizer.php:521
+msgid "Subtitle for the fourth slide"
+msgstr "Sous-titre pour le 4ème panneau"
+
+#: inc/customizer/customizer.php:535
+msgid "Fifth slide"
+msgstr "Cinquième panneau"
+
+#: inc/customizer/customizer.php:554
+msgid "Upload your fifth image for the slider"
+msgstr "Envoi de la cinquième image pour le diaporama"
+
+#: inc/customizer/customizer.php:606
+msgid "Call to action button"
+msgstr "Bouton d’appel à action"
+
+#: inc/customizer/customizer.php:623
+msgid "URL for your call to action button"
+msgstr "URL pour le bouton d’appel à action"
+
+#: inc/customizer/customizer.php:632
+msgid "Click to begin"
+msgstr "Cliquez pour commencer"
+
+#: inc/customizer/customizer.php:640
+msgid "Text for your call to action button"
+msgstr "Texte pour le bouton d’appel à action"
+
+#: inc/customizer/customizer.php:691
+msgid "Menu style"
+msgstr "Style du menu"
+
+#: inc/customizer/customizer.php:670 inc/theme-dashboard-settings.php:42
+msgid "Sticky menu"
+msgstr "Menu fixe"
+
+#: inc/customizer/customizer.php:574
+msgid "Title for the fifth slide"
+msgstr "Titre pour le cinquième panneau"
+
+#: inc/customizer/customizer.php:592
+msgid "Subtitle for the fifth slide"
+msgstr "Sous-titre pour le cinquième panneau"
+
+#: inc/customizer/customizer.php:432
+msgid "Title for the third slide"
+msgstr "Titre pour le troisième panneau"
+
+#: inc/customizer/customizer.php:450
+msgid "Subtitle for the third slide"
+msgstr "Sous-titre pour le troisième panneau"
+
+#: inc/customizer/customizer.php:152 inc/customizer/customizer.php:175
+msgid "No header (only menu)"
+msgstr "Pas d’en-tête (menu seul)"
+
+#: inc/customizer/customizer.php:168
+msgid "Site header type"
+msgstr "Type d’en-tête du site"
+
+#: inc/customizer/customizer.php:214
+msgid "4000"
+msgstr "4000"
+
+#: inc/customizer/customizer.php:221
+msgid "Slider speed"
+msgstr "Vitesse de diaporama"
+
+#: inc/customizer/customizer.php:224
+msgid "Slider speed in miliseconds. Use 0 to disable [default: 4000]"
+msgstr "Vitesse de diaporama en millisecondes. 0 pour désactiver [par défaut : 4000]"
+
+#: inc/customizer/customizer.php:238
+msgid "Stop the text slider?"
+msgstr "Stopper le texte de diaporama ?"
+
+#: inc/customizer/customizer.php:251
+msgid "First slide"
+msgstr "Premier panneau"
+
+#: inc/customizer/customizer.php:270
+msgid "Upload your first image for the slider"
+msgstr "Envoi de la première image pour le diaporama"
+
+#: inc/onboarding/theme-info.php:31 inc/theme-dashboard-settings.php:136
+msgid "Welcome to Sydney"
+msgstr "Bienvenue sur Sydney"
+
+#: inc/customizer/customizer.php:290
+msgid "Title for the first slide"
+msgstr "Titre pour le 1er panneau"
+
+#: inc/customizer/customizer.php:308
+msgid "Subtitle for the first slide"
+msgstr "Sous-titre pour le 1er panneau"
+
+#: inc/customizer/customizer.php:322
+msgid "Second slide"
+msgstr "Second panneau"
+
+#: inc/customizer/customizer.php:150 inc/customizer/customizer.php:173
+#: inc/customizer/customizer.php:1032
+#: inc/customizer/options/blog-single.php:168
+msgid "Image"
+msgstr "Image"
+
+#: inc/customizer/customizer.php:145
+msgid "Front page header type"
+msgstr "Type d’en-tête de page d’accueil"
+
+#: inc/customizer/customizer.php:147
+msgid "Select the header type for your front page"
+msgstr "Choix du type d’en-tête pour votre page d’accueil"
+
+#: inc/customizer/customizer.php:149 inc/customizer/customizer.php:172
+#: inc/customizer/customizer.php:1031
+msgid "Full screen slider"
+msgstr "Diaporama plein écran"
+
+#: inc/customizer/controls/class_sydney_tab_control.php:40
+#: inc/customizer/options/colors.php:20 inc/customizer/options/general.php:14
+#: inc/customizer/options/woocommerce.php:12
+#: inc/integrations/lifter/customize.php:18
+msgid "General"
+msgstr "Général"
+
+#: header.php:29
+msgid "Skip to content"
+msgstr "Aller au contenu"
+
+#: functions.php:312
+msgid "Create your menu here"
+msgstr "Créez votre menu ici"
+
+#: functions.php:116
+msgid "Footer "
+msgstr "Pied"
+
+#: functions.php:104 inc/customizer/options/colors.php:590
+#: inc/customizer/options/woocommerce.php:96
+msgid "Sidebar"
+msgstr "Barre"
+
+#: functions.php:57
+msgid "Primary Menu"
+msgstr "Menu principal"
+
+#: content-page.php:31 inc/template-tags.php:163
+msgid "Edit"
+msgstr "Modifier"
+
+#: content-page.php:24 content-search.php:32 content-single.php:45
+msgid "Pages:"
+msgstr "Pages&nbsp;:"
+
+#: content-none.php:28
+msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
+msgstr "Il semblerait que nous ne soyons pas en mesure de trouver votre contenu. Essayez en lançant une recherche."
+
+#: content-none.php:23
+msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
+msgstr "Désolé, mais rien ne correspond à votre recherche. Veuillez réessayer avec des mots différents."
+
+#: content-none.php:19
+msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
+msgstr "Prêt à publier votre premier article&nbsp;? <a href=\"%1$s\">Lancez-vous</a>&nbsp;!"
+
+#: content-none.php:13
+msgid "Nothing Found"
+msgstr "Rien de trouvé"
+
+#: comments.php:66
+msgid "Comments are closed."
+msgstr "Les commentaires sont fermés."
+
+#: comments.php:38 comments.php:56
+msgid "Newer Comments &rarr;"
+msgstr "Commentaires plus récents &rarr;"
+
+#: comments.php:37 comments.php:55
+msgid "&larr; Older Comments"
+msgstr "&larr; Commentaires plus anciens"
+
+#: comments.php:36 comments.php:54
+msgid "Comment navigation"
+msgstr "Navigation de commentaire"
+
+#: comments.php:29
+msgctxt "comments title"
+msgid "One thought on &ldquo;%2$s&rdquo;"
+msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
+msgstr[0] "Une réflexion au sujet de &laquo;&nbsp;%2$s&nbsp;&raquo;"
+msgstr[1] "%1$s réflexions au sujet de &laquo;&nbsp;%2$s&nbsp;&raquo;"
+
+#: 404.php:19
+msgid "It looks like nothing was found at this location. Maybe try one of the links below or a search?"
+msgstr "Il semble que rien ne soit trouvé ici. Essayez un des liens ci-dessous ou une recherche ?"
+
+#: 404.php:15
+msgid "Oops! That page can&rsquo;t be found."
+msgstr "Aïe&nbsp;! Cette page est introuvable."
+
+#. Author of the theme
+#: theme-dashboard/class-theme-dashboard.php:542
+msgid "aThemes"
+msgstr "aThemes"
+
+#. Author URI of the theme
+msgid "https://athemes.com"
+msgstr "https://athemes.com"
+
+#. Theme URI of the theme
+msgid "https://athemes.com/theme/sydney"
+msgstr "https://athemes.com/theme/sydney"

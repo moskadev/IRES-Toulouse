@@ -61,7 +61,7 @@ function test_page() {
         3
     );
 }
-add_action( 'admin_menu', 'test_page' );
+// add_action( 'admin_menu', 'test_page' );
 
 function test_sql() {
 	global $wpdb; // Permet d'utiliser $wpdb
@@ -91,15 +91,21 @@ function test_sql() {
 		 ."<br>Login : ".$user_login
 		 ."<br>ID : ".$new_user_id; 
 	
-	// Préparation de la requête SQL
-	$add_user = $wpdb->prepare(
-		'INSERT INTO wp_users (ID, user_login, user_nicename, user_email)
-		 VALUES ('.$new_user_id.', '.$user_login.', '.$user_login.', '.$mail.')'
-	);
+	$userdata = array(
+	'user_login' => $user_login,
+	'user_pass' => NULL,
+	'user_email' => $mail,
+	'user_registered' => 'NOW',
+	'user_status' => '0',
+	'display_name' => $display);
+	
+	$user_id = wp_insert_user( $userdata ) ;
 
-	// Requête SQL
-	$wpdb->query($add_user);
-// ID, user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name
+	if ( ! is_wp_error( $user_id ) ) {
+		echo "User created : ". $user_id;
+	}
+
+	// ID, user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name
 	
 }
 /*

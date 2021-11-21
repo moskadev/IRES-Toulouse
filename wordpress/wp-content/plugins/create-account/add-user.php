@@ -64,77 +64,78 @@ add_action("admin_menu", "my_page");
 function page_content() {?>
     <h1>Créer un compte d"un utilisateur.</h1>
 
-<form method="post" name="createuser" id="createuser" class="validate" novalidate="novalidate"
-    <?php
-    /**
-     * This action is documented in wp-admin/user-new.php.
-     */
-    do_action("user_new_form_tag"); ?>>
-
-    <input name="action" type="hidden" value="createuser"/>
-    <?php
-
-    wp_nonce_field("create-user", "_wpnonce_create-user");
-    // Load past data, otherwise set a default value
-    $creating = isset($_POST["createuser"]);
-
-    $new_user_login = $creating && isset($_POST["user_login"]) ? wp_unslash($_POST["user_login"]) : "";
-    $new_user_firstname = $creating && isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
-    $new_user_lastname = $creating && isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
-    $new_user_email = $creating && isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
-    $new_user_uri = $creating && isset($_POST["url"]) ? wp_unslash($_POST["url"]) : "";
-    $new_user_role = $creating && isset($_POST["role"]) ? wp_unslash($_POST["role"]) : "";
-    $new_user_send_notification = !($creating && !isset($_POST["send_user_notification"]));
-    $new_user_ignore_pass = $creating && isset($_POST["noconfirmation"]) ? wp_unslash($_POST["noconfirmation"]) : "";
-
-    ?>
-    <table class="form-table" role="presentation">
-        <tr class="form-field form-required">
-            <th scope="row"><label for="email"><?php _e("Email"); ?> <span
-                            class="description"><?php _e("(required)"); ?></span></label></th>
-            <td><input class="to-fill" name="email" type="email" id="email" value="<?php echo esc_attr($new_user_email); ?>"/></td>
-        </tr>
-        <?php if (!is_multisite()) { ?>
+    <form method="post" name="createuser" id="createuser" class="validate" novalidate="novalidate"
+        <?php
+        /**
+         * This action is documented in wp-admin/user-new.php.
+         */
+        do_action("user_new_form_tag"); ?>>
+    
+        <input name="action" type="hidden" value="createuser"/>
+        <?php
+    
+        wp_nonce_field("create-user", "_wpnonce_create-user");
+        // Load past data, otherwise set a default value
+        $creating = isset($_POST["createuser"]);
+    
+        $new_user_login = $creating && isset($_POST["user_login"]) ? wp_unslash($_POST["user_login"]) : "";
+        $new_user_firstname = $creating && isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
+        $new_user_lastname = $creating && isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
+        $new_user_email = $creating && isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
+        $new_user_uri = $creating && isset($_POST["url"]) ? wp_unslash($_POST["url"]) : "";
+        $new_user_role = $creating && isset($_POST["role"]) ? wp_unslash($_POST["role"]) : "";
+        $new_user_send_notification = !($creating && !isset($_POST["send_user_notification"]));
+        $new_user_ignore_pass = $creating && isset($_POST["noconfirmation"]) ? wp_unslash($_POST["noconfirmation"]) : "";
+    
+        ?>
+        <table class="form-table" role="presentation">
             <tr class="form-field form-required">
-                <th scope="row"><label for="first_name"><?php _e("First Name"); ?> </label></th>
-                <td><input class="to-fill" name="first_name" type="text" id="first_name"
-                           value="<?php echo esc_attr($new_user_firstname); ?>"/></td>
+                <th scope="row"><label for="email"><?php _e("Email"); ?> <span
+                                class="description"><?php _e("(required)"); ?></span></label></th>
+                <td><input class="to-fill" name="email" type="email" id="email" value="<?php echo esc_attr($new_user_email); ?>"/></td>
             </tr>
-            <tr class="form-field form-required">
-                <th scope="row"><label for="last_name"><?php _e("Last Name"); ?> </label></th>
-                <td><input class="to-fill" name="last_name" type="text" id="last_name"
-                           value="<?php echo esc_attr($new_user_lastname); ?>"/></td>
-            </tr>
-        <?php } // End if ! is_multisite().	?>
-    </table>
-
-    <?php
-    /**
-     * This action is documented in wp-admin/user-new.php
-     */
-    do_action("user_new_form", "add-new-user");
-
-    submit_button(__("Add New User"), "primary", "createuser", true, ["id" => "createusersub", "disabled" => "true"]);
-    /**
-     * Creation of the user's login
-     */
-    $first_char_firstname = substr($new_user_firstname, 0, 1);
-    $new_user_login = strtolower($first_char_firstname . $new_user_lastname);
-    /**
-     * Adding the user to the WordPress database
-     */
-    $user_id = wp_insert_user([
-        "user_login" => $new_user_login,
-        "user_pass" => null,
-        "user_email" => $new_user_email,
-        "user_registered" => current_time("mysql", 1),
-        "user_status" => "0",
-        "display_name" => $new_user_login
-    ]);
-    if (!is_wp_error($user_id)) {
-        echo "L'utilsateur $new_user_login a été ajouté";
-    }
-    ?>
+            <?php if (!is_multisite()) { ?>
+                <tr class="form-field form-required">
+                    <th scope="row"><label for="first_name"><?php _e("First Name"); ?> </label></th>
+                    <td><input class="to-fill" name="first_name" type="text" id="first_name"
+                               value="<?php echo esc_attr($new_user_firstname); ?>"/></td>
+                </tr>
+                <tr class="form-field form-required">
+                    <th scope="row"><label for="last_name"><?php _e("Last Name"); ?> </label></th>
+                    <td><input class="to-fill" name="last_name" type="text" id="last_name"
+                               value="<?php echo esc_attr($new_user_lastname); ?>"/></td>
+                </tr>
+            <?php } // End if ! is_multisite().	?>
+        </table>
+    
+        <?php
+        /**
+         * This action is documented in wp-admin/user-new.php
+         */
+        do_action("user_new_form", "add-new-user");
+    
+        submit_button(__("Add New User"), "primary", "createuser", true, ["id" => "createusersub", "disabled" => "true"]);
+        /**
+         * Creation of the user's login
+         */
+        $first_char_firstname = substr($new_user_firstname, 0, 1);
+        $new_user_login = strtolower($first_char_firstname . $new_user_lastname);
+        /**
+         * Adding the user to the WordPress database
+         */
+        $user_id = wp_insert_user([
+            "user_login" => $new_user_login,
+            "user_pass" => null,
+            "user_email" => $new_user_email,
+            "user_registered" => current_time("mysql", 1),
+            "user_status" => "0",
+            "display_name" => $new_user_login
+        ]);
+        if (!is_wp_error($user_id)) {
+            echo "L'utilsateur $new_user_login a été ajouté";
+        }
+        ?>
+    </form>
     <script>
         const form = document.querySelector("#createuser");
         const formInputs = [...form.querySelectorAll(".to-fill")];

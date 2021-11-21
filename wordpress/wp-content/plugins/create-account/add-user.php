@@ -5,15 +5,15 @@
  */
 /*
 Plugin Name: Create Account
-Description: Create account without using the WordPress panel
+Description: Create an account without using the WordPress panel
 Author: IUT Rodez
 Version: 1.0.0
 */
-$host = 'localhost';
-$db = 'wordpress';
-$user = 'root';
-$pass = 'root';
-$charset = 'utf8mb4';
+$host = "localhost";
+$db = "wordpress";
+$user = "root";
+$pass = "root";
+$charset = "utf8mb4";
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
@@ -24,110 +24,149 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    echo $e->getMessage() ;
+    echo $e->getMessage();
     throw new PDOException($e->getMessage(), (int)$e->getCode());
 }
 
 /**
- * Création de la page du plugin
- * Cette page permettra d'ajouter un utilisateur par un responsable
- * Le responsable devra renseigner les informations suivantes :
- *      - Le Mail
- *      - Le Prénom
- *      - Le Nom
+ * Creation of the plugin page
+ * This page will allow you to add a user by a manager
+ * The manager will have to fill in the following information:
+ *      - E-mail
+ *      - First name
+ *      - Last name
  */
 function my_page() {
-	add_menu_page(
-		'Ajouter un utilisateur',	// Titre de la page quand le menu est selectionné
-        'Ajouter compte',			// Nom du menu
-        0,							// Niveau de sécurité d'accès au menu
-        'add-account',				// Nom de référence du menu
-        'page_content', 			// Appel de la fonction du contenu de la page
-        'dashicons-admin-users', 			// Icone du menu
-        3 							// Position de la page dans la liste
+    add_menu_page(
+        "Ajouter un utilisateur", // Page title when the menu is selected
+        "Ajouter compte", // Name of the menu
+        0, // Menu access security level
+        "add-account", // Menu reference name
+        "page_content", // Calling the page content function
+        "dashicons-admin-users", // Menu icon
+        3 // Page position in the list
     );
 }
-/** Ajout du menu dans le tableau de bord de l'administration WordPress */
-add_action( 'admin_menu', 'my_page' );
 
 /**
- * Contenu du menu "Ajouter un utilisateur"
- * Permet de :
- * 		- Afficher un formulaire pour ajouter un utilisateur (Mail, Prénom, Nom)
- * 		- Créer le login de l'utilisateur sous le format :
- * 				première lettre du prénom concaténé avec le nom le tout en minuscule
- * 		- Ajouter l'utilisateur à la base de données
+ * Adding the menu in the dashboard of the WordPress administration
  */
-function page_content() {
-	?>
-        <h1>
-			Créer un compte d'un utilisateur.
-        </h1>
-		
-        <form method="post" name="createuser" id="createuser" class="validate" novalidate="novalidate"
-		<?php
-	/** This action is documented in wp-admin/user-new.php */
-	do_action( 'user_new_form_tag' );
-	
-	?>
->
-<input name="action" type="hidden" value="createuser" />
-	<?php wp_nonce_field( 'create-user', '_wpnonce_create-user' ); ?>
-	<?php
-	// Load up the passed data, else set to a default.
-	$creating = isset( $_POST['createuser'] );
+add_action("admin_menu", "my_page");
 
-	$new_user_login             = $creating && isset( $_POST['user_login'] ) ? wp_unslash( $_POST['user_login'] ) : '';
-	$new_user_firstname         = $creating && isset( $_POST['first_name'] ) ? wp_unslash( $_POST['first_name'] ) : '';
-	$new_user_lastname          = $creating && isset( $_POST['last_name'] ) ? wp_unslash( $_POST['last_name'] ) : '';
-	$new_user_email             = $creating && isset( $_POST['email'] ) ? wp_unslash( $_POST['email'] ) : '';
-	$new_user_uri               = $creating && isset( $_POST['url'] ) ? wp_unslash( $_POST['url'] ) : '';
-	$new_user_role              = $creating && isset( $_POST['role'] ) ? wp_unslash( $_POST['role'] ) : '';
-	$new_user_send_notification = $creating && ! isset( $_POST['send_user_notification'] ) ? false : true;
-	$new_user_ignore_pass       = $creating && isset( $_POST['noconfirmation'] ) ? wp_unslash( $_POST['noconfirmation'] ) : '';
+/**
+ * Contents of the "Add a user" menu
+ * Allows to :
+ *      - Display a form to add a user (E-mail, First name, Last name)
+ *      - Create the user's login in the format:
+ *          first letter of the first name concatenated with the last name all in lower case
+ *      - Add the user to the database
+ */
+function page_content() {?>
+    <h1>Créer un compte d"un utilisateur.</h1>
 
-	?>
-<table class="form-table" role="presentation">
-	<tr class="form-field form-required">
-		<th scope="row"><label for="email"><?php _e( 'Email' ); ?> <span class="description"><?php _e( '(required)' ); ?></span></label></th>
-		<td><input name="email" type="email" id="email" value="<?php echo esc_attr( $new_user_email ); ?>" /></td>
-	</tr>
-	<?php if ( ! is_multisite() ) { ?>
-	<tr class="form-field form-required">
-		<th scope="row"><label for="first_name"><?php _e( 'First Name' ); ?> </label></th>
-		<td><input name="first_name" type="text" id="first_name" value="<?php echo esc_attr( $new_user_firstname ); ?>" /></td>
-	</tr>
-	<tr class="form-field form-required">
-		<th scope="row"><label for="last_name"><?php _e( 'Last Name' ); ?> </label></th>
-		<td><input name="last_name" type="text" id="last_name" value="<?php echo esc_attr( $new_user_lastname ); ?>" /></td>
-	</tr>
-	<?php } // End if ! is_multisite().	?>
-</table>
+<form method="post" name="createuser" id="createuser" class="validate" novalidate="novalidate"
+    <?php
+    /**
+     * This action is documented in wp-admin/user-new.php.
+     */
+    do_action("user_new_form_tag"); ?>>
 
-	<?php
-	/** This action is documented in wp-admin/user-new.php */
-	do_action( 'user_new_form', 'add-new-user' );
-	?>
+    <input name="action" type="hidden" value="createuser"/>
+    <?php
 
-	<?php submit_button( __( 'Add New User' ), 'primary', 'createuser', true, array( 'id' => 'createusersub' ) );
-	// Création du login de l'utilisateur
-	$new_user_login = strtolower( substr( $new_user_firstname, 0, 1 ).$new_user_lastname );
-	/**
-	 * Ajout de l'utilisateur à la base de données WordPress
-	 */
-	$userdata = array(
-		'user_login' => $new_user_login,
-		'user_pass' => NULL,
-		'user_email' => $new_user_email,
-		'user_registered' => current_time('mysql', 1),
-		'user_status' => '0',
-		'display_name' => $new_user_login);
-		
-	$user_id = wp_insert_user( $userdata ) ;
+    wp_nonce_field("create-user", "_wpnonce_create-user");
+    // Load past data, otherwise set a default value
+    $creating = isset($_POST["createuser"]);
 
-	$msg = "L'utilsateur $new_user_login a était ajouté";
-	
-	if ( ! is_wp_error( $user_id ) ) {
-		echo $msg;
-	}
+    $new_user_login = $creating && isset($_POST["user_login"]) ? wp_unslash($_POST["user_login"]) : "";
+    $new_user_firstname = $creating && isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
+    $new_user_lastname = $creating && isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
+    $new_user_email = $creating && isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
+    $new_user_uri = $creating && isset($_POST["url"]) ? wp_unslash($_POST["url"]) : "";
+    $new_user_role = $creating && isset($_POST["role"]) ? wp_unslash($_POST["role"]) : "";
+    $new_user_send_notification = !($creating && !isset($_POST["send_user_notification"]));
+    $new_user_ignore_pass = $creating && isset($_POST["noconfirmation"]) ? wp_unslash($_POST["noconfirmation"]) : "";
+
+    ?>
+    <table class="form-table" role="presentation">
+        <tr class="form-field form-required">
+            <th scope="row"><label for="email"><?php _e("Email"); ?> <span
+                            class="description"><?php _e("(required)"); ?></span></label></th>
+            <td><input class="to-fill" name="email" type="email" id="email" value="<?php echo esc_attr($new_user_email); ?>"/></td>
+        </tr>
+        <?php if (!is_multisite()) { ?>
+            <tr class="form-field form-required">
+                <th scope="row"><label for="first_name"><?php _e("First Name"); ?> </label></th>
+                <td><input class="to-fill" name="first_name" type="text" id="first_name"
+                           value="<?php echo esc_attr($new_user_firstname); ?>"/></td>
+            </tr>
+            <tr class="form-field form-required">
+                <th scope="row"><label for="last_name"><?php _e("Last Name"); ?> </label></th>
+                <td><input class="to-fill" name="last_name" type="text" id="last_name"
+                           value="<?php echo esc_attr($new_user_lastname); ?>"/></td>
+            </tr>
+        <?php } // End if ! is_multisite().	?>
+    </table>
+
+    <?php
+    /**
+     * This action is documented in wp-admin/user-new.php
+     */
+    do_action("user_new_form", "add-new-user");
+
+    submit_button(__("Add New User"), "primary", "createuser", true, ["id" => "createusersub", "disabled" => "true"]);
+    /**
+     * Creation of the user's login
+     */
+    $first_char_firstname = substr($new_user_firstname, 0, 1);
+    $new_user_login = strtolower($first_char_firstname . $new_user_lastname);
+    /**
+     * Adding the user to the WordPress database
+     */
+    $user_id = wp_insert_user([
+        "user_login" => $new_user_login,
+        "user_pass" => null,
+        "user_email" => $new_user_email,
+        "user_registered" => current_time("mysql", 1),
+        "user_status" => "0",
+        "display_name" => $new_user_login
+    ]);
+    if (!is_wp_error($user_id)) {
+        echo "L'utilsateur $new_user_login a été ajouté";
+    }
+    ?>
+    <script>
+        const form = document.querySelector("#createuser");
+        const formInputs = [...form.querySelectorAll(".to-fill")];
+        const buttonCreate = form.querySelector("#createusersub");
+
+        // cursor "prohibited" by default on the validation button
+        buttonCreate.style.cursor = "not-allowed";
+
+        // add the input event to the form inputs
+        form.addEventListener("input", function (){
+            buttonCreate.disabled = !areFilled();
+            buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
+        });
+
+        /**
+         * Verification of each input of the form by evaluating if they
+         * have a value. For e-mails, they must respect the format
+         * abc012@abc012.abc (some special characters included)
+         *
+         * @returns {this is *[]} true if the value of each input has
+         *                        been entered and follows the imposed format
+         */
+        function areFilled() {
+            return formInputs.every(input => {
+                if(input.id === "email"){
+                    // basic validation regEx for emails
+                    // https://stackoverflow.com/a/48800
+                    return input.value.match(/^\S+@\S+\.\S+$/g);
+                }
+                return input.value;
+            });
+        }
+    </script>
+    <?php
 }

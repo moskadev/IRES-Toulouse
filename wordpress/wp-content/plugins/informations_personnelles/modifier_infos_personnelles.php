@@ -9,25 +9,6 @@ Description: Editing personal information without using the wordpress panel
 Author: IUT Rodez
 Version: 1.0.0
 */
-$host = "localhost";
-$db = "wordpress";
-$user = "root";
-$pass = "root";
-$charset = "utf8mb4";
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES => false,
-];
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (PDOException $e) {
-    echo $e->getMessage();
-    throw new PDOException($e->getMessage(), (int)$e->getCode());
-}
-
 /**
  * Creation of the plugin page
  * This page will allow you to modify your personal information
@@ -73,7 +54,7 @@ function create_information_page() {
     );
 }
 
-/** 
+/**
  * Adding the menu in the dashboard of the WordPress administration
  */
 add_action("admin_menu", "create_information_page");
@@ -127,19 +108,19 @@ function information_page_content() {
     ?>
     <h1>Modifier vos informations personnelles</h1>
 
-    <form method="post">
+    <form method="post" action="">
         <label>
             Identifiant :
-            <input name="identifiant" type="text" value="<?php echo $user->user_login; ?>" readonly>
+            <input class="to-fill" name="identifiant" type="text" value="<?php echo $user->user_login; ?>" readonly>
         </label><br><br>
         <?php
         foreach ($metas as $key => $meta) {
-            echo "<label>";
-            echo "$meta : ";
-            echo "<input name=$key type='text' value=" . $user->$key . ">";
+            echo "<label>$meta : ";
+                echo "<input " . (in_array($key, ["last_name", "first_name", "email"]) ? "class='to-fill'" : "") . " name=$key id=$key type='text' value=" . $user->$key . ">";
             echo "</label><br><br>";
         }
         ?>
+
     </form>
     <?php
 } ?>

@@ -13,34 +13,34 @@ Version: 1.0.0
  * Creation of the plugin page
  * This page will allow you to modify your personal information
  * The user will have to modify all the following information:
- *      - LAST NAME (IN UPPER CASE)
- *      - FIRST NAME (IN UPPERCASE)
- *      - EMAIL (professional if possible)
- *      - PHONE (I authorize the display of my phone number on the IRES website)
- *      - CAPES
- *      - CAPET
- *      - AGREGATION
- *      - CRPE
- *      - CAFFA
- *      - CAPLP
- *      - CAPPEI
- *      - THESIS
- *      - PROFESSIONAL SITUATION
+ *      - LAST NAME (in uppercase)
+ *      - FIRST NAME (in uppercase)	
+ *      - mail (pro if possible)	
+ *      - phone	
+ *      - CAPES	==> radio button -> yes or no
+ *      - CAPET	==> radio button -> yes or no
+ *      - AGREGATION ==> radio button -> yes or no
+ *      - CRPE ==> radio button -> yes or no
+ *      - CAFFA ==> radio button -> yes or no
+ *      - CAPLP ==> radio button -> yes or no
+ *      - CAPPEI ==> radio button -> yes or no
+ *      - THESE	
+ *      - PREFESSIONNAL SITUATION	==> drop down
  *      - DISCIPLINE TAUGHT
- *      - WORKING TIME
- *      - NAME OF THE INSTITUTION
+ *      - WORK TIME	
+ *      - SCHOOL NAME	
  *      - SCHOOL CITY
- *      - SCHOOL"S UAI/RNE CODE
- *      NAME OF THE HEAD OF THE SCHOOL
- *      - PAF TRAINING LEADER 2018/2019
- *      - IF YES, TITLE OF THE TRAINING
- *      - PARTICIPATION IN A MATH LAB
- *      - Are you a member of INSPE?
- *      - DO YOU DO ANY INTERVENTIONS AT THE INSPE?
- *      - CII MEMBER
- *      - MEMBER OF A TEACHER ASSOCIATION (APMEP, ...)
- *      - MEMBER of a learned society (Société Mathématique de France, Société Française de Physique, ...)
- *      - ASSOCIATION MEMBER (OTHER)
+ *      - CODE UAI/RNE SCHOOL
+ *      - HEAD OF SCHOOL NAME
+ *      - ANIMATEUR FORMATION PAF 2018/2019	==> radio button -> yes or no ==> current and last year
+ *      - IF YES, TITLE OF THE FORMATION
+ *      - PARTICIPATION AS A MATH LABO	==> radio button -> yes or no
+ *      - ARE YOU A MEMBER OF INSPE ?	 ==> radio button -> yes or no
+ *      - DO YOU MAKE INTERVENTION TO INSPE ?	==> radio button -> yes or no
+ *      - MEMBER CII ==> radio button -> yes or no
+ *      - MEMBER ASSOCIATION PROFESSEURS (APMEP, ...) 
+ *      - MEMBER SOCIÉTÉ SAVANTE (Société Mathématique de France, Société Française de Physique, ...)	
+ *      - MEMBER ASSOCIATION (AUTRE) 
  */
 function create_information_page() {
     add_menu_page(
@@ -121,6 +121,7 @@ function information_page_content() {
         }
         ?>
 
+        <input type="submit" value="Enregistrer les informations">
     </form>
     <?php
 } ?>

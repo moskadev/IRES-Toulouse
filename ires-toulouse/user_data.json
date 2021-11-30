@@ -1,0 +1,183 @@
+[
+  {
+    "name": "Informations personnelles",
+    "type": "label",
+    "id": "info_perso"
+  },
+  {
+    "name": "Identifiant",
+    "parent": "info_perso",
+    "type": "text",
+    "id": "user_login",
+    "disabled": true
+  },
+  {
+    "name": "Nom",
+    "id": "last_name",
+    "parent": "info_perso",
+    "type": "text",
+    "uppercase": true,
+    "required": true,
+    "regex": "^[A-Z]+$"
+  },
+  {
+    "name": "Prénom",
+    "id": "first_name",
+    "parent": "info_perso",
+    "type": "text",
+    "uppercase": true,
+    "required": true,
+    "regex": "^[A-Z]+$"
+  },
+  {
+    "name": "E-mail",
+    "parent": "info_perso",
+    "type": "email",
+    "required": true,
+    "regex": "^\\S+@\\S+\\.\\S+$"
+  },
+  {
+    "name": "Téléphone",
+    "parent": "info_perso",
+    "type": "text",
+    "regex": "^(?:(?:\\+|00)33|0)\\s*[1-9](?:[\\s.-]*\\d{2}){4}$"
+  },
+  {
+    "name": "Diplomes",
+    "parent": "info_perso",
+    "type": "checklist",
+    "extraData": ["CAPES", "CAPET", "AGREGATION", "CRPE", "CAFFA", "CAPLP", "CAPPEI", "THÈSE"]
+  },
+  {
+    "name": "Situation professionnelle",
+    "parent": "info_perso",
+    "type": "dropdown",
+    "extraData": ["En activité", "Retraité"]
+  },
+  {
+    "name": "Type d'établissement",
+    "parent": "info_perso",
+    "type": "dropdown",
+    "extraData": ["Primaire", "Collège", "Lycée", "Classes prépas", "Université", "Autre"]
+  },
+  {
+    "name": "Nom de l'établissement",
+    "parent": "info_perso",
+    "type": "text",
+    "uppercase": true,
+    "regex": "^[A-Z]+$"
+  },
+  {
+    "name": "Ville de l'établissement",
+    "parent": "info_perso",
+    "type": "text",
+    "uppercase": true,
+    "regex": "^[A-Z]+$"
+  },
+  {
+    "name": "Code UAI/RNE de l'établissement scolaire",
+    "parent": "info_perso",
+    "type": "text",
+    "uppercase": true,
+    "regex": "^\\d{6}[A-Z]$"
+  },
+  {
+    "name": "Nom du chef de l'établissement",
+    "parent": "info_perso",
+    "type": "text",
+    "uppercase": true,
+    "regex": "^[A-Z]+$"
+  },
+  {
+    "name": "Discipline enseignée",
+    "type": "dropdown",
+    "parent": "info_perso",
+    "extraData": "disciplines"
+  },
+  {
+    "name": "Formations",
+    "type": "label",
+    "id": "formations"
+  },
+  {
+    "name": "Animateur formation PAF (année en cours)",
+    "parent": "formations",
+    "id": "animateur_formation",
+    "type": "checkbox"
+  },
+  {
+    "name": "Si animateur, titre de la formation",
+    "parent": "animateur_formation",
+    "type": "text"
+  },
+  {
+    "name": "Participation à un labo de maths",
+    "parent": "formations",
+    "type": "checkbox"
+  },
+  {
+    "name": "Membre de l'INSPE",
+    "parent": "formations",
+    "type": "checkbox"
+  },
+  {
+    "name": "Interventions à l'INSPE",
+    "parent": "formations",
+    "type": "checkbox"
+  },
+  {
+    "name": "CII IREM",
+    "type": "label",
+    "id": "cii_irem"
+  },
+  {
+    "name": "Membre CII",
+    "parent": "cii_irem",
+    "type": "checkbox"
+  },
+  {
+    "name": "Nom de la CII",
+    "parent": "cii_irem",
+    "type": "text"
+  },
+  {
+    "name": "Associations ou sociétés savantes",
+    "type": "label",
+    "id": "assoc_societes_savantes"
+  },
+  {
+    "name": "Mmembre association professeurs",
+    "type": "text",
+    "parent": "assoc_societes_savantes"
+  },
+  {
+    "name": "Mmembre société savante",
+    "type": "text",
+    "parent": "assoc_societes_savantes"
+  },
+  {
+    "name": "Mmembre association (autre)",
+    "type": "text",
+    "parent": "assoc_societes_savantes"
+  },
+  {
+    "name": "Activités de l'IRES de TOULOUSE",
+    "type": "label",
+    "id": "activites_ires"
+  },
+  {
+    "name": "Groupe de recherche-action",
+    "type": "text",
+    "parent": "activites_ires"
+  },
+  {
+    "name": "Responsable du groupe",
+    "type": "text",
+    "parent": "activites_ires"
+  },
+  {
+    "name": "Manifestation",
+    "type": "text",
+    "parent": "activites_ires"
+  }
+]

@@ -1,0 +1,16 @@
+h2 {
+    margin-top: 50px;
+}
+
+.disabled {
+    cursor: not-allowed;
+}
+
+#profile-page input[type=text], #profile-page input[type=email] {
+    width: 500px;
+}
+
+select[multiple] {
+    height: 200px !important;
+}
+

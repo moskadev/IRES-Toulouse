@@ -20,7 +20,7 @@ function affectation_page() {
     add_menu_page(
         "Affecter un role", // Page title when the menu is selected
         "Affecter un role", // Name of the menu
-        0, // Menu access security level
+        7, // Menu access security level
         "affecter_role", // Menu reference name
         "affectation_role_content", // Call the page content function
         "dashicons-admin-users", // Menu icon
@@ -44,10 +44,29 @@ function affectation_role_content() {
         "membre_association" => "Membre association (autre)"
     ];
 
-	if ( isset($_POST['username']) && username_exists( $_POST['username'] ) !== null ) {
-		//$_POST['username']->set_role($_POST['choosen_role']);
-        $user_id = get_userdatabylogin($_POST['username']);
-		$user_id = wp_update_user( array( 'ID' => $user_id->id, 'role' => $_POST['choosen_role'] ) );
+    // Check that the form has been sent
+    if(isset($_POST['username']) ) {
+	    $choice = $_POST['choosen_role'];
+
+        // Check if the login name submit exist
+        if ( username_exists( $_POST['username'] ) != null ) {
+	        $user = get_userdatabylogin( $_POST['username'] );
+
+            // The role for the user haven't been changed because he already had the role choose
+            if (!in_array( "$choice", (array) $user->roles )) {
+	            $user = wp_update_user( array( 'ID' => $user->id, 'role' => $choice ) );
+	            echo "<script>alert(\"Le rôle a bien été modifié\")</script>";
+            } else {
+
+	            // Determine the displayed role name
+	            $name_role = ( $choice === 'contributor' )
+		            ? 'membre' : ( $choice === 'author' )
+                    ? 'responsable de groupe' : 'administrateur';
+	            echo "<script>alert(\"Rien n'a été effectué car l'utilisateur possédait déjà le rôle que vous avez affecté ($name_role)\")</script>";
+            }
+	    } else if ( username_exists( $_POST['username'] ) == null ) {
+		    echo "<script>alert(\"Vous n'avez pas entré d'identifiant correct, la requête n'a donc pas été exécutée\")</script>";
+	    }
     }
     ?>
     <form method="post" name="modifyuser" id="modifyuser" class="validate" novalidate="novalidate">
@@ -64,15 +83,15 @@ function affectation_role_content() {
                 <th scope="row"><label for="role"><?php _e( 'Role' ); ?></label></th>
                 <td>
                     <select name="choosen_role">
-                        <option value="author" selected>Auteur</option>
-                        <option value="contributor">Responsable de groupe</option>
+                        <option value="contributor">Membre (contributeur)</option>
+                        <option value="author" selected>Responsable de groupe (auteur)</option>
                         <option value="administrator">Administrateur</option>
                     </select>
                 </td>
             </tr>
             <?php } ?>
             </table>
-            <?php submit_button(__("Modifier rôle"), "primary", "modifyuser", true, ["id" => "createusersub", "disabled" => "true"]);
+            <?php submit_button(__("Modifier rôle"), "primary", "modifyuser", true, ["id" => "createusersub"]);
 ?>
     </form>
 <?php
@@ -81,7 +100,11 @@ function affectation_role_content() {
 
 
      <script>
+        if (document.getElementById(alert1)) {
+            alert("Le rôle a bien été modifié");
+        } else if (document.getElementById(alert2)) {
 
+        }
       /*   afficher les utils s'ils sont dans la base de donnée
                 searchInput.addEventListener('input', function(){
                     const input = searchInput.value;

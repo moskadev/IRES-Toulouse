@@ -52,7 +52,7 @@ function affectation_role_content() {
         if ( username_exists( $_POST['username'] ) != null ) {
 	        $user = get_userdatabylogin( $_POST['username'] );
 
-            // The role for the user haven't been changed because he already had the role choose
+            // Check if the role of the user have changed
             if (!in_array( "$choice", (array) $user->roles )) {
 	            $user = wp_update_user( array( 'ID' => $user->id, 'role' => $choice ) );
 	            echo "<script>alert(\"Le rôle a bien été modifié\")</script>";

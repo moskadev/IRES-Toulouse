@@ -16,6 +16,11 @@ Version: 1.0.0
  *      - Username
  *      - the permission that you want grant him
  */
+function add_roles_on_plugin_activation() {	add_role( 'responsable', 'Responsable', array('level_0' => true) ); }
+function delete_roles_on_plugin_deactivation() { remove_role('responsable'); }
+register_activation_hook( __FILE__, 'add_roles_on_plugin_activation' );
+register_deactivation_hook( __FILE__, 'delete_roles_on_plugin_deactivation' );
+
 function affectation_page() {
     add_menu_page(
         "Affecter un role", // Page title when the menu is selected

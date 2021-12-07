@@ -4,8 +4,6 @@ namespace irestoulouse\elements;
 
 use irestoulouse\Database;
 
-include_once(__DIR__ . "../../sql/Database.php");
-
 /**
  * A discipline is only represented by its name and its id
  */

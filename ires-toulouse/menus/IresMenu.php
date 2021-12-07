@@ -14,21 +14,9 @@ abstract class IresMenu {
      * Initialize all menus
      */
     public static function init() : void{
-        IresMenu::register("admin_menu", new AddUserMenu(
-            "Ajouter utilisateur", // Page title when the menu is selected
-            "Ajouter compte", // Name of the menu
-            0, // Menu access security level
-            "dashicons-admin-users", // Menu icon
-            3 // Page position in the list
-        ));
+        IresMenu::register("admin_menu", new AddUserMenu());
 
-        IresMenu::register("admin_menu", new ModifyUserDataMenu(
-            "Modifier les informations de l'utilisateur", // Page title when the menu is selected
-            "Renseigner ses informations", // Name of the menu
-            0, // Menu access security level
-            "dashicons-id-alt", // Menu icon
-            3 // Page position in the list
-        ));
+        IresMenu::register("admin_menu", new ModifyUserDataMenu());
     }
 
     /**

@@ -56,4 +56,8 @@ forms.forEach(function(form) {
         });
         return filled;
     }
+
+    function isRequired(){
+
+    }
 });

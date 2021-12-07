@@ -2,10 +2,6 @@
 
 namespace irestoulouse\menus;
 
-use irestoulouse\elements\UserData;
-
-include_once("IresMenu.php");
-
 /**
  * TODO Refaire la classe en utilisant UserData.php, un peu comme ModifyUserDataMenu
  */
@@ -19,6 +15,16 @@ include_once("IresMenu.php");
  *      - Last name
  */
 class AddUserMenu extends IresMenu {
+
+    public function __construct() {
+        parent::__construct(
+            "Ajouter utilisateur", // Page title when the menu is selected
+            "Ajouter compte", // Name of the menu
+            0, // Menu access security level
+            "dashicons-admin-users", // Menu icon
+            3 // Page position in the list
+        );
+    }
 
     /**
      * Contents of the "Add a user" menu

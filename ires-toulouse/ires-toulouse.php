@@ -10,14 +10,30 @@ Author URI: http://URI_Of_The_Plugin_Author
 License: A "Slug" license name e.g. GPL2
 */
 
-include_once("php/irestoulouse/menus/IresMenu.php");
+require_once("menus/IresMenu.php");
+require_once("menus/AddUserMenu.php");
+require_once("menus/ModifyUserDataMenu.php");
 
+require_once("elements/IresElement.php");
+require_once("elements/Discipline.php");
+require_once("elements/IresElement.php");
+require_once("elements/user/UserData.php");
+
+require_once("sql/Database.php");
+require_once("sql/SqlRequest.php");
+
+require_once("utils/Identifier.php");
+
+use irestoulouse\elements\UserData;
 use irestoulouse\menus\IresMenu;
 
 if(!function_exists('wp_get_current_user')) {
     include(ABSPATH . "wp-includes/pluggable.php");
 }
 
+echo var_dump(plugin_dir_url(__FILE__));
+
+UserData::registerMetas(get_current_user_id());
 IresMenu::init();
 
 add_action("admin_enqueue_scripts", function () {

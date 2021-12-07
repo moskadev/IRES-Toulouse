@@ -2,9 +2,7 @@
 
 namespace irestoulouse;
 
-include_once("SqlRequest.php");
-
-class Database implements SqlRequest {
+class Database {
 
     const PREFIX = "ires_";
 

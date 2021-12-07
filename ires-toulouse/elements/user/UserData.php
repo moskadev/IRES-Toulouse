@@ -2,9 +2,6 @@
 
 namespace irestoulouse\elements;
 
-include_once("IresElement.php");
-include_once("Discipline.php");
-
 class UserData extends IresElement {
 
     public const DATAS = ["name", "type", "id",
@@ -18,13 +15,24 @@ class UserData extends IresElement {
      */
     public static function all(bool $labelIncluded = true) : array{
         $datas = [];
-        $jsonData = json_decode(file_get_contents(__DIR__ . "/../../../user_data.json"), true);
+        $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
         foreach ($jsonData as $d){
             if($labelIncluded || $d["type"] !== "label"){
                 $datas[] = new UserData(...UserData::formatData($d));
             }
         }
         return $datas;
+    }
+
+    /**
+     * Register all new metas for the IRES Toulouse to the user
+     *
+     * @param int $userId the user id
+     */
+    public static function registerMetas(int $userId) : void{
+        foreach (self::all(false) as $m){
+            add_user_meta($userId, $m->getName(), "", true);
+        }
     }
 
     /**
@@ -158,37 +166,5 @@ class UserData extends IresElement {
      */
     public function isDisabled(): bool {
         return $this->disabled;
-    }
-
-    /**
-     * Convert all datas to an HTML code for forms
-     * @return string
-     */
-    public function html() : string{
-        $input = "";
-        $htmlData = "";
-        foreach (self::DATAS as $d){
-            if(!is_array($this->$d)) {
-                $htmlData .= "data-$d='" . $this->$d . "' ";
-            }
-        }
-        if(in_array($this->type, ["text", "email", "checkbox"])){
-            $input .= "<input " . ($this->disabled ? "disabled" : "") .
-                " class='" . ($this->disabled ? "disabled" : "") .
-                "' $htmlData 'name='$this->id' type='$this->type' id='$this->id' 
-                value='" . wp_unslash($_POST[$this->id] ?? "") . "'>";
-        } else if(in_array($this->type, ["dropdown", "checklist"])){
-            $multiple = $this->type === "checklist" ? "multiple" : "";
-            $input .= "<select id='$this->id' type='dropdown' $multiple>";
-            foreach ($this->extraData as $data){
-                $input .= "<option value='$data'>$data</option>";
-            }
-            $input .= "<select>";
-            if($multiple) {
-                $input .= " <span class='description'>Enfoncez Ctrl (^) ou Cmd (⌘) 
-                            sur Mac pour sélectionner de multiples choix</span>";
-            }
-        }
-        return $input;
     }
 }

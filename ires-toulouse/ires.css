@@ -6,8 +6,8 @@ h2 {
     cursor: not-allowed;
 }
 
-#profile-page input[type=text], #profile-page input[type=email] {
-    width: 500px;
+input[type=text], input[type=email] {
+    width: 500px !important;
 }
 
 select[multiple] {

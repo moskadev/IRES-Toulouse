@@ -2,6 +2,9 @@
 
 namespace irestoulouse\menus;
 
+use irestoulouse\elements\UserData;
+use irestoulouse\utils\Dataset;
+
 /**
  * TODO Refaire la classe en utilisant UserData.php, un peu comme ModifyUserDataMenu
  */
@@ -20,7 +23,7 @@ class AddUserMenu extends IresMenu {
         parent::__construct(
             "Ajouter utilisateur", // Page title when the menu is selected
             "Ajouter compte", // Name of the menu
-            0, // Menu access security level
+            2, // Menu access security level
             "dashicons-admin-users", // Menu icon
             3 // Page position in the list
         );
@@ -41,50 +44,48 @@ class AddUserMenu extends IresMenu {
         /**
          * This action is documented in wp-admin/user-new.php.
          */
-        do_action("user_new_form_tag");
+        do_action("user_new_form_tag");?>
 
-        echo "<input name='action' type='hidden' value='createuser'>";
+        <input name='action' type='hidden' value='createuser'>
 
+        <?php
         wp_nonce_field("create-user", "_wpnonce_create-user");
         // Load past data, otherwise set a default value
         $creating = isset($_POST["createuser"]);
 
-        $necessaryData = [
-            "user_login",
-            "first_name",
-            "last_name",
-            "email",
-        ];
-        $new_user_firstname = $creating && isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
-        $new_user_lastname = $creating && isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
-        $new_user_email = $creating && isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
-        ?>
-        <table class="form-table" role="presentation">
-            <tr class="form-field form-required">
-                <th><label for="user_login"><?php _e( 'Username' ); ?></label></th>
-                <td><input type="text" name="user_login" id="user_login" value="" disabled class="regular-text">
-                    <span class="description"><?php _e( 'Usernames cannot be changed.' ); ?></span>
-                </td>
-            <tr class="form-field form-required">
-                <th><label for="email"><?php _e("Email"); ?> <span
-                            class="description"><?php _e("(required)"); ?></span></label></th>
-                <td><input class="to-fill" name="email" type="email" id="email" value="<?php echo esc_attr($new_user_email); ?>"/></td>
-            </tr>
-            <tr class="form-field form-required">
-                <th><label for="first_name"><?php _e("First Name"); ?> <span
-                            class="description"><?php _e("(required)"); ?></span></label></th>
-                <td><input class="to-fill" name="first_name" type="text" id="first_name"
-                           value="<?php echo esc_attr($new_user_firstname); ?>"/></td>
-            </tr>
-            <tr class="form-field form-required">
-                <th><label for="last_name"><?php _e("Last Name"); ?> <span
-                            class="description"><?php _e("(required)"); ?></span></label></th>
-                <td><input class="to-fill" name="last_name" type="text" id="last_name"
-                           value="<?php echo esc_attr($new_user_lastname); ?>"/></td>
-            </tr>
-        </table>
-
+        foreach(UserData::all() as $userData){
+             if(!in_array($userData->getId(), ["nickname", "first_name", "last_name", "email"])){
+                 continue;
+             }?>
+             <table class='form-table' role='presentation'>
+                 <tr class="form-field form-required">
+                     <th>
+                         <label for='<?php echo $userData->getId() ?>'>
+                             <?php
+                             _e($userData->getName());
+                             if($userData->isRequired()){?>
+                                 <span class='description'><?php echo _e("(required)") ?></span>
+                                 <?php
+                             } ?>
+                         </label>
+                     </th>
+                     <td>
+                         <?php
+                         if(in_array($userData->getType(), ["text", "email", "checkbox"])){?>
+                             <input <?php
+                             if($userData->isDisabled()) echo "disabled class='disabled' "; echo Dataset::allFrom($userData)?>
+                                     type='<?php echo $userData->getType() ?>'
+                                     id='<?php echo $userData->getId() ?>'
+                                     name='<?php echo $userData->getId() ?>'
+                                     value='<?php echo $creating && isset($_POST[$userData->getId()]) ? wp_unslash($_POST[$userData->getId()]) : "" ?>'>
+                             <?php
+                         }?>
+                     </td>
+                 </tr>
+              </table>
         <?php
+        }
+
         /**
          * This action is documented in wp-admin/user-new.php
          */
@@ -92,28 +93,46 @@ class AddUserMenu extends IresMenu {
 
         submit_button(__("Add New User"), "primary", "createuser",
             true, ["id" => "createusersub", "disabled" => "true"]);
-        /**
-         * Creation of the user's login
-         */
-        $firstChar = substr($new_user_firstname, 0, 1);
-        $newUserLogin = strtolower($firstChar . $new_user_lastname);
+        if($creating) {
+            $userFirstname = isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
+            $userLastname = isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
+            $userEmail = isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
+            /**
+             * Creation of the user's login
+             */
+            $firstChar = substr($userFirstname, 0, 1);
+            $userLogin = strtolower($firstChar . $userLastname);
+            $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
+                return $user->nickname === preg_replace("/\d/", "", $userLogin);
+            }));
+            $correctedUserLogin = $userLogin . ($usersSameNickCount > 1 ? $usersSameNickCount - 1 : "");
 
-        /**
-         * Adding the user to the WordPress database
-         */
-        $user_id = wp_insert_user([
-            "user_login" => $newUserLogin,
-            "user_pass" => wp_generate_password(), // automatic generated password
-            "user_email" => $new_user_email,
-            "user_registered" => current_time("mysql", 1),
-            "user_status" => "0", // visitor
-            "display_name" => $newUserLogin
-        ]);
-
-        // TODO Ajouter les disciplines
-        if (!is_wp_error($user_id)) {
-            echo "<p>L'utilisateur $newUserLogin a été ajouté. Une notification lui a été envoyé.</p>";
+            /**
+             * Adding the user to the WordPress database
+             */
+            $userId = wp_insert_user([
+                "user_login" => $correctedUserLogin,
+                "first_name" => $userFirstname,
+                "last_name" => $userLastname,
+                "user_pass" => wp_generate_password(), // automatic generated password
+                "user_email" => $userEmail,
+                "user_registered" => current_time("mysql", 1),
+                "user_status" => "0", // visitor
+                "display_name" => $correctedUserLogin
+            ]);
+            if (!is_wp_error($userId)) {
+                UserData::registerMetas($userId);?>
+                <div id="message" class="updated notice is-dismissible">
+                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien enregistré, <a href='admin.php?page=renseigner_ses_informations'>vous pouvez renseigner ses informations ici</a></strong></p>
+                </div> <?php
+            } else {?>
+                <div id="message" class="error notice is-dismissible">
+                    <p><strong>Une erreur s'est produite lors de l'enregistrement de <?php echo $correctedUserLogin ?></strong></p>
+                </div>
+            <?php }
         }?>
+
         </form>
-    <?php }
+    <?php
+    }
 }

@@ -4,11 +4,18 @@ forms.forEach(function(form) {
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
 
+    form.querySelector("#nickname").value = generateUserLogin();
+
+    form.addEventListener("click", function (event) {
+        console.log(event.target);
+    })
+
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
-        event.target.value = uppercase(event.target);
+        event.target.value = uppercase(event.target)
+            .replaceAll(/\s/g, " ");
 
-        form.querySelector("#user_login").value = generateUserLogin();
+        form.querySelector("#nickname").value = generateUserLogin();
         buttonCreate.disabled = !areFilled();
         buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
 
@@ -20,8 +27,9 @@ forms.forEach(function(form) {
      *                   the user for its login
      */
     function generateUserLogin(){
-        return(String(form.querySelector("#first_name").value).substr(0, 1) +
-            form.querySelector("#last_name").value).toLowerCase();
+        return ((String(form.querySelector("#first_name").value).substr(0, 1) +
+            form.querySelector("#last_name").value).toLowerCase())
+            .replaceAll(/(\s|\W)+/g, "-");
     }
 
     /**
@@ -49,15 +57,12 @@ forms.forEach(function(form) {
          */
         formInputs.some(input => {
             if(filled && input.dataset.required) {
+                console.log(input.dataset.regex)
                 filled = input.dataset.regex ?
                     (new RegExp(input.dataset.regex)).test(input.value) :
                     input.value;
             }
         });
         return filled;
-    }
-
-    function isRequired(){
-
     }
 });

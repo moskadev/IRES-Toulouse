@@ -5,6 +5,8 @@ namespace irestoulouse\menus;
 include_once("IresMenu.php");
 
 use irestoulouse\elements\UserData;
+use irestoulouse\utils\Dataset;
+use irestoulouse\utils\Identifier;
 
 /**
  * Creation of the plugin page
@@ -41,10 +43,11 @@ use irestoulouse\elements\UserData;
  */
 class ModifyUserDataMenu extends IresMenu {
 
+
     public function __construct() {
         parent::__construct("Modifier les informations de l'utilisateur", // Page title when the menu is selected
             "Renseigner ses informations", // Name of the menu
-            0, // Menu access security level
+            2, // Menu access security level
             "dashicons-id-alt", // Menu icon
             3 // Page position in the list
         );
@@ -52,8 +55,12 @@ class ModifyUserDataMenu extends IresMenu {
 
     public function getContent(): void {?>
         <h1>Renseigner ses informations supplémentaires</h1>
-        <form method='post' name='profile-page' id='profile-page' class='validate' novalidate='novalidate'>
+        <form method='post' name='modify-user' id='modify-user' class='validate' novalidate='novalidate'>
+            <input name='action' type='hidden' value='modifyuser'>
         <?php
+        if(get_current_user_id() != Identifier::getLastRegisteredUser()){?>
+            <h2>Vous avez très récemment créé un nouveau utilisateur, les informations ont été pré-remplies</h2>
+        <?php }
         foreach(UserData::all() as $userData){
             if($userData->getType() === "label"){
                 echo "<h2>" . $userData->getName() . "</h2>";
@@ -73,44 +80,29 @@ class ModifyUserDataMenu extends IresMenu {
                     </th>
                     <td>
                     <?php
-                        $htmlData = "";
-                        foreach (UserData::DATAS as $d){
-                            $functions = get_class_methods($userData);
-                            $call = null;
-                            foreach ($functions as $f){
-                                if(strpos($f, ucwords($d), 1) <= 1){
-                                    $call = call_user_func([$userData, $f]);
-                                    break;
-                                }
-                            }
-
-                            if($call !== null && !is_array($call)) {
-                                $htmlData .= "data-$d='" . $call . "' ";
-                            }
-                        }
                         if(in_array($userData->getType(), ["text", "email", "checkbox"])){?>
                             <input <?php
-                                if($userData->isDisabled()) echo "disabled class='disabled' "; echo $htmlData?>
+                                if($userData->isDisabled()) echo "disabled class='disabled' "; echo Dataset::allFrom($userData)?>
                                 type='<?php echo $userData->getType() ?>'
                                 id='<?php echo $userData->getId() ?>'
                                 name='<?php echo $userData->getId() ?>'
-                                value='<?php echo wp_unslash($_POST[$userData->getId()] ?? "") ?>'>
+                                value='<?php echo get_user_meta(Identifier::getLastRegisteredUser(), $userData->getId())[0]?>'>
                         <?php
                         } else if(in_array($userData->getType(), ["dropdown", "checklist"])){
-                        $multiple = $userData->getType() === "checklist" ? "multiple" : "";?>
-                        <select id='<?php echo ($userData->getId() . "' " . $multiple); ?>>
+                            $multiple = $userData->getType() === "checklist" ? "multiple" : "";?>
+
+                            <select <?php echo $multiple ?> id='<?php echo $userData->getId() ?>'>
                             <?php
                             foreach ($userData->getExtraData() as $data){?>
                                 <option value='<?php echo $data ?>'><?php echo $data ?></option>
                             <?php
                             }
-                            echo var_dump($multiple);
-                            if($multiple) {?>
+                            if(!empty($multiple)) {?>
                                 <span class='description'>Enfoncez Ctrl (^) ou Cmd (⌘)
                                 sur Mac pour sélectionner de multiples choix</span>
                             <?php }
                         }?>
-                        </select
+                        </select>
                     </td>
                 </tr>
             </table>
@@ -119,6 +111,8 @@ class ModifyUserDataMenu extends IresMenu {
             submit_button(__("Modifier les informations"), "primary",
                 "profile-page", true,
                 ["id" => "profile-page-sub", "disabled" => "true"]);
+
+        echo var_dump($_POST, $_GET);
             ?>
         </form>
     <?php

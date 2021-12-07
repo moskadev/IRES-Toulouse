@@ -8,7 +8,7 @@
     "name": "Identifiant",
     "parent": "info_perso",
     "type": "text",
-    "id": "user_login",
+    "id": "nickname",
     "disabled": true
   },
   {
@@ -18,7 +18,7 @@
     "type": "text",
     "uppercase": true,
     "required": true,
-    "regex": "^[A-Z]+$"
+    "regex": "^\\s*[A-Z]+[a-z]*\\s*(\\s*-?[A-Z]?[a-z]*)*\\s*$"
   },
   {
     "name": "Prénom",
@@ -27,7 +27,7 @@
     "type": "text",
     "uppercase": true,
     "required": true,
-    "regex": "^[A-Z]+$"
+    "regex": "^\\s*[A-Z]+[a-z]*\\s*(\\s*-?[A-Z]?[a-z]*)*\\s*$"
   },
   {
     "name": "E-mail",

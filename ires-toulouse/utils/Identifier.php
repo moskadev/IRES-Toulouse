@@ -20,4 +20,20 @@ class Identifier {
             iconv("UTF-8", "ASCII//TRANSLIT//IGNORE",
                 strtolower($string)));
     }
+
+    /**
+     * @return int
+     */
+    public static function getLastRegisteredUser() : int{
+        $max = -1;
+        foreach (get_users() as $user){
+            if($user->ID > $max){
+                $max = $user->ID;
+            }
+        }
+        if($max === -1){
+            $max = get_current_user_id();
+        }
+        return $max;
+    }
 }

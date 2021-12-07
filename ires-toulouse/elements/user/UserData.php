@@ -18,7 +18,7 @@ class UserData extends IresElement {
         $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
         foreach ($jsonData as $d){
             if($labelIncluded || $d["type"] !== "label"){
-                $datas[] = new UserData(...UserData::formatData($d));
+                $datas[] = new UserData(...array_values(UserData::formatData($d)));
             }
         }
         return $datas;
@@ -31,7 +31,7 @@ class UserData extends IresElement {
      */
     public static function registerMetas(int $userId) : void{
         foreach (self::all(false) as $m){
-            add_user_meta($userId, $m->getName(), "", true);
+            add_user_meta($userId, $m->getId(), "", true);
         }
     }
 

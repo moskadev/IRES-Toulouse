@@ -18,7 +18,7 @@
     "type": "text",
     "uppercase": true,
     "required": true,
-    "regex": "^\\s*[A-Z]+[a-z]*\\s*(\\s*-?[A-Z]?[a-z]*)*\\s*$"
+    "regex": "^\\s*[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+[a-z]*\\s*(\\s*-?[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]?[a-z]*)*\\s*$"
   },
   {
     "name": "Prénom",
@@ -27,7 +27,7 @@
     "type": "text",
     "uppercase": true,
     "required": true,
-    "regex": "^\\s*[A-Z]+[a-z]*\\s*(\\s*-?[A-Z]?[a-z]*)*\\s*$"
+    "regex": "^\\s*[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+[a-z]*\\s*(\\s*-?[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]?[a-z]*)*\\s*$"
   },
   {
     "name": "E-mail",
@@ -65,28 +65,28 @@
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^[A-Z]+$"
+    "regex": "^[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+$"
   },
   {
     "name": "Ville de l'établissement",
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^[A-Z]+$"
+    "regex": "^[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+$"
   },
   {
     "name": "Code UAI/RNE de l'établissement scolaire",
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^\\d{6}[A-Z]$"
+    "regex": "^\\d{6}[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]$"
   },
   {
     "name": "Nom du chef de l'établissement",
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^[A-Z]+$"
+    "regex": "^[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+$"
   },
   {
     "name": "Discipline enseignée",
@@ -146,17 +146,17 @@
     "id": "assoc_societes_savantes"
   },
   {
-    "name": "Mmembre association professeurs",
+    "name": "Membre association professeurs",
     "type": "text",
     "parent": "assoc_societes_savantes"
   },
   {
-    "name": "Mmembre société savante",
+    "name": "Membre société savante",
     "type": "text",
     "parent": "assoc_societes_savantes"
   },
   {
-    "name": "Mmembre association (autre)",
+    "name": "Membre association (autre)",
     "type": "text",
     "parent": "assoc_societes_savantes"
   },

@@ -112,7 +112,7 @@ class ModifyUserDataMenu extends IresMenu {
                 "profile-page", true,
                 ["id" => "profile-page-sub", "disabled" => "true"]);
 
-        echo var_dump($_POST, $_GET);
+            echo var_dump($_POST, $_GET);
             ?>
         </form>
     <?php

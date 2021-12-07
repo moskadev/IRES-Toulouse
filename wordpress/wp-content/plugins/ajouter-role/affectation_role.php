@@ -53,7 +53,8 @@ function affectation_role_content() {
 	$user_login = $_POST['username'];
 	if(isset($user_login) ) {
 		$choice = $_POST['choosen_role'];
-		$message="$user_login est maintenant $choice.";
+		$name_role = ( $choice === 'subscriber' ) ? 'membre' : 'responsable';
+		$message="$user_login est maintenant $name_role.";
 		$type_message="error";
 
 		// Check if the login name submit exist
@@ -67,9 +68,6 @@ function affectation_role_content() {
 			} else {
 
 				// Determine the displayed role name
-				$name_role = ( $choice === 'contributor' )
-					? 'membre' : ( $choice === 'author' )
-						? 'responsable de groupe' : 'administrateur';
 				$message ="Rien n'a été effectué, $user_login était déjà $name_role.";
 			}
 		} else if ( username_exists( $_POST['username'] ) == null ) {
@@ -95,13 +93,21 @@ function affectation_role_content() {
                     <th scope="row"><label for="role"><?php _e( 'Role' ); ?></label></th>
                     <td>
                         <select name="choosen_role">
-                            <option value="contributor">Membre (contributeur)</option>
-                            <option value="author" selected>Responsable de groupe (auteur)</option>
-                            <option value="administrator">Administrateur</option>
+                            <option value="subscriber">Membre</option>
+                            <option value="responsable" selected>Responsable</option>
                         </select>
                     </td>
                 </tr>
 			<?php } ?>
+            <tr>
+                <th><label for="group"><?php echo _e('Group'); ?></label></th>
+                <td>
+                    <select name="group-selection">
+                        <option>Groupe 1</option>
+                        <option selected>Groupe 2</option>
+                    </select>
+                </td>
+            </tr>
         </table>
 		<?php submit_button(__("Modifier rôle"), "primary", "modifyuser", true, ["id" => "createusersub"]);
 		?>

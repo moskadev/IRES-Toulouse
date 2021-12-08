@@ -48,7 +48,7 @@ class ModifyUserDataMenu extends IresMenu {
     public function __construct() {
         parent::__construct("Modifier les informations de l'utilisateur", // Page title when the menu is selected
             "Renseigner ses informations", // Name of the menu
-            2, // Menu access security level
+            0, // Menu access security level
             "dashicons-id-alt", // Menu icon
             3 // Page position in the list
         );
@@ -60,6 +60,9 @@ class ModifyUserDataMenu extends IresMenu {
             $this->lastUserId = (int) ($_POST["users"] ?? Identifier::getLastRegisteredUser());
             if(isset($_POST["action"]) && $_POST["action"] == "modifyuser"){
                 try {
+                    foreach (UserData::all(false) as $d){
+
+                    }
                     $this->updateAllData() ?>
                     <div id="message" class="updated notice is-dismissible">
                         <p><strong>Modification des informations de l'utilisateur ID: <?php echo $this->lastUserId ?> ont été bien effectuées </strong></p>
@@ -69,39 +72,44 @@ class ModifyUserDataMenu extends IresMenu {
                         <p><strong>Une erreur s'est produite lors du renseignement des informations</strong></p>
                     </div>
                 <?php }
-            } ?>
-            <form method='post' name='to-modify-user' id='to-modify-user' class='validate' novalidate='novalidate'>
-                <table class='form-table' role='presentation'>
-                    <tr class="form-field form-required">
-                        <th>
-                            <label for='users'>
-                                Sélectionner l'utilisateur à modifier <?php
-                                if($this->lastUserId == Identifier::getLastRegisteredUser()){ ?>
-                                    <span class='description'>(sélection par défaut de la dernière création)</span>
-                                <?php } ?>
-                            </label>
-                        </th>
-                        <td>
-                            <select name="users"><?php
-                                foreach (get_users() as $user){
-                                    if($user->ID == get_current_user_id()){
-                                        continue;
-                                    }
-                                    ?>
-                                    <option value='<?php echo $user->ID ?>' <?php if($this->lastUserId == $user->ID) echo "selected" ?>>
-                                        <?php echo $user->nickname ?>
-                                    </option>
-                                <?php }
-                                ?></select>
-                            </select>
-                        </td>
-                    </tr>
-                </table> <?php
-                submit_button(__("Modifier cet utilisateur"), "button action",
-                    "to-modify", true,
-                    ["id" => "to-modify-user-btn"]);
-                ?>
-            </form>
+            }
+
+            if(in_array('administrator',  wp_get_current_user()->roles)){?>
+                <form method='post' name='to-modify-user' id='to-modify-user' class='validate' novalidate='novalidate'
+                    <table class='form-table' role='presentation'>
+                        <tr class="form-field form-required">
+                            <th>
+                                <label for='users'>
+                                    Sélectionner l'utilisateur à modifier <?php
+                                    if($this->lastUserId == Identifier::getLastRegisteredUser()){ ?>
+                                        <span class='description'>(sélection par défaut de la dernière création)</span>
+                                    <?php } ?>
+                                </label>
+                            </th>
+                            <td>
+                                <select name="users"><?php
+                                    foreach (get_users() as $user){
+                                        if($user->ID == get_current_user_id()){
+                                            continue;
+                                        }
+                                        ?>
+                                        <option value='<?php echo $user->ID ?>' <?php if($this->lastUserId == $user->ID) echo "selected" ?>>
+                                            <?php echo $user->nickname ?>
+                                        </option>
+                                    <?php }
+                                    ?></select>
+                                </select>
+                            </td>
+                        </tr>
+                    </table> <?php
+                    submit_button(__("Modifier cet utilisateur"), "button action",
+                        "to-modify", true,
+                        ["id" => "to-modify-user-btn"]);
+                    ?>
+                </form><?php
+            }
+            ?>
+
             <form method='post' name='modify-user' id='modify-user' class='verifiy-form validate' novalidate='novalidate'>
                 <input name='action' type='hidden' value='modifyuser'>
                 <?php

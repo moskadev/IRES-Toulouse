@@ -16,7 +16,7 @@ class AffectionRoleMenu extends IresMenu {
     public function __construct() {
         parent::__construct("Affecter un rôle", // Page title when the menu is selected
             "Affecter un rôle", // Name of the menu
-            10, // Menu access security level
+            2, // Menu access security level
             "dashicons-businesswoman", // Menu icon
             3 // Page position in the list
         );

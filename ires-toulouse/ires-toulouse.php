@@ -30,7 +30,12 @@ use irestoulouse\elements\UserData;
 use irestoulouse\menus\IresMenu;
 
 register_activation_hook( __FILE__, function (){
-    add_role( 'responsable', 'Responsable', ['level_0' => true, 'level_1' => true, 'level_2' => true]);
+    add_role( 'responsable', 'Responsable', [
+        'read' => true,
+        'level_0' => true,
+        'level_1' => true,
+        'level_2' => true
+    ]);
 });
 register_deactivation_hook( __FILE__, function () {
     remove_role('responsable');

@@ -37,7 +37,54 @@ class AddUserMenu extends IresMenu {
      *          first letter of the first name concatenated with the last name all in lower case
      *      - Add the user to the database
      */
-    public function getContent(): void {?>
+    public function getContent(): void {
+        $creating = isset($_POST["createuser"]);
+        $userId = -1;
+        if($creating) {
+            $userFirstname = isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
+            $userLastname = isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
+            $userEmail = isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
+            /**
+             * Creation of the user's login
+             */
+            $firstChar = substr($userFirstname, 0, 1);
+            $userLogin = strtolower($firstChar . $userLastname);
+
+            /**
+             * We verify if the same nickname/user login and so we count the quantity of users
+             * with the same nickname by deleting the numbers
+             * We also reduce it by 1 because the current user is already in the array too,
+             * it's useless to count it
+             */
+            $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
+                    return $user->nickname === preg_replace("/\d/", "", $userLogin);
+                })) - 1;
+            $correctedUserLogin = $userLogin . ($usersSameNickCount > 0 ? $usersSameNickCount : "");
+
+            /**
+             * Adding the user to the WordPress database
+             */
+            $userId = wp_insert_user([
+                "user_login" => $correctedUserLogin,
+                "first_name" => $userFirstname,
+                "last_name" => $userLastname,
+                "user_pass" => "test", //wp_generate_password(), // automatic generated password
+                "user_email" => $userEmail,
+                "user_registered" => current_time("mysql", 1),
+                "user_status" => "0", // visitor
+                "display_name" => $correctedUserLogin
+            ]);
+            if (!is_wp_error($userId)) {
+                UserData::registerExtraMetas($userId);?>
+                <div id="message" class="updated notice is-dismissible">
+                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien enregistré, <a href='admin.php?page=renseigner_ses_informations'>vous pouvez renseigner ses informations ici</a></strong></p>
+                </div> <?php
+            } else {?>
+                <div id="message" class="error notice is-dismissible">
+                    <p><strong>Une erreur s'est produite lors de l'enregistrement de <?php echo $correctedUserLogin ?></strong></p>
+                </div>
+            <?php }
+        }?>
         <h1>Créer un compte d'un utilisateur</h1>
         <form method='post' name='createuser' id='createuser' class='verifiy-form validate' novalidate='novalidate'>
         <?php
@@ -51,7 +98,6 @@ class AddUserMenu extends IresMenu {
         <?php
         wp_nonce_field("create-user", "_wpnonce_create-user");
         // Load past data, otherwise set a default value
-        $creating = isset($_POST["createuser"]);
 
         foreach(UserData::all() as $userData){
              if(!in_array($userData->getId(), ["nickname", "first_name", "last_name", "email"])){
@@ -96,51 +142,11 @@ class AddUserMenu extends IresMenu {
 
         submit_button(__("Add New User"), "primary", "createuser",
             true, ["id" => "createusersub", "disabled" => "true"]);
-        if($creating) {
-            $userFirstname = isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
-            $userLastname = isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
-            $userEmail = isset($_POST["email"]) ? wp_unslash($_POST["email"]) : "";
-            /**
-             * Creation of the user's login
-             */
-            $firstChar = substr($userFirstname, 0, 1);
-            $userLogin = strtolower($firstChar . $userLastname);
 
-            /**
-             * We verify if the same nickname/user login and so we count the quantity of users
-             * with the same nickname by deleting the numbers
-             * We also reduce it by 1 because the current user is already in the array too,
-             * it's useless to count it
-             */
-            $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
-                return $user->nickname === preg_replace("/\d/", "", $userLogin);
-            })) - 1;
-            $correctedUserLogin = $userLogin . ($usersSameNickCount > 0 ? $usersSameNickCount : "");
-
-            /**
-             * Adding the user to the WordPress database
-             */
-            $userId = wp_insert_user([
-                "user_login" => $correctedUserLogin,
-                "first_name" => $userFirstname,
-                "last_name" => $userLastname,
-                "user_pass" => wp_generate_password(), // automatic generated password
-                "user_email" => $userEmail,
-                "user_registered" => current_time("mysql", 1),
-                "user_status" => "0", // visitor
-                "display_name" => $correctedUserLogin
-            ]);
-            if (!is_wp_error($userId)) {
-                UserData::registerExtraMetas($userId);?>
-                <div id="message" class="updated notice is-dismissible">
-                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien enregistré, <a href='admin.php?page=renseigner_ses_informations'>vous pouvez renseigner ses informations ici</a></strong></p>
-                </div> <?php
-            } else {?>
-                <div id="message" class="error notice is-dismissible">
-                    <p><strong>Une erreur s'est produite lors de l'enregistrement de <?php echo $correctedUserLogin ?></strong></p>
-                </div>
-            <?php }
-        }?>
+        if($userId > -1) {
+            echo "<h2>Mot de passe : test </h2>";
+            }
+        ?>
 
         </form>
     <?php

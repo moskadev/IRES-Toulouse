@@ -14,12 +14,6 @@ use irestoulouse\utils\Identifier;
 class AffectionRoleMenu extends IresMenu {
 
     public function __construct() {
-        register_activation_hook( __FILE__, function (){
-            add_role( 'responsable', 'Responsable', array('level_0' => true) );
-        });
-        register_deactivation_hook( __FILE__, function () {
-            remove_role('responsable');
-        });
         parent::__construct("Affecter un rôle", // Page title when the menu is selected
             "Affecter un rôle", // Name of the menu
             10, // Menu access security level
@@ -67,7 +61,7 @@ class AffectionRoleMenu extends IresMenu {
     	}?>
         <h1>Modifier le rôle d'un utilisateur</h1> <?php
         if(count(get_users()) > 1){?>
-            <form method="post" name="modify-role" id="modify-role" class="verifiy-form validate" novalidate="novalidate">
+            <form method="post" name="modify-role" id="modify-role" class="validate" novalidate="novalidate">
                 <table class="form-table" role="presentation">
                     <tr class="form-field form-required">
                         <th>

@@ -29,6 +29,13 @@ require_once("utils/Dataset.php");
 use irestoulouse\elements\UserData;
 use irestoulouse\menus\IresMenu;
 
+register_activation_hook( __FILE__, function (){
+    add_role( 'responsable', 'Responsable', array('level_0' => true) );
+});
+register_deactivation_hook( __FILE__, function () {
+    remove_role('responsable');
+});
+
 UserData::registerExtraMetas(get_current_user_id());
 IresMenu::init();
 

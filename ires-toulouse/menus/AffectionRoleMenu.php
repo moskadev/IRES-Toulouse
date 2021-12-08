@@ -35,12 +35,13 @@ class AffectionRoleMenu extends IresMenu {
      */
     public function getContent() : void {
     	// Check that the form has been sent
-    	if(isset($_POST['username']) ) {
-            $user_login = $_POST['username'];
+        $user = null;
+    	if(isset($_POST['users']) ) {
+            $user_login = get_userdata($_POST['users'])->data->user_login;
 
     		$choice = $_POST['choosen_role'];
     		$name_role = ( $choice === 'subscriber' ) ? 'membre' : 'responsable';
-    		$message="$user_login est maintenant $name_role.";
+    		$message = $user_login . " est maintenant $name_role.";
     		$type_message="error";
 
     		// Check if the login name submit exist
@@ -48,11 +49,11 @@ class AffectionRoleMenu extends IresMenu {
     			$user = get_userdatabylogin( $user_login );
 
     			// The role for the user haven't been changed because he already had the role choose
-    			if (!in_array( "$choice", (array) $user->roles )) {
-    				$user = wp_update_user( array( 'ID' => $user->ID, 'role' => $choice ) );
+    			if (!in_array( $choice, $user->roles )) {
+                    $user->roles = [$choice];
+    				$user->set_role($choice);
     				$type_message = "updated";
     			} else {
-
     				// Determine the displayed role name
     				$message ="Rien n'a été effectué, $user_login était déjà $name_role.";
     			}
@@ -66,7 +67,7 @@ class AffectionRoleMenu extends IresMenu {
     	}?>
         <h1>Modifier le rôle d'un utilisateur</h1> <?php
         if(count(get_users()) > 1){?>
-            <form method="post" name="modifyuser" id="modifyuser" class="verifiy-form validate" novalidate="novalidate">
+            <form method="post" name="modify-role" id="modify-role" class="verifiy-form validate" novalidate="novalidate">
                 <table class="form-table" role="presentation">
                     <tr class="form-field form-required">
                         <th>
@@ -80,13 +81,13 @@ class AffectionRoleMenu extends IresMenu {
                         </th>
                         <td>
                             <select name="users"><?php
-                                foreach (get_users() as $user){
-                                    if($user->ID == get_current_user_id()){
+                                foreach (get_users() as $u){
+                                    if($u->ID == get_current_user_id()){
                                         continue;
                                     }
                                     ?>
-                                    <option value='<?php echo $user->ID ?>' <?php if($lastId == $user->ID) echo "selected" ?>>
-                                        <?php echo $user->nickname ?>
+                                    <option value='<?php echo $u->ID ?>' <?php if($lastId == $u->ID) echo "selected" ?>>
+                                        <?php echo $u->nickname ?>
                                     </option>
                                 <?php }
                                 ?></select>
@@ -99,14 +100,22 @@ class AffectionRoleMenu extends IresMenu {
                             <th scope="row"><label for="role"><?php _e( 'Role' ); ?></label></th>
                             <td>
                                 <select name="choosen_role">
-                                    <option value="subscriber" selected>Membre</option>
-                                    <option value="responsable">Responsable</option>
+                                    <option value="subscriber" <?php
+                                        if($user != null && in_array("subscriber", $user->roles))
+                                            echo "selected" ?>>
+                                        Membre
+                                    </option>
+                                    <option value="responsable" <?php
+                                    if($user != null && in_array("responsable", $user->roles))
+                                        echo "selected" ?>>
+                                        Responsable
+                                    </option>
                                 </select>
                             </td>
                         </tr>
                     <?php } ?>
                     <tr>
-                        <th><label for="group"><?php echo _e('Group'); ?></label></th>
+                        <th><label for="group"><?php echo _e('Groupe'); ?></label></th>
                         <td>
                             <select name="group-selection">
                                 <option>Groupe 1</option>
@@ -115,7 +124,7 @@ class AffectionRoleMenu extends IresMenu {
                         </td>
                     </tr>
                 </table>
-                <?php submit_button(__("Modifier rôle"), "primary", "modifyuser", true, ["id" => "createusersub"]);
+                <?php submit_button(__("Modifier rôle"), "primary", "modify-role", true, ["id" => "modify-role-sub"]);
                 ?>
             </form>
     	<?php

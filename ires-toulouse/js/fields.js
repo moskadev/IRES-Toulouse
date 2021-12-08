@@ -4,7 +4,6 @@ forms.forEach(function(form) {
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
 
-    console.log(formInputs)
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
         if(!String(event.target.type).includes("select")) {
@@ -16,7 +15,7 @@ forms.forEach(function(form) {
             buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
         }
     });
-
+    buttonCreate.disabled = !areFilled();
     form.querySelector("#nickname").value = generateUserLogin();
 
     /**

@@ -61,7 +61,10 @@ class ModifyUserDataMenu extends IresMenu {
             if(isset($_POST["action"]) && $_POST["action"] == "modifyuser"){
                 try {
                     foreach (UserData::all(false) as $d){
-
+                        // TODO back end verify
+                        //if(isset($_POST[$d->getId()]) && $d->matches($_POST[$d->getId()])){
+                        //    throw new \Exception();
+                        //}
                     }
                     $this->updateAllData() ?>
                     <div id="message" class="updated notice is-dismissible">

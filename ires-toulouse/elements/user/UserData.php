@@ -151,7 +151,8 @@ class UserData extends IresElement {
      * @return bool
      */
     public function matches(string $input): bool{
-        return preg_match($this->regex, $input);
+
+        return preg_match("$this->regex", $input);
     }
 
     /**

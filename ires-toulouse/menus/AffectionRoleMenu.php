@@ -30,30 +30,30 @@ class AffectionRoleMenu extends IresMenu {
     public function getContent() : void {
     	// Check that the form has been sent
         $user = null;
-    	if(isset($_POST['users']) ) {
-            $user_login = get_userdata($_POST['users'])->data->user_login;
+        if(isset($_POST['username'])) {
+            $user_login = $_POST['username'];
 
-    		$choice = $_POST['choosen_role'];
-    		$name_role = ( $choice === 'subscriber' ) ? 'membre' : 'responsable';
-    		$message = $user_login . " est maintenant $name_role.";
-    		$type_message="error";
+            $choice = $_POST['choosen_role'];
+            $name_role = ( $choice === 'subscriber' ) ? 'membre' : 'responsable';
+            $message="$user_login est maintenant $name_role.";
+            $type_message="error";
 
-    		// Check if the login name submit exist
-    		if ( username_exists( $user_login ) != null ) {
-    			$user = get_userdatabylogin( $user_login );
+            // Check if the login name submit exist
+            if ( username_exists( $user_login ) != null ) {
+                $user = get_userdatabylogin( $user_login );
 
-    			// The role for the user haven't been changed because he already had the role choose
-    			if (!in_array( $choice, $user->roles )) {
-                    $user->roles = [$choice];
-    				$user->set_role($choice);
-    				$type_message = "updated";
-    			} else {
-    				// Determine the displayed role name
-    				$message ="Rien n'a été effectué, $user_login était déjà $name_role.";
-    			}
-    		} else if ( username_exists( $user_login ) == null ) {
-    			$message = "Rien n'a été effectué, $user_login n'est pas un identifiant valide.";
-    		} ?>
+                // The role for the user haven't been changed because he already had the role choose
+                if (!in_array( "$choice", (array) $user->roles )) {
+                    wp_update_user( array( 'ID' => $user->ID, 'role' => $choice ) );
+                    $type_message="updated";
+                } else {
+
+                    // Determine the displayed role name
+                    $message ="Rien n'a été effectué, $user_login était déjà $name_role.";
+                }
+            } else if ( username_exists( $_POST['username'] ) == null ) {
+                $message = "Rien n'a été effectué, $user_login n'est pas un identifiant valide.";
+            } ?>
             <div id="message" class="<?php echo "$type_message";?> notice is-dismissible">
                 <p><strong><?php echo "$message"; ?></strong></p>
             </div>
@@ -74,13 +74,13 @@ class AffectionRoleMenu extends IresMenu {
                             </label>
                         </th>
                         <td>
-                            <select name="users"><?php
+                            <select name="username"><?php
                                 foreach (get_users() as $u){
                                     if($u->ID == get_current_user_id()){
                                         continue;
                                     }
                                     ?>
-                                    <option value='<?php echo $u->ID ?>' <?php if($lastId == $u->ID) echo "selected" ?>>
+                                    <option value='<?php echo $u->nickname ?>' <?php if($lastId == $u->ID) echo "selected" ?>>
                                         <?php echo $u->nickname ?>
                                     </option>
                                 <?php }
@@ -100,8 +100,8 @@ class AffectionRoleMenu extends IresMenu {
                                         Membre
                                     </option>
                                     <option value="responsable" <?php
-                                    if($user != null && in_array("responsable", $user->roles))
-                                        echo "selected" ?>>
+                                        if($user != null && in_array("responsable", $user->roles))
+                                            echo "selected" ?>>
                                         Responsable
                                     </option>
                                 </select>

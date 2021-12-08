@@ -56,14 +56,26 @@ class ModifyUserDataMenu extends IresMenu {
 
     public function getContent() : void {?>
         <h1>Renseigner ses informations supplémentaires</h1><?php
-        if(count(get_users()) > 1){?>
+        if(count(get_users()) > 1){
+            $this->lastUserId = (int) ($_POST["users"] ?? Identifier::getLastRegisteredUser());
+            if(isset($_POST["action"]) && $_POST["action"] == "modifyuser"){
+                try {
+                    $this->updateAllData() ?>
+                    <div id="message" class="updated notice is-dismissible">
+                        <p><strong>Modification des informations de l'utilisateur ID: <?php echo $this->lastUserId ?> ont été bien effectuées </strong></p>
+                    </div> <?php
+                } catch (\Exception $e){?>
+                    <div id="message" class="error notice is-dismissible">
+                        <p><strong>Une erreur s'est produite lors du renseignement des informations</strong></p>
+                    </div>
+                <?php }
+            } ?>
             <form method='post' name='to-modify-user' id='to-modify-user' class='validate' novalidate='novalidate'>
                 <table class='form-table' role='presentation'>
                     <tr class="form-field form-required">
                         <th>
                             <label for='users'>
                                 Sélectionner l'utilisateur à modifier <?php
-                                $this->lastUserId = (int) ($_POST["users"] ?? Identifier::getLastRegisteredUser());
                                 if($this->lastUserId == Identifier::getLastRegisteredUser()){ ?>
                                     <span class='description'>(sélection par défaut de la dernière création)</span>
                                 <?php } ?>
@@ -119,7 +131,8 @@ class ModifyUserDataMenu extends IresMenu {
                                         type='<?php echo htmlspecialchars($type) ?>'
                                         id='<?php echo htmlspecialchars($id) ?>'
                                         name='<?php echo htmlspecialchars($id) ?>'
-                                        value='<?php echo htmlspecialchars($this->getInputValue($id))?>'>
+                                        value='<?php echo htmlspecialchars($this->getInputValue($id));?>'
+                                        <?php echo "selected" ?>>
                                 <?php
                                 } else if(in_array($type, ["dropdown", "checklist"])){
                                     $multiple = $type === "checklist"?>
@@ -158,19 +171,7 @@ class ModifyUserDataMenu extends IresMenu {
                     submit_button(__("Modifier les informations"), "primary",
                         "profile-page", true,
                         ["id" => "profile-page-sub", "disabled" => "true"]);
-
-                    if(isset($_POST["action"]) && $_POST["action"] == "modifyuser"){
-                        try {
-                            $this->updateAllData() ?>
-                            <div id="message" class="updated notice is-dismissible">
-                                <p><strong>Modification des informations de l'utilisateur ID: <?php echo $this->lastUserId ?> ont été bien effectuées </strong></p>
-                            </div> <?php
-                        } catch (\Exception $e){?>
-                            <div id="message" class="error notice is-dismissible">
-                                <p><strong>Une erreur s'est produite lors du renseignement des informations</strong></p>
-                            </div>
-                        <?php }
-                    } ?>
+                    ?>
                 </form> <?php
         } else { ?>
             <div id="message" class="error notice">

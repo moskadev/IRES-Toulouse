@@ -186,7 +186,7 @@ class ModifyUserDataMenu extends IresMenu {
      */
     private function containsExtraData(UserData $userData, string $dataToAnalyse) : bool{
         $metadata = get_user_meta($this->lastUserId, $userData->getId(), true);
-        return in_array($dataToAnalyse, explode(",", $metadata != false ? $metadata : []));
+        return in_array($dataToAnalyse, explode(",", $metadata != false ? $metadata : ""));
     }
 
     private function getInputValue(string $inputId) : string{

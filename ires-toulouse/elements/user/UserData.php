@@ -29,7 +29,7 @@ class UserData extends IresElement {
      *
      * @param int $userId the user id
      */
-    public static function registerMetas(int $userId) : void{
+    public static function registerExtraMetas(int $userId) : void{
         foreach (self::all(false) as $m){
             add_user_meta($userId, $m->getId(), "", true);
         }

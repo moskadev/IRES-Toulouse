@@ -2,6 +2,8 @@
 
 namespace irestoulouse\menus;
 
+use irestoulouse\utils\Identifier;
+
 /**
  * Creation of the plugin page
  * This page will allow you to change a role of an util
@@ -21,7 +23,7 @@ class AffectionRoleMenu extends IresMenu {
         parent::__construct("Affecter un rôle", // Page title when the menu is selected
             "Affecter un rôle", // Name of the menu
             10, // Menu access security level
-            "dashicons-id-alt", // Menu icon
+            "dashicons-businesswoman", // Menu icon
             3 // Page position in the list
         );
     }
@@ -47,7 +49,7 @@ class AffectionRoleMenu extends IresMenu {
 
     			// The role for the user haven't been changed because he already had the role choose
     			if (!in_array( "$choice", (array) $user->roles )) {
-    				$user = wp_update_user( array( 'ID' => $user->id, 'role' => $choice ) );
+    				$user = wp_update_user( array( 'ID' => $user->ID, 'role' => $choice ) );
     				$type_message = "updated";
     			} else {
 
@@ -61,41 +63,66 @@ class AffectionRoleMenu extends IresMenu {
                 <p><strong><?php echo "$message"; ?></strong></p>
             </div>
     		<?php
-    	}
-    	?>
-        <form method="post" name="modifyuser" id="modifyuser" class="validate" novalidate="novalidate">
-            <h1>Modifier le rôle d'un utilisateur</h1>
-            <table class="form-table" role="presentation">
-                <tr class="form-field form-required">
-                    <th scope="row"><label for="username"><?php _e("Username"); ?> <span
-                                    class="description"><?php _e("(required)"); ?></span></label></th>
-                    <td><input class="to-fill" name="username" type="text" id="username"/></td>
-                </tr>
-
-    			<?php if ( current_user_can('edit_users') ) { ?>
-                    <tr class="form-field">
-                        <th scope="row"><label for="role"><?php _e( 'Role' ); ?></label></th>
+    	}?>
+        <h1>Modifier le rôle d'un utilisateur</h1> <?php
+        if(count(get_users()) > 1){?>
+            <form method="post" name="modifyuser" id="modifyuser" class="verifiy-form validate" novalidate="novalidate">
+                <table class="form-table" role="presentation">
+                    <tr class="form-field form-required">
+                        <th>
+                            <label for='users'>
+                                Sélectionner l'utilisateur à modifier <?php
+                                $lastId = (int) ($_POST["users"] ?? Identifier::getLastRegisteredUser());
+                                if($lastId == Identifier::getLastRegisteredUser()){ ?>
+                                    <span class='description'>(sélection par défaut de la dernière création)</span>
+                                <?php } ?>
+                            </label>
+                        </th>
                         <td>
-                            <select name="choosen_role">
-                                <option value="subscriber">Membre</option>
-                                <option value="responsable" selected>Responsable</option>
+                            <select name="users"><?php
+                                foreach (get_users() as $user){
+                                    if($user->ID == get_current_user_id()){
+                                        continue;
+                                    }
+                                    ?>
+                                    <option value='<?php echo $user->ID ?>' <?php if($lastId == $user->ID) echo "selected" ?>>
+                                        <?php echo $user->nickname ?>
+                                    </option>
+                                <?php }
+                                ?></select>
                             </select>
                         </td>
                     </tr>
-    			<?php } ?>
-                <tr>
-                    <th><label for="group"><?php echo _e('Group'); ?></label></th>
-                    <td>
-                        <select name="group-selection">
-                            <option>Groupe 1</option>
-                            <option selected>Groupe 2</option>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-    		<?php submit_button(__("Modifier rôle"), "primary", "modifyuser", true, ["id" => "createusersub"]);
-    		?>
-        </form>
+
+                    <?php if ( current_user_can('edit_users') ) { ?>
+                        <tr class="form-field">
+                            <th scope="row"><label for="role"><?php _e( 'Role' ); ?></label></th>
+                            <td>
+                                <select name="choosen_role">
+                                    <option value="subscriber" selected>Membre</option>
+                                    <option value="responsable">Responsable</option>
+                                </select>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                    <tr>
+                        <th><label for="group"><?php echo _e('Group'); ?></label></th>
+                        <td>
+                            <select name="group-selection">
+                                <option>Groupe 1</option>
+                                <option selected>Groupe 2</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <?php submit_button(__("Modifier rôle"), "primary", "modifyuser", true, ["id" => "createusersub"]);
+                ?>
+            </form>
     	<?php
+        } else { ?>
+            <div id="message" class="error notice">
+                <p><strong>Aucun utilisateur ne peut être modifié</strong></p>
+            </div>
+        <?php }
     }
 }

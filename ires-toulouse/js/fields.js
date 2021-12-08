@@ -1,26 +1,23 @@
-const forms = document.querySelectorAll("form");
+const forms = document.querySelectorAll(".verifiy-form ");
 forms.forEach(function(form) {
 
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
 
-    form.querySelector("#nickname").value = generateUserLogin();
-
-    form.addEventListener("click", function (event) {
-        console.log(event.target);
-    })
-
+    console.log(formInputs)
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
-        event.target.value = uppercase(event.target)
-            .replaceAll(/\s/g, " ");
+        if(!String(event.target.type).includes("select")) {
+            event.target.value = uppercase(event.target)
+                .replaceAll(/\s/g, " ");
 
-        form.querySelector("#nickname").value = generateUserLogin();
-        buttonCreate.disabled = !areFilled();
-        buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
-
-        console.log(event.target.value)
+            form.querySelector("#nickname").value = generateUserLogin();
+            buttonCreate.disabled = !areFilled();
+            buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
+        }
     });
+
+    form.querySelector("#nickname").value = generateUserLogin();
 
     /**
      * @returns {string} generate the identifier of

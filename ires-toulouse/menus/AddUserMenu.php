@@ -39,7 +39,7 @@ class AddUserMenu extends IresMenu {
      */
     public function getContent(): void {?>
         <h1>Créer un compte d'un utilisateur</h1>
-        <form method='post' name='createuser' id='createuser' class='validate' novalidate='novalidate'>
+        <form method='post' name='createuser' id='createuser' class='verifiy-form validate' novalidate='novalidate'>
         <?php
         /**
          * This action is documented in wp-admin/user-new.php.
@@ -79,6 +79,9 @@ class AddUserMenu extends IresMenu {
                                      name='<?php echo $userData->getId() ?>'
                                      value='<?php echo $creating && isset($_POST[$userData->getId()]) ? wp_unslash($_POST[$userData->getId()]) : "" ?>'>
                              <?php
+                             if($userData->getId() === "nickname"){?>
+                                 <span class="description">L'identifiant ne sera plus modifiable et sera attribué automatiquement</span>
+                             <?php }
                          }?>
                      </td>
                  </tr>
@@ -102,10 +105,17 @@ class AddUserMenu extends IresMenu {
              */
             $firstChar = substr($userFirstname, 0, 1);
             $userLogin = strtolower($firstChar . $userLastname);
+
+            /**
+             * We verify if the same nickname/user login and so we count the quantity of users
+             * with the same nickname by deleting the numbers
+             * We also reduce it by 1 because the current user is already in the array too,
+             * it's useless to count it
+             */
             $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
                 return $user->nickname === preg_replace("/\d/", "", $userLogin);
-            }));
-            $correctedUserLogin = $userLogin . ($usersSameNickCount > 1 ? $usersSameNickCount - 1 : "");
+            })) - 1;
+            $correctedUserLogin = $userLogin . ($usersSameNickCount > 0 ? $usersSameNickCount : "");
 
             /**
              * Adding the user to the WordPress database
@@ -121,7 +131,7 @@ class AddUserMenu extends IresMenu {
                 "display_name" => $correctedUserLogin
             ]);
             if (!is_wp_error($userId)) {
-                UserData::registerMetas($userId);?>
+                UserData::registerExtraMetas($userId);?>
                 <div id="message" class="updated notice is-dismissible">
                     <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien enregistré, <a href='admin.php?page=renseigner_ses_informations'>vous pouvez renseigner ses informations ici</a></strong></p>
                 </div> <?php

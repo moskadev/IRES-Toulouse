@@ -18,7 +18,7 @@
     "type": "text",
     "uppercase": true,
     "required": true,
-    "regex": "^\\s*[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+[a-z]*\\s*(\\s*-?[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]?[a-z]*)*\\s*$"
+    "regex": "^\\s*[A-Z\\u00C0-\\u00FF]+[a-z\\u00C0-\\u00FF]*\\s*(\\s*-?[A-Z\\u00C0-\\u00FF]?[a-z\\u00C0-\\u00FF]*)*\\s*$"
   },
   {
     "name": "Prénom",
@@ -27,7 +27,7 @@
     "type": "text",
     "uppercase": true,
     "required": true,
-    "regex": "^\\s*[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+[a-z]*\\s*(\\s*-?[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]?[a-z]*)*\\s*$"
+    "regex": "^\\s*[A-Z\\u00C0-\\u00FF]+[a-z\\u00C0-\\u00FF]*\\s*(\\s*-?[A-Z\\u00C0-\\u00FF]?[a-z\\u00C0-\\u00FF]*)*\\s*$"
   },
   {
     "name": "E-mail",
@@ -65,28 +65,28 @@
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+$"
+    "regex": "^[A-Z\\u00C0-\\u00FF]+$"
   },
   {
     "name": "Ville de l'établissement",
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+$"
+    "regex": "^[A-Z\\u00C0-\\u00FF]+$"
   },
   {
     "name": "Code UAI/RNE de l'établissement scolaire",
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^\\d{6}[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]$"
+    "regex": "^\\d{6}[A-Z]$"
   },
   {
     "name": "Nom du chef de l'établissement",
     "parent": "info_perso",
     "type": "text",
     "uppercase": true,
-    "regex": "^[A-Z|À|É|È|Ç|Ù|Ï|Ü|Î|Û|Ö|Ô|Ä|Â|Ÿ|Ë|Ê]+$"
+    "regex": "^[A-Z\\u00C0-\\u00FF]+$"
   },
   {
     "name": "Discipline enseignée",

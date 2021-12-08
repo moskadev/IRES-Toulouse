@@ -29,9 +29,7 @@ require_once("utils/Dataset.php");
 use irestoulouse\elements\UserData;
 use irestoulouse\menus\IresMenu;
 
-use irestoulouse\utils\Identifier;
-
-UserData::registerMetas(get_current_user_id());
+UserData::registerExtraMetas(get_current_user_id());
 IresMenu::init();
 
 add_action("admin_enqueue_scripts", function () {

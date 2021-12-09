@@ -79,7 +79,7 @@ class AddUserMenu extends IresMenu {
                 UserInputData::registerExtraMetas($userId);?>
                 <div id="message" class="updated notice is-dismissible">
                     <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien
-                            enregistré, <a href='admin.php?page=renseigner_les_informations'>
+                            enregistré, <a href='admin.php?page=renseigner_des_informations'>
                                 vous pouvez renseigner ses informations ici</a></strong></p>
                 </div> <?php
             } catch(\Exception $e) {?>

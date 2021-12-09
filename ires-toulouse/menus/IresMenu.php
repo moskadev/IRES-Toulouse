@@ -2,10 +2,8 @@
 
 namespace irestoulouse\menus;
 
-include_once("AddUserMenu.php");
-include_once("ModifyUserDataMenu.php");
-include_once(__DIR__ . "../../utils/Identifier.php"); // see why this one is tricky
-
+use irestoulouse\elements\input\UserInputData;
+use irestoulouse\exceptions\InvalidInputValueException;
 use irestoulouse\utils\Identifier;
 
 abstract class IresMenu {
@@ -108,4 +106,17 @@ abstract class IresMenu {
      * Content of the page
      */
     public abstract function getContent() : void;
+
+    /**
+     * Check each input data that needs to be verified by its regex
+     * @throws InvalidInputValueException if the value doesn't match the regex
+     */
+    public function verifyPostData() : void{
+        foreach ($_POST as $key => $value){
+             $data = UserInputData::fromId($key);
+             if(!is_array($value) && $data !== null && !$data->matches($value)){
+                 throw new InvalidInputValueException($data->getName());
+             }
+        }
+    }
 }

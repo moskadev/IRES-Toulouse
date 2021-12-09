@@ -38,6 +38,9 @@ class IresElement {
         return $this->id;
     }
 
+    /**
+     * @return string[]
+     */
     public function toArray() : array {
         return [
             "name" => $this->getName(),

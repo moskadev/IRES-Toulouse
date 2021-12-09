@@ -2,12 +2,8 @@
 
 namespace irestoulouse\menus;
 
-use irestoulouse\elements\UserData;
+use irestoulouse\elements\input\UserInputData;
 use irestoulouse\utils\Dataset;
-
-/**
- * TODO Refaire la classe en utilisant UserData.php, un peu comme ModifyUserDataMenu
- */
 
 /**
  * Creation of the plugin page
@@ -40,6 +36,7 @@ class AddUserMenu extends IresMenu {
     public function getContent(): void {
         $creating = isset($_POST["createuser"]);
         $userId = -1;
+
         if($creating) {
             $userFirstname = isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
             $userLastname = isset($_POST["last_name"]) ? wp_unslash($_POST["last_name"]) : "";
@@ -57,31 +54,37 @@ class AddUserMenu extends IresMenu {
              * it's useless to count it
              */
             $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
-                    return $user->nickname === preg_replace("/\d/", "", $userLogin);
-                })) - 1;
+                return $user->nickname === preg_replace("/\d/", "", $userLogin);
+            })) - 1;
             $correctedUserLogin = $userLogin . ($usersSameNickCount > 0 ? $usersSameNickCount : "");
 
-            /**
-             * Adding the user to the WordPress database
-             */
-            $userId = wp_insert_user([
-                "user_login" => $correctedUserLogin,
-                "first_name" => $userFirstname,
-                "last_name" => $userLastname,
-                "user_pass" => "test", //wp_generate_password(), // automatic generated password
-                "user_email" => $userEmail,
-                "user_registered" => current_time("mysql", 1),
-                "user_status" => "0", // visitor
-                "display_name" => $correctedUserLogin
-            ]);
-            if (!is_wp_error($userId)) {
-                UserData::registerExtraMetas($userId);?>
+            try{
+                $this->verifyPostData();
+                /**
+                 * Adding the user to the WordPress database
+                 */
+                $userId = wp_insert_user([
+                    "user_login" => $correctedUserLogin,
+                    "first_name" => $userFirstname,
+                    "last_name" => $userLastname,
+                    "user_pass" => "test", //wp_generate_password(), // automatic generated password
+                    "user_email" => $userEmail,
+                    "user_registered" => current_time("mysql", 1),
+                    "user_status" => "0", // visitor
+                    "display_name" => $correctedUserLogin
+                ]);
+                if(is_wp_error($userId)){
+                    throw new \Exception($userId->get_error_message());
+                }
+                UserInputData::registerExtraMetas($userId);?>
                 <div id="message" class="updated notice is-dismissible">
-                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien enregistré, <a href='admin.php?page=renseigner_ses_informations'>vous pouvez renseigner ses informations ici</a></strong></p>
+                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien
+                            enregistré, <a href='admin.php?page=renseigner_ses_informations'>
+                                vous pouvez renseigner ses informations ici</a></strong></p>
                 </div> <?php
-            } else {?>
+            } catch(\Exception $e) {?>
                 <div id="message" class="error notice is-dismissible">
-                    <p><strong>Une erreur s'est produite lors de l'enregistrement de <?php echo $correctedUserLogin ?></strong></p>
+                    <p><strong><?php echo "$correctedUserLogin : " . $e->getMessage() ?></strong></p>
                 </div>
             <?php }
         }?>
@@ -99,34 +102,37 @@ class AddUserMenu extends IresMenu {
         wp_nonce_field("create-user", "_wpnonce_create-user");
         // Load past data, otherwise set a default value
 
-        foreach(UserData::all() as $userData){
-             if(!in_array($userData->getId(), ["nickname", "first_name", "last_name", "email"])){
+        foreach(UserInputData::all() as $inputData){
+            $inputFormType = $inputData->getFormType();
+            $inputId = $inputData->getId();
+
+             if(!in_array($inputId, ["nickname", "first_name", "last_name", "email"])){
                  continue;
              }?>
              <table class='form-table' role='presentation'>
                  <tr class="form-field form-required">
                      <th>
-                         <label for='<?php echo $userData->getId() ?>'>
+                         <label for='<?php echo $inputId ?>'>
                              <?php
-                             _e($userData->getName());
-                             if($userData->isRequired()){?>
-                                 <span class='description'><?php echo _e("(required)") ?></span>
+                             _e($inputData->getName());
+                             if($inputData->isRequired()){?>
+                                 <span class='description'><?php _e("(required)") ?></span>
                                  <?php
                              } ?>
                          </label>
                      </th>
                      <td>
                          <?php
-                         if(in_array($userData->getType(), ["text", "email", "checkbox"])){?>
-                             <input <?php
-                             if($userData->isDisabled()) echo "disabled class='disabled' "; echo Dataset::allFrom($userData)?>
-                                     type='<?php echo $userData->getType() ?>'
-                                     id='<?php echo $userData->getId() ?>'
-                                     name='<?php echo $userData->getId() ?>'
-                                     value='<?php echo $creating && isset($_POST[$userData->getId()]) ? wp_unslash($_POST[$userData->getId()]) : "" ?>'>
+                         if(in_array($inputData->getFormType(), ["text", "email"])){?>
+                             <input <?php echo Dataset::allFrom($inputData)?>
+                                     class='<?php if($inputId === "nickname") echo "update-nickname" ?>'
+                                     type='<?php echo htmlspecialchars($inputFormType) ?>'
+                                     id='<?php echo htmlspecialchars($inputId) ?>'
+                                     name='<?php echo htmlspecialchars($inputId) ?>'
+                                     value='<?php echo $creating && isset($_POST[$inputId]) ? wp_unslash($_POST[$inputId]) : "" ?>'>
                              <?php
-                             if($userData->getId() === "nickname"){?>
-                                 <span class="description">L'identifiant ne sera plus modifiable et sera attribué automatiquement</span>
+                             if(!empty($inputData->getDescription())){?>
+                                 <p class="description"><?php _e($inputData->getDescription()) ?></p>
                              <?php }
                          }?>
                      </td>
@@ -143,6 +149,10 @@ class AddUserMenu extends IresMenu {
         submit_button(__("Add New User"), "primary", "createuser",
             true, ["id" => "createusersub", "disabled" => "true"]);
 
+        /**
+         * Temporaire : la génération de mdp auto est fait mais le mail le contenant
+         * doit être codé
+         */
         if($userId > -1) {
             echo "<h2>Mot de passe : test </h2>";
             }

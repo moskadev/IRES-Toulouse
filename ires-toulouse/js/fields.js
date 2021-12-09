@@ -1,21 +1,40 @@
-const forms = document.querySelectorAll(".verifiy-form ");
+const forms = document.querySelectorAll(".verifiy-form");
 forms.forEach(function(form) {
-
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
+
+    /**
+     * Disable all inp
+     */
+    formInputs.forEach(function (element) {
+        if(element.dataset?.disabled){
+            element.classList.add("disabled");
+            element.disabled = true;
+        }
+    });
 
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
         if(!String(event.target.type).includes("select")) {
-            event.target.value = uppercase(event.target)
-                .replaceAll(/\s/g, " ");
+            // uppercase caracters if necessary
+            event.target.value = uppercase(event.target);
 
-            form.querySelector("#nickname").value = generateUserLogin();
-            buttonCreate.disabled = !areFilled();
-            buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
+            // if a regex is present for the input
+            if(event.target.dataset?.regex) {
+                const regex = new RegExp(event.target.dataset.regex, "g").exec(event.target.value);
+                if(regex !== null) { // analyze the input value
+                    event.target.value = regex[0]; // change the value corresponding to the regex
+                }
+            }
+
+            const nickname = form.querySelector(".update-nickname");
+            if(nickname != null){
+                nickname.value = generateUserLogin();
+            }
         }
+        buttonCreate.disabled = !areFilled();
+        buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
     });
-    buttonCreate.disabled = !areFilled();
     form.querySelector("#nickname").value = generateUserLogin();
 
     /**
@@ -47,16 +66,33 @@ forms.forEach(function(form) {
      */
     function areFilled() {
         let filled = true;
-        /* TODO ne prend pas en compte les autres input et select,
-         *      il faut ajouter la lecture de tout lorsqu'elles
-         *      commencent à être complétés même non obligatoire
-         */
+
         formInputs.some(input => {
-            if(filled && input.dataset.required) {
-                console.log(input.dataset.regex)
-                filled = input.dataset.regex ?
-                    (new RegExp(input.dataset.regex)).test(input.value) :
-                    input.value;
+            /*
+             * Checks if it's the right input we're looking for with its formType.
+             * If the var "filled" is on true, we check again each value :
+             * - Required case : we check if the RegEx exists and we test
+             *   with the value of the input. If not, we check if the input is not empty
+             * - Not required case : it means that if the value or RegEx is empty, it is "filled".
+             *   But if the RegEx exists, we check if the value follows it.
+             *
+             * The value of the inputs are also verified on the back-end
+             */
+            if(filled && input.dataset.formtype) {
+                const regex = input.dataset.regex ? new RegExp("^" + input.dataset.regex + "$") : "";
+                if(input.dataset.required) {
+                    /*
+                     * If the regex exists, we test the value, if not, we check
+                     * if the input contains a value
+                     */
+                    filled = regex ? regex.test(input.value) : input.value;
+                } else {
+                    /*
+                     * Checks if the value or the regex is empty, so it is "filled".
+                     * If the value and regex exists, we test the value
+                     */
+                    filled = !input.value || !regex || regex.test(input.value);
+                }
             }
         });
         return filled;

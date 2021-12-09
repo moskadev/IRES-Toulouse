@@ -10,7 +10,6 @@ input[type=text], input[type=email] {
     width: 500px !important;
 }
 
-select[multiple] {
+.verifiy-form select[multiple] {
     height: 200px !important;
 }
-

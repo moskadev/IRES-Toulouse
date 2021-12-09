@@ -4,7 +4,7 @@ namespace irestoulouse\menus;
 
 include_once("IresMenu.php");
 
-use irestoulouse\elements\UserData;
+use irestoulouse\elements\input\UserInputData;
 use irestoulouse\utils\Dataset;
 use irestoulouse\utils\Identifier;
 
@@ -43,42 +43,52 @@ use irestoulouse\utils\Identifier;
  */
 class ModifyUserDataMenu extends IresMenu {
 
+    /** @var int */
     private int $lastUserId;
 
+    /**
+     * Constructing the menu and link to the admin page
+     */
     public function __construct() {
-        parent::__construct("Modifier les informations de l'utilisateur", // Page title when the menu is selected
-            "Renseigner ses informations", // Name of the menu
+        parent::__construct("Modifier les informations supplémentaires", // Page title when the menu is selected
+            "Renseigner des informations", // Name of the menu
             0, // Menu access security level
             "dashicons-id-alt", // Menu icon
             3 // Page position in the list
         );
     }
 
-    public function getContent() : void {?>
-        <h1>Renseigner ses informations supplémentaires</h1><?php
+    /**
+     *
+     */
+    public function getContent() : void {
+        $isAdmin = in_array("administrator",  wp_get_current_user()->roles); ?>
+        <h1>Renseigner des informations supplémentaires</h1> <?php
         if(count(get_users()) > 1){
-            $this->lastUserId = (int) ($_POST["users"] ?? Identifier::getLastRegisteredUser());
+            /**
+             * If admin, it gets the last created user or chosen user
+             * if not, it's just itself
+             */
+            $this->lastUserId = $isAdmin ?
+                ((int) ($_POST["users"] ?? Identifier::getLastRegisteredUser())) :
+                get_current_user_id();
             if(isset($_POST["action"]) && $_POST["action"] == "modifyuser"){
                 try {
-                    foreach (UserData::all(false) as $d){
-                        // TODO back end verify
-                        //if(isset($_POST[$d->getId()]) && $d->matches($_POST[$d->getId()])){
-                        //    throw new \Exception();
-                        //}
-                    }
+                    $this->verifyPostData();
                     $this->updateAllData() ?>
                     <div id="message" class="updated notice is-dismissible">
-                        <p><strong>Modification des informations de l'utilisateur ID: <?php echo $this->lastUserId ?> ont été bien effectuées </strong></p>
+                        <p><strong>Modification des informations de l'utilisateur ID:
+                                <?php echo $this->lastUserId ?> ont été bien effectuées </strong></p>
                     </div> <?php
                 } catch (\Exception $e){?>
                     <div id="message" class="error notice is-dismissible">
-                        <p><strong>Une erreur s'est produite lors du renseignement des informations</strong></p>
+                        <p><strong>Erreur : <?php echo $e->getMessage() ?></strong></p>
                     </div>
                 <?php }
             }
 
-            if(in_array('administrator',  wp_get_current_user()->roles)){?>
-                <form method='post' name='to-modify-user' id='to-modify-user' class='validate' novalidate='novalidate'
+            if($isAdmin){?>
+                <form method='post' name='to-modify-user' id='to-modify-user' class='validate' novalidate='novalidate'>
                     <table class='form-table' role='presentation'>
                         <tr class="form-field form-required">
                             <th>
@@ -91,11 +101,10 @@ class ModifyUserDataMenu extends IresMenu {
                             </th>
                             <td>
                                 <select name="users"><?php
-                                    foreach (get_users() as $user){
-                                        if($user->ID == get_current_user_id()){
-                                            continue;
-                                        }
-                                        ?>
+                                    $users = array_filter(get_users(), function ($u){
+                                        return $u->ID != get_current_user_id() && !in_array("administrator",  $u->roles);
+                                    });
+                                    foreach ($users as $user){?>
                                         <option value='<?php echo $user->ID ?>' <?php if($this->lastUserId == $user->ID) echo "selected" ?>>
                                             <?php echo $user->nickname ?>
                                         </option>
@@ -109,6 +118,7 @@ class ModifyUserDataMenu extends IresMenu {
                         "to-modify", true,
                         ["id" => "to-modify-user-btn"]);
                     ?>
+                    <span class='description'>Veuillez valider si vous avez sélectionner un nouveau utilisateur</span>
                 </form><?php
             }
             ?>
@@ -116,64 +126,73 @@ class ModifyUserDataMenu extends IresMenu {
             <form method='post' name='modify-user' id='modify-user' class='verifiy-form validate' novalidate='novalidate'>
                 <input name='action' type='hidden' value='modifyuser'>
                 <?php
-                foreach(UserData::all() as $userData){
-                    if($userData->getType() === "label"){
-                        echo "<h2>" . $userData->getName() . "</h2>";
+                foreach(UserInputData::all() as $inputData){
+                    $inputFormType = $inputData->getFormType();
+                    $inputId = $inputData->getId();
+
+                    if($inputFormType === "label"){
+                        echo "<h2>" . $inputData->getName() . "</h2>";
                         continue;
                     }?>
                     <table class='form-table' role='presentation'>
                         <tr class="form-field form-required">
                             <th>
                                 <!-- Creating the title of input -->
-                                <label for='<?php echo $userData->getId() ?>'> <?php
-                                    _e($userData->getName());
-                                    if($userData->isRequired()){?>
-                                        <span class='description'><?php echo _e("(required)") ?></span> <?php
+                                <label for='<?php echo $inputId ?>'> <?php
+                                    _e($inputData->getName());
+                                    if($inputData->isRequired()){?>
+                                        <span class='description'><?php _e("(required)") ?></span> <?php
                                     } ?>
                                 </label>
                             </th>
                             <td>
                                 <?php
-                                $type = $userData->getType();
-                                $id = $userData->getId();
-                                if(in_array($type, ["text", "email", "checkbox"])){?>
-                                    <input <?php
-                                        if($userData->isDisabled()) echo "disabled class='disabled' "; echo Dataset::allFrom($userData)?>
-                                        type='<?php echo htmlspecialchars($type) ?>'
-                                        id='<?php echo htmlspecialchars($id) ?>'
-                                        name='<?php echo htmlspecialchars($id) ?>'
-                                        value='<?php echo htmlspecialchars($this->getInputValue($id));?>'
-                                        <?php echo "selected" ?>>
+                                if(in_array($inputFormType, ["text", "email"])){?>
+                                    <input <?php echo Dataset::allFrom($inputData)?>
+                                        type='<?php echo htmlspecialchars($inputFormType) ?>'
+                                        id='<?php echo htmlspecialchars($inputId) ?>'
+                                        name='<?php echo htmlspecialchars($inputId) ?>'
+                                        value='<?php echo htmlspecialchars($this->getInputValue($inputId));?>'>
                                 <?php
-                                } else if(in_array($type, ["dropdown", "checklist"])){
-                                    $multiple = $type === "checklist"?>
-
-                                    <select <?php if($multiple) echo "multiple" ?>
-                                            name='<?php echo $id ?>[]'
-                                            id='<?php echo $userData->getId() ?>'> <?php
+                                } else if($inputFormType === "radio"){
+                                    $value = filter_var($this->getInputValue($inputId), FILTER_VALIDATE_BOOLEAN);?>
+                                    Oui <input <?php echo Dataset::allFrom($inputData) ?>
+                                        type="radio"
+                                        id='<?php echo htmlspecialchars($inputId) ?>_oui'
+                                        name='<?php echo htmlspecialchars($inputId) ?>'
+                                        value="true"
+                                        <?php if($value == true) echo "checked" ?>>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    Non <input <?php echo Dataset::allFrom($inputData) ?>
+                                        type="radio"
+                                        id='<?php echo htmlspecialchars($inputId) ?>_non'
+                                        name='<?php echo htmlspecialchars($inputId) ?>'
+                                        value="false"
+                                        <?php if($value == false) echo "checked" ?>>
+                                    <?php
+                                } else if(in_array($inputFormType, ["dropdown", "checklist"])){?>
+                                    <select <?php if($inputFormType === "checklist") echo "multiple" ?>
+                                            name='<?php echo $inputId ?>[]'
+                                            id='<?php echo $inputData->getId() ?>'> <?php
                                     /**
-                                     * Extra data are check individually and put in the dropdown or checklist
+                                     * Extra data are checked individually and put in the dropdown or checklist
                                      * Multiple items can be selected for checklist, so we check if the user
                                      * has those extra data
                                      */
-                                    foreach ($userData->getExtraData() as $data){?>
+                                    foreach ($inputData->getExtraData() as $data){?>
                                         <!-- value of the option -->
-                                        <!-- check if the extra data has been selected by the user -->
+
                                         <option value='<?php echo $data ?>'
-                                            <?php if($this->containsExtraData($userData, $data)) echo "selected" ?>>
+                                            <?php if($this->containsExtraData($inputData, $data)) echo "selected" ?>>
+                                            <!-- check if the extra data has been selected by the user -->
                                             <?php echo $data ?> <!-- the option's text -->
                                         </option> <?php
                                     } ?>
                                     </select> <?php
-                                    /**
-                                     * Add a notice to the user who wants to use checklist
-                                     */
-                                    if($multiple) {?>
-                                        <span class='description'>Enfoncez Ctrl (^) ou Cmd (⌘)
-                                            sur Mac pour sélectionner de multiples choix
-                                        </span> <?php
-                                    }
-                                } ?>
+                                }
+                                if(!empty($inputData->getDescription())){ ?>
+                                    <p class="description"><?php _e($inputData->getDescription()) ?></p>
+                                <?php } ?>
                             </td>
                         </tr>
                     </table>
@@ -192,21 +211,32 @@ class ModifyUserDataMenu extends IresMenu {
     }
 
     /**
-     * @param UserData $userData the extra user's metadata
+     * @param UserInputData $inputData the extra user's metadata
      * @param string $dataToAnalyse metadata that should be checked
      * @return bool true if the metadata has been found
      */
-    private function containsExtraData(UserData $userData, string $dataToAnalyse) : bool{
-        $metadata = get_user_meta($this->lastUserId, $userData->getId(), true);
+    private function containsExtraData(UserInputData $inputData, string $dataToAnalyse) : bool{
+        $metadata = get_user_meta($this->lastUserId, $inputData->getId(), true);
         return in_array($dataToAnalyse, explode(",", $metadata != false ? $metadata : ""));
     }
 
+    /**
+     * Looking for the value to put in the input
+     * Special check for the emails whi
+     *
+     * @param string $inputId
+     * @return string input's value
+     */
     private function getInputValue(string $inputId) : string{
-        $userDatas = get_userdata($this->lastUserId);
-        $value = get_user_meta($this->lastUserId, $inputId, true);
-        if($inputId === "email" && $userDatas !== null){
-            $value = $userDatas->data->user_email ?? $value;
+        $inputDatas = get_userdata($this->lastUserId);
+        if(get_user_meta($this->lastUserId, $inputId, true) === false){
+            add_user_meta($this->lastUserId, $inputId, UserInputData::fromId($inputId)->getDefaultValue(), true);
         }
+        $value = get_user_meta($this->lastUserId, $inputId, true);
+        if($inputId === "email" && $inputDatas !== null){
+            $value = $inputDatas->data->user_email ?? $value;
+        }
+
         return $value;
     }
 
@@ -214,12 +244,14 @@ class ModifyUserDataMenu extends IresMenu {
      * It is necessary to update all datas from the extra metadatas
      * which are in another table in the database, but we should not forgot
      * about the main user's metadata
+     *
+     * @throws \Exception If an error occured with Wordpress registration
      */
     private function updateAllData(){
         foreach ($_POST as $meta => $data) {
             if (get_user_meta($this->lastUserId, $meta) !== false) {
                 /**
-                 * Some values can be arrays of mutlple values, so we stick them with a comma
+                 * Some values can be arrays of mutltiple values, so we stick them with a comma
                  * For others, nothing changes
                  */
                 $dataValue = implode(",", !is_array($data) ? [$data] : $data);
@@ -229,11 +261,14 @@ class ModifyUserDataMenu extends IresMenu {
         /**
          * We update the main metadata
          */
-        wp_update_user([
+        $user = wp_update_user([
             "ID" => $this->lastUserId,
             "first_name" => get_user_meta($this->lastUserId, "first_name", true),
             "last_name" => get_user_meta($this->lastUserId, "last_name", true),
             "user_email" => get_user_meta($this->lastUserId, "email", true)
         ]);
+        if(is_wp_error($user)){
+            throw new \Exception("ID  $this->lastUserId : Problème lors de l'enregistrement d'une donnée");
+        }
     }
 }

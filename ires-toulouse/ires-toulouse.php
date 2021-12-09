@@ -18,7 +18,9 @@ require_once("menus/AffectionRoleMenu.php");
 require_once("elements/IresElement.php");
 require_once("elements/Discipline.php");
 require_once("elements/IresElement.php");
-require_once("elements/user/UserData.php");
+require_once("elements/input/UserInputData.php");
+
+require_once("exceptions/InvalidInputValueException.php");
 
 require_once("sql/Database.php");
 require_once("sql/SqlRequest.php");
@@ -26,26 +28,43 @@ require_once("sql/SqlRequest.php");
 require_once("utils/Identifier.php");
 require_once("utils/Dataset.php");
 
-use irestoulouse\elements\UserData;
+use irestoulouse\elements\Discipline;
+use irestoulouse\elements\input\UserInputData;
 use irestoulouse\menus\IresMenu;
 
 register_activation_hook( __FILE__, function (){
-    add_role( 'responsable', 'Responsable', [
-        'read' => true,
-        'level_0' => true,
-        'level_1' => true,
-        'level_2' => true
+    add_role( "responsable", "Responsable", [
+        "read" => true,
+        "level_0" => true,
+        "level_1" => true,
+        "level_2" => true
     ]);
 });
 register_deactivation_hook( __FILE__, function () {
-    remove_role('responsable');
+    remove_role("responsable");
 });
 
-UserData::registerExtraMetas(get_current_user_id());
+UserInputData::registerExtraMetas(get_current_user_id());
 IresMenu::init();
 
+$dis = [
+    "Mathématiques",
+    "Physique-Chimie",
+    "SVT",
+    "SNT",
+    "NSI",
+    "Technologie",
+    "Informatique",
+    "Documentation",
+    "STI"
+];
+foreach ($dis as $d){
+    Discipline::register(new Discipline($d));
+}
+
+//TODO do not use bruteforced paths
 add_action("admin_enqueue_scripts", function () {
-    wp_enqueue_style( 'ires-style', '/wp-content/plugins/ires-toulouse/ires.css');
-    wp_enqueue_script( 'ires-script', '/wp-content/plugins/ires-toulouse/js/fields.js', [], false, true);
+    wp_enqueue_style("ires-style", "/wp-content/plugins/ires-toulouse/style/ires.css");
+    wp_enqueue_script("ires-script-fields", "/wp-content/plugins/ires-toulouse/js/fields.js", [], false, true);
 });
 

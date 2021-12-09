@@ -2,32 +2,20 @@
 
 namespace irestoulouse\utils;
 
-use irestoulouse\elements\UserData;
+use irestoulouse\elements\input\UserInputData;
 
 class Dataset {
 
     /**
      * Hacky way to get all the da
-     * @param UserData $userData the datas to convert
+     * @param UserInputData $userData the datas to convert
      * @return string
      */
-    public static function allFrom(UserData $userData) : string{
-        $htmlData = "";
-        foreach (UserData::DATAS as $d){
-            $functions = get_class_methods($userData);
-            $call = null;
-            foreach ($functions as $f){
-                // TODO change this
-                if(stripos(str_replace(["get", "is"], "", $f), $d) === 0){ // completely horrible
-                    $call = call_user_func([$userData, $f]);
-                    break;
-                }
-            }
-
-            if($call !== null && !is_array($call)) {
-                $htmlData .= "data-$d='" . htmlentities($call) . "' ";
-            }
+    public static function allFrom(UserInputData $userData) : string{
+        $datasetHtml = "";
+        foreach ($userData->toArray() as $name => $value){
+            $datasetHtml .= "data-$name='" . htmlspecialchars(is_array($value) ? implode(",", $value) : $value) . "' ";
         }
-        return $htmlData;
+        return $datasetHtml;
     }
 }

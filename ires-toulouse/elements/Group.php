@@ -8,12 +8,12 @@ namespace irestoulouse\elements;
 class Group extends IresElement {
 
     /**
-     * TODO: Comme pour discipline, name et id existe déjà
-     *      il faut juste ajouter register, remove, exists pour lier la BD
-     *      Un groupe doit pouvoir accueillir de multiples disciplines
-     *      et multiples enseignants (plus tard)
-     *      Lors de l'enregistrement de tout ça dans le BD, il faut que le tableau de disciplines
-     *      se transforme en un string en utilisant implode(",", array)
-     *      Même juste pour les enseignants mais leur user identifiant
+     * TODO: As for discipline, name and id already exist
+     *       you just need to add register, remove, exist to link the database
+     *       A group must be able to accommodate multiple disciplines
+     *       and multiple teachers (later)
+     *       When registering all this in the DB, the discipline table must be transformed into a string
+     *       transform into a string using implode(",", array)
+     *       Even just for the teachers but their user id
      */
 }

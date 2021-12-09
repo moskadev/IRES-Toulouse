@@ -30,28 +30,29 @@ class AffectionRoleMenu extends IresMenu {
     public function getContent() : void {
     	// Check that the form has been sent
         $user = null;
+
+
         if(isset($_POST['username'])) {
             $user_login = $_POST['username'];
-
-            $choice = $_POST['choosen_role'];
-            $name_role = ( $choice === 'subscriber' ) ? 'membre' : 'responsable';
-            $message="$user_login est maintenant $name_role.";
             $type_message="error";
 
             // Check if the login name submit exist
-            if ( username_exists( $user_login ) != null ) {
+            if ( username_exists( $user_login ) !== false ) {
+                $choice = $_POST['choosen_role'];
+                $name_role = $choice !== 'subscriber' ? 'responsable' : 'membre';
+                $message="$user_login est maintenant $name_role.";
+
                 $user = get_userdatabylogin( $user_login );
 
                 // The role for the user haven't been changed because he already had the role choose
-                if (!in_array( "$choice", (array) $user->roles )) {
-                    wp_update_user( array( 'ID' => $user->ID, 'role' => $choice ) );
-                    $type_message="updated";
+                if (!in_array( $choice, $user->roles)) {
+                    $user->set_role($choice);
+                    $type_message = "updated";
                 } else {
-
                     // Determine the displayed role name
                     $message ="Rien n'a été effectué, $user_login était déjà $name_role.";
                 }
-            } else if ( username_exists( $_POST['username'] ) == null ) {
+            } else {
                 $message = "Rien n'a été effectué, $user_login n'est pas un identifiant valide.";
             } ?>
             <div id="message" class="<?php echo "$type_message";?> notice is-dismissible">
@@ -65,23 +66,25 @@ class AffectionRoleMenu extends IresMenu {
                 <table class="form-table" role="presentation">
                     <tr class="form-field form-required">
                         <th>
-                            <label for='users'>
+                            <label for='username'>
                                 Sélectionner l'utilisateur à modifier <?php
-                                $lastId = (int) ($_POST["users"] ?? Identifier::getLastRegisteredUser());
-                                if($lastId == Identifier::getLastRegisteredUser()){ ?>
+                                $lastNickname = get_userdata(Identifier::getLastRegisteredUser())->user_login;
+                                $lastChooseNickname = $_POST["username"] ?? $lastNickname;
+                                if($lastChooseNickname == $lastNickname){ ?>
                                     <span class='description'>(sélection par défaut de la dernière création)</span>
                                 <?php } ?>
                             </label>
                         </th>
                         <td>
                             <select name="username"><?php
-                                foreach (get_users() as $u){
-                                    if($u->ID == get_current_user_id()){
-                                        continue;
-                                    }
-                                    ?>
-                                    <option value='<?php echo $u->nickname ?>' <?php if($lastId == $u->ID) echo "selected" ?>>
-                                        <?php echo $u->nickname ?>
+                                $users = array_filter(get_users(), function ($u){
+                                    return $u->ID != get_current_user_id() && !in_array("administrator",  $u->roles);
+                                });
+                                foreach ($users as $u){?>
+                                    <option
+                                        value='<?php echo $u->user_login ?>'
+                                        <?php if($lastChooseNickname == $u->user_login) echo "selected" ?>>
+                                        <?php echo $u->user_login ?>
                                     </option>
                                 <?php }
                                 ?></select>
@@ -95,7 +98,7 @@ class AffectionRoleMenu extends IresMenu {
                             <td>
                                 <select name="choosen_role">
                                     <option value="subscriber" <?php
-                                        if($user != null && in_array("subscriber", $user->roles))
+                                        if($user === null || $user != null && in_array("subscriber", $user->roles))
                                             echo "selected" ?>>
                                         Membre
                                     </option>
@@ -109,7 +112,7 @@ class AffectionRoleMenu extends IresMenu {
                         </tr>
                     <?php } ?>
                     <tr>
-                        <th><label for="group"><?php echo _e('Groupe'); ?></label></th>
+                        <th><label for="group"><?php _e('Groupe'); ?></label></th>
                         <td>
                             <select name="group-selection">
                                 <option>Groupe 1</option>

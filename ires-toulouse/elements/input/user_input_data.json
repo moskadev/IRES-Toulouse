@@ -95,8 +95,8 @@
     "formType": "text",
     "id": "code_uai_rne",
     "uppercase": true,
-    "regex": "\\d{6}[A-Z]",
-    "description": "Consititué de 6 chiffres et une lettre : 000000X"
+    "regex": "\\d{7}[A-Z]",
+    "description": "Consititué de 7 chiffres et une lettre : 0000000X"
   },
   {
     "name": "Nom du chef de l'établissement",

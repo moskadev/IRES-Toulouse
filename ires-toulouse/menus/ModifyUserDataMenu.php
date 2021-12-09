@@ -124,8 +124,7 @@ class ModifyUserDataMenu extends IresMenu {
             ?>
 
             <form method='post' name='modify-user' id='modify-user' class='verifiy-form validate' novalidate='novalidate'>
-                <input name='action' type='hidden' value='modifyuser'>
-                <?php
+                <input name='action' type='hidden' value='modifyuser'> <?php
                 foreach(UserInputData::all() as $inputData){
                     $inputFormType = $inputData->getFormType();
                     $inputId = $inputData->getId();
@@ -173,7 +172,7 @@ class ModifyUserDataMenu extends IresMenu {
                                 } else if(in_array($inputFormType, ["dropdown", "checklist"])){?>
                                     <select <?php if($inputFormType === "checklist") echo "multiple" ?>
                                             name='<?php echo $inputId ?>[]'
-                                            id='<?php echo $inputData->getId() ?>'> <?php
+                                            id='<?php echo $inputId ?>'> <?php
                                     /**
                                      * Extra data are checked individually and put in the dropdown or checklist
                                      * Multiple items can be selected for checklist, so we check if the user
@@ -181,7 +180,6 @@ class ModifyUserDataMenu extends IresMenu {
                                      */
                                     foreach ($inputData->getExtraData() as $data){?>
                                         <!-- value of the option -->
-
                                         <option value='<?php echo $data ?>'
                                             <?php if($this->containsExtraData($inputData, $data)) echo "selected" ?>>
                                             <!-- check if the extra data has been selected by the user -->
@@ -222,7 +220,8 @@ class ModifyUserDataMenu extends IresMenu {
 
     /**
      * Looking for the value to put in the input
-     * Special check for the emails whi
+     * Special check for the emails which should be checked in
+     * the other table of the user
      *
      * @param string $inputId
      * @return string input's value
@@ -236,22 +235,21 @@ class ModifyUserDataMenu extends IresMenu {
         if($inputId === "email" && $inputDatas !== null){
             $value = $inputDatas->data->user_email ?? $value;
         }
-
         return $value;
     }
 
     /**
-     * It is necessary to update all datas from the extra metadatas
-     * which are in another table in the database, but we should not forgot
+     * It is necessary to update all data from the extra metadata
+     * which are in another table in the database, but we should not forget
      * about the main user's metadata
      *
-     * @throws \Exception If an error occured with Wordpress registration
+     * @throws \Exception If an error occurred with Wordpress registration
      */
     private function updateAllData(){
         foreach ($_POST as $meta => $data) {
             if (get_user_meta($this->lastUserId, $meta) !== false) {
                 /**
-                 * Some values can be arrays of mutltiple values, so we stick them with a comma
+                 * Some values can be arrays of multiple values, so we stick them with a comma
                  * For others, nothing changes
                  */
                 $dataValue = implode(",", !is_array($data) ? [$data] : $data);
@@ -268,7 +266,7 @@ class ModifyUserDataMenu extends IresMenu {
             "user_email" => get_user_meta($this->lastUserId, "email", true)
         ]);
         if(is_wp_error($user)){
-            throw new \Exception("ID  $this->lastUserId : Problème lors de l'enregistrement d'une donnée");
+            throw new \Exception("ID $this->lastUserId : Problème lors de l'enregistrement d'une donnée");
         }
     }
 }

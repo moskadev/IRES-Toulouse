@@ -30,8 +30,6 @@ class AffectionRoleMenu extends IresMenu {
     public function getContent() : void {
     	// Check that the form has been sent
         $user = null;
-
-
         if(isset($_POST['username'])) {
             $user_login = $_POST['username'];
             $type_message="error";

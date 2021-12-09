@@ -3,9 +3,7 @@ forms.forEach(function(form) {
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
 
-    /**
-     * Disable all inp
-     */
+    // disable all inputs if the data is set
     formInputs.forEach(function (element) {
         if(element.dataset?.disabled){
             element.classList.add("disabled");
@@ -32,8 +30,8 @@ forms.forEach(function(form) {
                 nickname.value = generateUserLogin();
             }
         }
-        buttonCreate.disabled = !areFilled();
-        buttonCreate.style.cursor = areFilled() ? "pointer" : "not-allowed";
+        buttonCreate.disabled = !areCorrectlyFilled();
+        buttonCreate.style.cursor = areCorrectlyFilled() ? "pointer" : "not-allowed";
     });
     form.querySelector("#nickname").value = generateUserLogin();
 
@@ -64,7 +62,7 @@ forms.forEach(function(form) {
      * @returns {boolean} true if the value of each input has
      *                    been entered and follows the imposed format
      */
-    function areFilled() {
+    function areCorrectlyFilled() {
         let filled = true;
 
         formInputs.some(input => {

@@ -59,7 +59,7 @@ class ModifyUserDataMenu extends IresMenu {
     }
 
     /**
-     *
+     * Content of the page
      */
     public function getContent() : void {
         $isAdmin = in_array("administrator",  wp_get_current_user()->roles); ?>
@@ -93,7 +93,7 @@ class ModifyUserDataMenu extends IresMenu {
                         <tr class="form-field form-required">
                             <th>
                                 <label for='users'>
-                                    Sélectionner l'utilisateur à modifier <?php
+                                    Sélectionnez l'utilisateur à modifier <?php
                                     if($this->lastUserId == Identifier::getLastRegisteredUser()){ ?>
                                         <span class='description'>(sélection par défaut de la dernière création)</span>
                                     <?php } ?>
@@ -118,7 +118,7 @@ class ModifyUserDataMenu extends IresMenu {
                         "to-modify", true,
                         ["id" => "to-modify-user-btn"]);
                     ?>
-                    <span class='description'>Veuillez valider si vous avez sélectionner un nouveau utilisateur</span>
+                    <span class='description'>Veuillez valider si vous avez sélectionné un nouveau utilisateur</span>
                 </form><?php
             }
             ?>

@@ -8,13 +8,23 @@ use irestoulouse\utils\Identifier;
 
 abstract class IresMenu {
 
+    /** @var IresMenu */
+    private static IresMenu $instance;
+
+    /**
+     * @return IresMenu
+     */
+    public static function getInstance(): IresMenu {
+        return self::$instance;
+    }
+
     /**
      * Initialize all menus
      */
     public static function init() : void{
         IresMenu::register("admin_menu", new AddUserMenu());
-        IresMenu::register("admin_menu", new ModifyUserDataMenu());
         IresMenu::register("admin_menu", new AffectionRoleMenu());
+        IresMenu::register("admin_menu", new ModifyUserDataMenu());
     }
 
     /**
@@ -28,10 +38,10 @@ abstract class IresMenu {
             add_menu_page($menu->getPageTitle(),
                 $menu->getPageMenu(),
                 $menu->getLvlAccess(),
-                Identifier::fromName($menu->getPageMenu()),
+                $menu->getId(),
                 function () use ($menu) {
                     echo "<div class='wrap'>";
-                    $menu->getContent();
+                        $menu->getContent();
                     echo "</div>";
                 },
                 $menu->getIconUrl(),
@@ -65,6 +75,8 @@ abstract class IresMenu {
         $this->lvlAccess = $lvlAccess;
         $this->iconUrl = $iconUrl;
         $this->position = $position;
+
+        self::$instance = $this;
     }
 
     /**
@@ -72,6 +84,13 @@ abstract class IresMenu {
      */
     public function getPageTitle(): string {
         return $this->pageTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId() : string{
+        return Identifier::fromName($this->pageMenu);
     }
 
     /**

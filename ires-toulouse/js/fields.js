@@ -19,10 +19,7 @@ forms.forEach(function(form) {
 
             // if a regex is present for the input
             if(event.target.dataset?.regex) {
-                const regex = new RegExp(event.target.dataset.regex, "g").exec(event.target.value);
-                if(regex !== null) { // analyze the input value
-                    event.target.value = regex[0]; // change the value corresponding to the regex
-                }
+                updateValueFromRegex(event.target);
             }
 
             const nickname = form.querySelector(".update-nickname");
@@ -34,6 +31,19 @@ forms.forEach(function(form) {
         buttonCreate.style.cursor = areCorrectlyFilled() ? "pointer" : "not-allowed";
     });
     form.querySelector("#nickname").value = generateUserLogin();
+
+    /**
+     * Dynamically update the value in the input from
+     * the RegEx if it exists
+     *
+     * @param inout to update
+     */
+    function updateValueFromRegex(inout){
+        const regex = new RegExp(inout.dataset.regex, "g").exec(inout.value);
+        if(regex !== null) { // analyze the input value
+            inout.value = regex[0]; // change the value corresponding to the regex
+        }
+    }
 
     /**
      * @returns {string} generate the identifier of

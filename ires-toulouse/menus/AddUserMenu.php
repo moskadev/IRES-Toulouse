@@ -79,7 +79,7 @@ class AddUserMenu extends IresMenu {
                 UserInputData::registerExtraMetas($userId);?>
                 <div id="message" class="updated notice is-dismissible">
                     <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien
-                            enregistré, <a href='admin.php?page=renseigner_des_informations'>
+                            enregistré, <a href='admin.php?page=<?php echo ModifyUserDataMenu::getInstance()->getId() ?>'>
                                 vous pouvez renseigner ses informations ici</a></strong></p>
                 </div> <?php
             } catch(\Exception $e) {?>
@@ -150,8 +150,8 @@ class AddUserMenu extends IresMenu {
             true, ["id" => "createusersub", "disabled" => "true"]);
 
         /**
-         * Temporaire : la génération de mdp auto est fait mais le mail le contenant
-         * doit être codé
+         * Temporary : the generation of password is done
+         * but the e-mail containing it must be coded
          */
         if($userId > -1) {
             echo "<h2>Mot de passe : test </h2>";

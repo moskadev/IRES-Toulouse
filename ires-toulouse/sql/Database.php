@@ -15,7 +15,7 @@ class Database {
     }
 
     /**
-     * Get all datas from a table
+     * Get all data from a table
      *
      * @param string $table
      * @return array

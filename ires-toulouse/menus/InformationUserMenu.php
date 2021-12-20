@@ -68,91 +68,84 @@ class InformationUserMenu extends IresMenu {
 
 		//$userDatas = json_decode(json_encode($userDatas), true);
 
-		$infos = [
-                "first_name",
-                "last_name",
-                "Si animateur, titre de la formation",
-                "Participation à un labo de maths",
-                "Animateur formation PAF (année en cours)",
-                "Manifestation",
-                "Responsable du groupe",
-                "Groupe de recherche-action",
-                "Mmembre association (autre)",
-                "Mmembre société savante",
-			    "Mmembre association professeurs",
-                "Nom de la CII",
-                "Membre CII",
-                "Interventions à l'INSPE",
-                "Membre de l'INSPE",
-                "Nom du chef de l'établissement",
-                "Discipline enseignée",
-                "Code UAI/RNE de l'établissement scolaire",
-                "Situation professionnelle",
-                "Ville de l'établissement",
-                "Nom de l'établissement",
-                "Type d'établissement",
-                "Diplomes",
-                "E-mail",
-                "Téléphone",
-                "Prénom",
-                "Identifiant",
-                "Nom",
-                "situation_pro",
-                "type_etablissement",
-                "nom_etablissement",
-                "ville_etablissement",
-                "code_uai_rne",
-                "nom_chef_etablissement",
-                "participation_labo_maths",
-                "membre_inspe",
-                "email",
-                "interventions_inspe",
-                "situation_professionnelle",
-                "type_detablissement",
-                "nom_de_letablissement",
-                "ville_de_letablissement",
-                "code_uairne_de_letablissement_scolaire",
-                "nom_du_chef_de_letablissement",
-                "discipline_enseignee",
-                "animateur_formation",
-                "si_animateur_titre_de_la_formation",
-                "participation_a_un_labo_de_maths",
-                "membre_de_linspe",
-                "interventions_a_linspe",
-                "membre_cii",
-                "nom_de_la_cii",
-                "membre_association_professeurs",
-                "membre_societe_savante",
-                "membre_association_autre",
-                "groupe_de_rechercheaction",
-                "responsable_du_groupe",
-                "membre_socit_savante",
-                "responsable_groupe",
-                "groupe_recherche_action",
-                "membre_association_prof",
-                "nom_cii",
-                "interventions_linspe",
-                "participation_un_labo_de_maths",
-                "discipline_enseigne",
-                "nom_du_chef_de_ltablissement",
-                "code_uairne_de_ltablissement_scolaire",
-                "ville_de_ltablissement",
-                "nom_de_ltablissement",
-                "type_dtablissement",
-                "tlphone"
-            ];
+		$type = [
+            "si_animateur_titre_de_la_formation" => "text",
+            "participation_labo_maths" => "boolean",
+            "membre_inspe" => "boolean",
+            "interventions_inspe" => "boolean",
+            "manifestation" => "text",
+            "responsable_groupe" => "text",
+            "groupe_recherche_action" => "text",
+            "membre_association_autre" => "text",
+            "membre_societe_savante" => "text",
+            "membre_association_prof" => "text",
+            "nom_cii" => "text",
+            "membre_cii" => "boolean",
+            "discipline_enseignee" => "text",
+            "animateur_formation" => "boolean",
+            "nom_chef_etablissement" => "text",
+            "code_uai_rne" => "text",
+            "ville_etablissement" => "text",
+            "nom_etablissement" => "text",
+            "type_etablissement" => "text",
+            "situation_pro" => "text",
+            "email" => "text",
+            "diplomes" => "text",
+            "telephone" => "text",
+            "first_name" => "text",
+            "last_name" => "text"
+        ];
+
+		$correspondance = [
+			"si_animateur_titre_de_la_formation" => "Titre de la formation",
+			"participation_labo_maths" => "Participation labo de mathématiques",
+			"membre_inspe" => "Membre INSPE",
+			"interventions_inspe" => "Interventions INSPE",
+			"manifestation" => "Manifestation",
+			"responsable_groupe" => "Responsable du groupe",
+			"groupe_recherche_action" => "Groupe recherche action",
+			"membre_association_autre" => "Membre association autre",
+			"membre_societe_savante" => "Membre societe savante",
+			"membre_association_prof" => "Membre association prof",
+			"nom_cii" => "Nom CII",
+			"membre_cii" => "Membre CII",
+			"discipline_enseignee" => "Discipline enseignée",
+			"animateur_formation" => "Animateur formation",
+			"nom_chef_etablissement" => "Nom chef établissement",
+			"code_uai_rne" => "Code UAI RNE",
+			"ville_etablissement" => "Ville établissement",
+			"nom_etablissement" => "Nom établissement",
+			"type_etablissement" => "Type établissement",
+			"situation_pro" => "Situation professionnelle",
+			"email" => "Email",
+			"diplomes" => "Diplomes",
+			"telephone" => "Téléphone",
+			"first_name" => "Prénom",
+			"last_name" => "Nom"
+		];
 ?>
             <table>
 <?php
 		foreach ($userDatas as $data) {
-			if (in_array($data['meta_key'], $infos)) {?>
+			if (array_key_exists($data['meta_key'], $type)) {?>
 
                 <tr>
                     <td>
-                        Meta key : <?php echo $data['meta_key'] ?>
+                        <h3>
+		                    <?php echo $correspondance[$data['meta_key']] ?>
+                        </h3>
                     </td>
                     <td>
-                        Meta value : <?php echo $data['meta_value'] ?>
+                        <?php
+                        // Affichage des données
+                        if ($type[$data['meta_key']] == "boolean") { ?>
+                            <input disabled type="checkbox" <?php if ($data['meta_value'] == "true") echo "checked";?>>
+                        <?php } // endif
+                        if ($type[$data['meta_key']] == "text") { ?>
+                            <input disabled type="text" value="<?php echo $data['meta_value'] ?>">
+                        <?php } //endif
+
+                        ?>
                     </td>
                 </tr>
 

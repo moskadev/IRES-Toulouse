@@ -66,8 +66,7 @@ class InformationUserMenu extends IresMenu {
                 ARRAY_A
         );
 
-		//$userDatas = json_decode(json_encode($userDatas), true);
-
+		// Array with the type of each line
 		$type = [
             "si_animateur_titre_de_la_formation" => "text",
             "participation_labo_maths" => "boolean",
@@ -95,8 +94,11 @@ class InformationUserMenu extends IresMenu {
             "first_name" => "text",
             "last_name" => "text"
         ];
-
+        // ARray with the text of each line
 		$correspondance = [
+			"first_name" => "Prénom",
+			"last_name" => "Nom",
+			"telephone" => "Téléphone",
 			"si_animateur_titre_de_la_formation" => "Titre de la formation",
 			"participation_labo_maths" => "Participation labo de mathématiques",
 			"membre_inspe" => "Membre INSPE",
@@ -119,40 +121,32 @@ class InformationUserMenu extends IresMenu {
 			"situation_pro" => "Situation professionnelle",
 			"email" => "Email",
 			"diplomes" => "Diplomes",
-			"telephone" => "Téléphone",
-			"first_name" => "Prénom",
-			"last_name" => "Nom"
 		];
 ?>
             <table>
 <?php
-		foreach ($userDatas as $data) {
-			if (array_key_exists($data['meta_key'], $type)) {?>
-
-                <tr>
-                    <td>
-                        <h3>
-		                    <?php echo $correspondance[$data['meta_key']] ?>
-                        </h3>
-                    </td>
-                    <td>
-                        <?php
-                        // Affichage des données
-                        if ($type[$data['meta_key']] == "boolean") { ?>
-                            <input disabled type="checkbox" <?php if ($data['meta_value'] == "true") echo "checked";?>>
-                        <?php } // endif
-                        if ($type[$data['meta_key']] == "text") { ?>
-                            <input disabled type="text" value="<?php echo $data['meta_value'] ?>">
-                        <?php } //endif
-
-                        ?>
-                    </td>
-                </tr>
-
-    <?php   } // endif
-		} ?>
-            </table>
-	<?php }
-
-
+        foreach ($correspondance as $key => $item) {
+	        foreach ($userDatas as $data) {
+                if ($data['meta_key'] === $key) {?>
+                    <tr>
+                        <td>
+                            <h3>
+                                <?php echo $item ?>
+                            </h3>
+                        </td>
+                        <td>
+                            <?php
+                            // Affichage des données
+                            if ($type[$data['meta_key']] == "boolean") { ?>
+                                <input disabled type="checkbox" <?php if ($data['meta_value'] == "true") echo "checked";?>>
+                            <?php } // endif
+                            if ($type[$data['meta_key']] == "text") { ?>
+                                <input disabled type="text" value="<?php echo $data['meta_value'] ?>">
+                            <?php } //endif ?>
+                        </td>
+                    </tr>
+                <?php }
+            }
+        }
+    }
 }

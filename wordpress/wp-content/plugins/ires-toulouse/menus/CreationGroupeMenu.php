@@ -17,17 +17,16 @@ class CreationGroupeMenu extends IresMenu
     }
 
     /**
-     * Contents of the "Modify a user" menu
+     * Contents of the "Create a group" menu
      * Allows to :
-     *      - change a permission of an user if you are admin
+     *      - create a group of user if you are admin
      */
     function getContent(): void {
         if(isset($_POST['group_name'])) {
 
             // TODO : empêcher de créer deux groupes avec le même nom
-            $group_name = $_POST['group_name'];
             $this->create_table();
-            $this->insert_data_group($group_name);
+            $this->insert_data_group(esc_attr($_POST['group_name']));
         }
         ?>
         <form method="post" name="create_group" id="create_group" class="validate" novalidate="novalidate">
@@ -72,16 +71,24 @@ class CreationGroupeMenu extends IresMenu
 
     function insert_data_group($name) {
         global $wpdb;
-        $creator_id = get_current_user_id();
-        $table_name = $wpdb->prefix.'groups';
-        $wpdb->insert(
+        $table_name = $wpdb->prefix . 'groups';
+        echo $name.'<br/>';
+        $sql = "SELECT * FROM $table_name WHERE name='$name'";
+        echo $sql.'<br/>';
+        $num = count($wpdb->get_results($sql));
+        echo $num.'<br/>';
+        if ($num == 0) {
+            $creator_id = get_current_user_id();
+            $table_name = $wpdb->prefix.'groups';
+            $wpdb->insert(
                 $table_name,
                 array(
                     'name'=>$name,
                     'creator_id'=>$creator_id
                 ),
                 array( '%s','%d')
-        );
+            );
+        }
     }
 }
 ?>

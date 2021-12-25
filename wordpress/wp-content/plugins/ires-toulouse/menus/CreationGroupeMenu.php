@@ -72,11 +72,8 @@ class CreationGroupeMenu extends IresMenu
     function insert_data_group($name) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'groups';
-        echo $name.'<br/>';
         $sql = "SELECT * FROM $table_name WHERE name='$name'";
-        echo $sql.'<br/>';
         $num = count($wpdb->get_results($sql));
-        echo $num.'<br/>';
         if ($num == 0) {
             $creator_id = get_current_user_id();
             $table_name = $wpdb->prefix.'groups';

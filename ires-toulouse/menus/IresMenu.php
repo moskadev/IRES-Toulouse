@@ -25,6 +25,8 @@ abstract class IresMenu {
         IresMenu::register("admin_menu", new AddUserMenu());
         IresMenu::register("admin_menu", new AffectionRoleMenu());
         IresMenu::register("admin_menu", new ModifyUserDataMenu());
+        IresMenu::register("admin_menu", new InformationUserMenu());
+        IresMenu::registerSub("admin_menu", new CreationGroupeMenu(), array(new ModificationGroupeMenu(), new ListeGroupeMenu(), new SuppressionGroupMenu()));
     }
 
     /**
@@ -46,6 +48,96 @@ abstract class IresMenu {
                 },
                 $menu->getIconUrl(),
                 $menu->getPosition());
+        });
+    }
+
+    /**
+     * Adding a submenu in the dashboard of the WordPress administration
+     *
+     * @param string $destSubMenu
+     * @param IresMenu $menuDefault it's the menu by default on the panel
+     * @param array $menu composed of the number of sub-menus you want to add at your panel
+     */
+    public static function registerSub(string $destSubMenu, IresMenu $menuDefault, array $menu) : void{
+        add_action($destSubMenu, function () use ($menu, $menuDefault) {
+            add_menu_page(
+				"Groupes",
+	            "Groupes",
+	            10,
+	            //$menuDefault->getPageTitle(),
+				//$menuDefault->getPageMenu(),
+                //$menuDefault->getLvlAccess(),
+                $menuDefault->getId(),
+                function () use ($menuDefault, $menu) {
+                    echo "<div class='wrap'>";
+                    $menuDefault->getContent();
+                    echo "</div>";
+                },
+                $menuDefault->getIconUrl(),
+                $menuDefault->getPosition()
+            );
+            add_submenu_page(
+				$menuDefault->getId(),
+                $menuDefault->getPageTitle(),
+                $menuDefault->getPageMenu(),
+                $menuDefault->getLvlAccess(),
+                $menuDefault->getId()
+            );
+        });
+        foreach ($menu as $browseMenu) {
+            add_action($destSubMenu, function () use ($menuDefault, $browseMenu) {
+                add_submenu_page($menuDefault->getId(),
+                    $browseMenu->getPageTitle(),
+                    $browseMenu->getPageMenu(),
+                    $browseMenu->getLvlAccess(),
+                    $browseMenu->getId(),
+                    function () use ($browseMenu) {
+                        echo "<div class='wrap'>";
+                        $browseMenu->getContent();
+                        echo "</div>";
+                    });
+            });
+        }
+    }
+
+    /**
+     * Adding the submenu in the dashboard of the WordPress administration
+     *
+     * @param string $destSubMenu
+     * @param IresMenu $menu
+     */
+    public static function registerSubSave(string $destSubMenu, IresMenu $menu, IresMenu $menuDefault) : void{
+        add_action($destSubMenu, function () use ($menu, $menuDefault) {
+            add_menu_page($menu->getPageTitle(),
+                $menuDefault->getPageMenu(),
+                $menuDefault->getLvlAccess(),
+                $menuDefault->getId(),
+                function () use ($menuDefault) {
+                    echo "<div class='wrap'>";
+                    $menuDefault->getContent();
+                    echo "</div>";
+                },
+                $menuDefault->getIconUrl(),
+                $menu->getPosition()
+            );
+            add_submenu_page($menuDefault->getId(),
+                $menuDefault->getPageTitle(),
+                $menuDefault->getPageMenu(),
+                $menuDefault->getLvlAccess(),
+                $menuDefault->getId()
+            );
+        });
+        add_action($destSubMenu, function () use ($menu, $menuDefault) {
+            add_submenu_page($menuDefault->getId(),
+                $menu->getPageTitle(),
+                $menu->getPageMenu(),
+                $menu->getLvlAccess(),
+                $menu->getId(),
+                function () use ($menu) {
+                    echo "<div class='wrap'>";
+                    $menu->getContent();
+                    echo "</div>";
+                });
         });
     }
 

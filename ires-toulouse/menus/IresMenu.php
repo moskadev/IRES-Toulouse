@@ -61,12 +61,9 @@ abstract class IresMenu {
     public static function registerSub(string $destSubMenu, IresMenu $menuDefault, array $menu) : void{
         add_action($destSubMenu, function () use ($menu, $menuDefault) {
             add_menu_page(
-				"Groupes",
-	            "Groupes",
-	            10,
-	            //$menuDefault->getPageTitle(),
-				//$menuDefault->getPageMenu(),
-                //$menuDefault->getLvlAccess(),
+	        $menuDefault->getPageTitle(),
+		$menuDefault->getPageMenu(),
+                $menuDefault->getLvlAccess(),
                 $menuDefault->getId(),
                 function () use ($menuDefault, $menu) {
                     echo "<div class='wrap'>";

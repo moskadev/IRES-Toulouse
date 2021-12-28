@@ -4,6 +4,7 @@ namespace irestoulouse\menus;
 
 use irestoulouse\elements\input\UserInputData;
 use irestoulouse\utils\Dataset;
+use irestoulouse\sql\SqlRequestGroup;
 
 include_once("IresMenu.php");
 
@@ -27,7 +28,7 @@ class CreationGroupeMenu extends IresMenu
     function getContent(): void {
         if(isset($_POST['group_name'])) {
             $this->create_table();
-            $this->insert_data_group(esc_attr($_POST['group_name']));
+            insert_data_group(esc_attr($_POST['group_name']));
         }
         ?>
         <form method="post" name="create_group" id="create_group" class="validate" novalidate="novalidate">
@@ -76,39 +77,6 @@ class CreationGroupeMenu extends IresMenu
         maybe_create_table($table_name, $sql_create_user_group );
     }
 
-    /***
-     * Check if a group already exist in database
-     *
-     * @param $groupName name of the group to create
-     * @return bool return true if the group exist, otherwise return false
-     */
-    function groupExist($wpdb, $table_name, $groupName): bool
-    {
-        $sql = "SELECT * FROM $table_name WHERE name='$groupName'";
-        return count($wpdb->get_results($sql)) == 0;
-    }
-
-    /**
-     * Create a groups if it doesn't already exist in database
-     *
-     * @param string $name
-     */
-    function insert_data_group($nameGroup) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'groups';
-
-        // If the name group is present 0 times in the database$
-        if ($this->groupExist($wpdb, $table_name,$nameGroup)) {
-            $creator_id = get_current_user_id();
-            $wpdb->insert(
-                $table_name,
-                array(
-                    'name'=>$nameGroup,
-                    'creator_id'=>$creator_id
-                ),
-                array( '%s','%d')
-            );
-        }
-    }
+    
 }
 ?>

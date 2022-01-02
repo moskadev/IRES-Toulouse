@@ -23,7 +23,7 @@ class ListeGroupeMenu extends IresMenu {
 	 *      - create a group of user if you are admin
 	 */
 	function getContent(): void {
-		$groups = $this->getGroups();
+		$groups = self::getGroups();
 		//var_dump($groups[0]); ?>
         <div>
             <h1 class="wp-heading-inline">Groupes</h1>
@@ -36,8 +36,9 @@ class ListeGroupeMenu extends IresMenu {
                 <tr>
                     <th scope="col">Nom</th>
                     <th scope="col">Responsable</th>
-                    <th scope="col">Date création</th>
+                    <th scope="col">Date de création</th>
                     <th scope="col"></th>
+                    <th scope="col">Membres</th>
                 </tr>
             </thead>
             <tbody>
@@ -67,7 +68,38 @@ class ListeGroupeMenu extends IresMenu {
                             <button type="submit" id="delete" name="delete" value="<?php echo $group['name'] ?>" class="btn btn-outline-danger btn-sm"><?php echo __('Delete') ?></button>
                         </form>
                     </td>
+                    <td>
+                        <form action="" method="post">
+                            <button type="submit" class="btn btn-outline-secondary" name="list<?php echo $group['name'] ?>" value="<?php echo $group['id_group'] ?>">
+                                <span class="dashicons dashicons-arrow-right-alt2"></span>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
+
+                    <?php
+                    $id = "list".$group['name'];
+                    if (isset($_POST[$id])) {
+                        $users = $this->getIdUserGroup($_POST[$id]);
+                        foreach ( $users as $user ) {
+	                        ?>
+                            <tr>
+                                <td>
+			                        <?php
+			                        $data = $this->getUser($user['user_id'], "last_name");
+                                    echo $data[0]['meta_value'];
+			                        $data = $this->getUser($user['user_id'], "first_name");
+			                        echo " ".$data[0]['meta_value'];
+			                        ?>
+                                </td>
+                                <td colspan="4"></td>
+                            </tr>
+	                        <?php
+                        }
+                        ?>
+                        <?php
+                    }
+                    ?>
 
             <?php
             } // end foreach
@@ -83,8 +115,9 @@ class ListeGroupeMenu extends IresMenu {
                 <tr>
                     <td>Nom</td>
                     <td>Responsable</th>
-                    <td>Date création</th>
+                    <td>Date de création</th>
                     <td></td>
+                    <td>Membres</td>
                 </tr>
             </tfoot>
 <?php       } // endif ?>
@@ -96,18 +129,6 @@ class ListeGroupeMenu extends IresMenu {
 			//var_dump($_POST);
         }
 	} // end function
-
-	/**
-	 * @return array|object|null all the groups available
-	 * TODO move to respect MVC
-	 */
-	private function getGroups() {
-		global $wpdb;
-		return $wpdb->get_results(
-			$wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups ORDER BY name"),
-			ARRAY_A);
-	}
-
 
 	/**
 	 * Check if a group already exist in database
@@ -122,10 +143,19 @@ class ListeGroupeMenu extends IresMenu {
 	}
 
 	/**
+	 * @return array|object|null all the groups available
+	 */
+	public static function getGroups() {
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups ORDER BY name"),
+			ARRAY_A);
+	}
+
+	/**
 	 * Delete a groups if he exist in database
 	 *
 	 * @param string $inputId
-	 * @return string input's value
+	 * @return true|false if group deleted or not
 	 */
 	function delete_group ($nameGroup) {
 		global $wpdb;
@@ -138,6 +168,30 @@ class ListeGroupeMenu extends IresMenu {
 				['name'=>$nameGroup],
 				['%s']
 			);
+			return true;
 		}
+        return false;
 	}
+
+	/**
+	 * @param $group_id the id of the group
+	 *
+	 * @return array|object|null
+	 */
+    private function getIdUserGroup($group_id) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups_users WHERE group_id = %d", $group_id),
+            ARRAY_A);
+    }
+
+	/**
+	 * @param $userId
+	 *
+	 * @return array|object|null
+	 */
+    private function getUser($userId, $metaKey) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT meta_value FROM {$wpdb->prefix}usermeta WHERE user_id = %d AND meta_key = %s", $userId, $metaKey),
+            ARRAY_A);
+    }
 }

@@ -23,6 +23,16 @@ class ListeGroupeMenu extends IresMenu {
 	 *      - create a group of user if you are admin
 	 */
 	function getContent(): void {
+		if(isset($_POST['delete'])) {
+			$this->delete_group($_POST['delete']);
+			echo "<meta http-equiv='refresh' content='0'>";
+		}
+
+		if (isset($_POST['deleteMember'])) {
+			$str = explode(".", $_POST['deleteMember']);
+			$this->deleteUserGroup($str[0], $str[1]);
+		}
+
 		$groups = self::getGroups();
 		//var_dump($groups[0]); ?>
         <div>
@@ -43,7 +53,7 @@ class ListeGroupeMenu extends IresMenu {
             </thead>
             <tbody>
 <?php
-                foreach ($groups as $group) { ?>
+                foreach ($groups as $group) {?>
                 <tr>
                     <!-- Name of the group -->
                     <th scope="row" class="text-primary">
@@ -92,7 +102,12 @@ class ListeGroupeMenu extends IresMenu {
 			                        echo " ".$data[0]['meta_value'];
 			                        ?>
                                 </td>
-                                <td colspan="4"></td>
+                                <td colspan="3"></td>
+                                <td>
+                                    <form action="" method="post">
+                                        <button type="submit" id="deleteMember" name="deleteMember" value="<?php echo $user['user_id'].".".$group['id_group'] ?>" class="btn btn-outline-danger btn-sm"><?php echo __('Remove') ?></button>
+                                    </form>
+                                </td>
                             </tr>
 	                        <?php
                         }
@@ -123,11 +138,6 @@ class ListeGroupeMenu extends IresMenu {
 <?php       } // endif ?>
         </table>
 <?php
-		if(isset($_POST['delete'])) {
-			$this->delete_group($_POST['delete']);
-			echo "<meta http-equiv='refresh' content='0'>";
-			//var_dump($_POST);
-        }
 	} // end function
 
 	/**
@@ -193,5 +203,10 @@ class ListeGroupeMenu extends IresMenu {
         global $wpdb;
         return $wpdb->get_results($wpdb->prepare("SELECT meta_value FROM {$wpdb->prefix}usermeta WHERE user_id = %d AND meta_key = %s", $userId, $metaKey),
             ARRAY_A);
+    }
+
+    private function deleteUserGroup($userId, $groupId) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
     }
 }

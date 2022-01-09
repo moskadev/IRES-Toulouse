@@ -89,36 +89,36 @@ class ModifyUserDataMenu extends IresMenu {
 
             if($isAdmin){?>
                 <form method='post' name='to-modify-user' id='to-modify-user' class='validate' novalidate='novalidate'>
-                    <table class='form-table' role='presentation'>
-                        <tr class="form-field form-required">
-                            <th>
-                                <label for='users'>
-                                    Sélectionnez l'utilisateur à modifier <?php
-                                    if($this->lastUserId == Identifier::getLastRegisteredUser()){ ?>
-                                        <span class='description'>(sélection par défaut de la dernière création)</span>
-                                    <?php } ?>
-                                </label>
-                            </th>
-                            <td>
-                                <select name="users"><?php
-                                    $users = array_filter(get_users(), function ($u){
-                                        return $u->ID != get_current_user_id() && !in_array("administrator",  $u->roles);
-                                    });
-                                    foreach ($users as $user){?>
-                                        <option value='<?php echo $user->ID ?>' <?php if($this->lastUserId == $user->ID) echo "selected" ?>>
-                                            <?php echo $user->nickname ?>
-                                        </option>
-                                    <?php }
-                                    ?></select>
-                                </select>
-                            </td>
-                        </tr>
-                    </table> <?php
-                    submit_button(__("Modifier cet utilisateur"), "button action",
-                        "to-modify", true,
-                        ["id" => "to-modify-user-btn"]);
-                    ?>
-                    <span class='description'>Veuillez valider si vous avez sélectionné un nouveau utilisateur</span>
+                <table class='form-table' role='presentation'>
+                    <tr class="form-field form-required">
+                        <th>
+                            <label for='users'>
+                                Sélectionnez l'utilisateur à modifier <?php
+                                if($this->lastUserId == Identifier::getLastRegisteredUser()){ ?>
+                                    <span class='description'>(sélection par défaut de la dernière création)</span>
+                                <?php } ?>
+                            </label>
+                        </th>
+                        <td>
+                            <select name="users"><?php
+                                $users = array_filter(get_users(), function ($u){
+                                    return $u->ID != get_current_user_id() && !in_array("administrator",  $u->roles);
+                                });
+                                foreach ($users as $user){?>
+                                    <option value='<?php echo $user->ID ?>' <?php if($this->lastUserId == $user->ID) echo "selected" ?>>
+                                        <?php echo $user->nickname ?>
+                                    </option>
+                                <?php }
+                                ?></select>
+                            </select>
+                        </td>
+                    </tr>
+                </table> <?php
+                submit_button(__("Modifier cet utilisateur"), "button action",
+                    "to-modify", true,
+                    ["id" => "to-modify-user-btn"]);
+                ?>
+                <span class='description'>Veuillez valider si vous avez sélectionné un nouveau utilisateur</span>
                 </form><?php
             }
             ?>
@@ -152,7 +152,7 @@ class ModifyUserDataMenu extends IresMenu {
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
                                         value='<?php echo htmlspecialchars($this->getInputValue($inputId));?>'>
-                                <?php
+                                    <?php
                                 } else if($inputFormType === "radio"){
                                     $value = filter_var($this->getInputValue($inputId), FILTER_VALIDATE_BOOLEAN);?>
                                     Oui <input <?php echo Dataset::allFrom($inputData) ?>
@@ -171,21 +171,21 @@ class ModifyUserDataMenu extends IresMenu {
                                     <?php
                                 } else if(in_array($inputFormType, ["dropdown", "checklist"])){?>
                                     <select <?php if($inputFormType === "checklist") echo "multiple" ?>
-                                            name='<?php echo $inputId ?>[]'
-                                            id='<?php echo $inputId ?>'> <?php
-                                    /**
-                                     * Extra data are checked individually and put in the dropdown or checklist
-                                     * Multiple items can be selected for checklist, so we check if the user
-                                     * has those extra data
-                                     */
-                                    foreach ($inputData->getExtraData() as $data){?>
-                                        <!-- value of the option -->
-                                        <option value='<?php echo $data ?>'
-                                            <?php if($this->containsExtraData($inputData, $data)) echo "selected" ?>>
-                                            <!-- check if the extra data has been selected by the user -->
-                                            <?php echo $data ?> <!-- the option's text -->
-                                        </option> <?php
-                                    } ?>
+                                        name='<?php echo $inputId ?>[]'
+                                        id='<?php echo $inputId ?>'> <?php
+                                        /**
+                                         * Extra data are checked individually and put in the dropdown or checklist
+                                         * Multiple items can be selected for checklist, so we check if the user
+                                         * has those extra data
+                                         */
+                                        foreach ($inputData->getExtraData() as $data){?>
+                                            <!-- value of the option -->
+                                            <option value='<?php echo $data ?>'
+                                                <?php if($this->containsExtraData($inputData, $data)) echo "selected" ?>>
+                                                <!-- check if the extra data has been selected by the user -->
+                                                <?php echo $data ?> <!-- the option's text -->
+                                            </option> <?php
+                                        } ?>
                                     </select> <?php
                                 }
                                 if(!empty($inputData->getDescription())){ ?>
@@ -195,12 +195,12 @@ class ModifyUserDataMenu extends IresMenu {
                         </tr>
                     </table>
                     <?php
-                    }
-                    submit_button(__("Modifier les informations"), "primary",
-                        "profile-page", true,
-                        ["id" => "profile-page-sub", "disabled" => "true"]);
-                    ?>
-                </form> <?php
+                }
+                submit_button(__("Modifier les informations"), "primary",
+                    "profile-page", true,
+                    ["id" => "profile-page-sub", "disabled" => "true"]);
+                ?>
+            </form> <?php
         } else { ?>
             <div id="message" class="error notice">
                 <p><strong>Aucun utilisateur ne peut être modifié</strong></p>

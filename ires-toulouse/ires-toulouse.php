@@ -13,7 +13,13 @@ License: A "Slug" license name e.g. GPL2
 require_once("menus/IresMenu.php");
 require_once("menus/AddUserMenu.php");
 require_once("menus/ModifyUserDataMenu.php");
+require_once("menus/InformationUserMenu.php");
 require_once("menus/AffectionRoleMenu.php");
+require_once("menus/CreationGroupeMenu.php");
+require_once("menus/ListeGroupeMenu.php");
+require_once("menus/ModificationGroupeMenu.php");
+require_once("menus/SuppressionGroupMenu.php");
+
 
 require_once("elements/IresElement.php");
 require_once("elements/Discipline.php");

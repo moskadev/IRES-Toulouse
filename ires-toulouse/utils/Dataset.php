@@ -7,7 +7,7 @@ use irestoulouse\elements\input\UserInputData;
 class Dataset {
 
     /**
-     * Hacky way to get all the da
+     * Hacky way to get all the data
      * @param UserInputData $userData the datas to convert
      * @return string
      */

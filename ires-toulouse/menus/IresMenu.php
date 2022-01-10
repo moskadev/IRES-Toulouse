@@ -26,7 +26,8 @@ abstract class IresMenu {
 		IresMenu::register("admin_menu", new AffectionRoleMenu());
 		IresMenu::register("admin_menu", new ModifyUserDataMenu());
 		IresMenu::register("admin_menu", new InformationUserMenu());
-		IresMenu::registerSub("admin_menu", new CreationGroupeMenu(), array(new ModificationGroupeMenu(), new ListeGroupeMenu(), new SuppressionGroupMenu()));
+		IresMenu::register("admin_menu", new ListeGroupeMenu());
+		IresMenu::registerInvisibleSub("admin_menu", new DetailsGroup(), "Groupes");
 	}
 
 	/**
@@ -47,6 +48,23 @@ abstract class IresMenu {
 					echo "</div>";
 				},
 				$menu->getIconUrl(),
+				$menu->getPosition());
+		});
+	}
+
+	public static function registerInvisibleSub(string $destMenu, IresMenu $menu, $parentSlug) : void{
+		add_action($destMenu, function () use ($menu) {
+			add_submenu_page(
+				null,
+				$menu->getPageTitle(),
+				$menu->getPageMenu(),
+				$menu->getLvlAccess(),
+				$menu->getId(),
+				function () use ($menu) {
+					echo "<div class='wrap'>";
+					$menu->getContent();
+					echo "</div>";
+				},
 				$menu->getPosition());
 		});
 	}

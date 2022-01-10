@@ -26,6 +26,7 @@ class ListeGroupeMenu extends IresMenu {
         $user = wp_get_current_user();
 		$groups = self::getGroups();
 
+
 		//var_dump($user);
 		//var_dump($groups[0]);
 		if(isset($_POST['delete'])) {
@@ -44,9 +45,11 @@ class ListeGroupeMenu extends IresMenu {
 	        $this->create_table();
 	        if ($this->insert_data_group(esc_attr($_POST['nameAddGroup']))) {
 		        $type_message = "updated";
-		        $message = "Le groupe ".$_POST['nameAddGroup']." a était créé.";
+		        $message = "Le groupe ".$_POST['nameAddGroup']." a été créé.";
             }
-	        //echo "<meta http-equiv='refresh' content='0'>";
+
+            // Rafraichir la page pour afficher le nouveau groupe
+	        // echo "<meta http-equiv='refresh' content='0'>";
 
             ?>
             <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un groupe -->
@@ -57,7 +60,6 @@ class ListeGroupeMenu extends IresMenu {
         }
 
 		?>
-
         <div>
             <h1 class="wp-heading-inline">Groupes</h1>
 
@@ -98,25 +100,32 @@ class ListeGroupeMenu extends IresMenu {
                     <th scope="col">Responsable</th>
                     <th scope="col">Date de création</th>
                     <th scope="col"></th>
-                    <th scope="col">Membres</th>
                 </tr>
             </thead>
             <tbody>
 <?php
-                foreach ($groups as $group) {?>
-                <tr>
+                foreach ($groups as $group) {
+	                $users = self::getIdUserGroup($group['id_group']);
+                    $list_user = [];
+                    foreach ($users as $user) {
+                        array_push($list_user, $user['user_id']);
+                    }
+	                $id_resp = $this->getIdResponsable($group['id_group']);
+	                $id_resp = $id_resp[0]['id_responsable'];
+                    ?>
+                <tr class="<?php if (in_array(get_current_user_id(), $list_user)) echo "table-primary"; ?>">
                     <!-- Name of the group -->
                     <th scope="row" class="text-primary">
-                        <?php echo $group['name'] ?>
+                        <a class="text-decoration-none" href="http://localhost/wordpress/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>">
+	                        <?php echo $group['name'] ?>
+                        </a>
                     </th>
                     <!-- Name of the responsible -->
                     <td class="">
                         <?php
-                            if ($group['name_responsable'] === "" | $group['name_responsable'] == null ) {
-                                echo "---";
-                            } else {
-                                echo $group['name_responsable'];
-                            }
+                        $first_name = self::getUser( $id_resp, "first_name" );
+                        $last_name  = self::getUser( $id_resp, "last_name" );
+                        echo $first_name[0]['meta_value'] . " " . $last_name[0]['meta_value'];
                         ?>
                     </td>
                     <!-- Date -->
@@ -124,62 +133,32 @@ class ListeGroupeMenu extends IresMenu {
                         <?php echo $group['time_created'] ?>
                     </td>
                     <td>
-                        <form action="" method="post">
-                            <button type="submit"
-                                    id="delete"
-                                    name="delete"
-                                    value="<?php echo $group['name'] ?>"
-                                    class="btn btn-outline-danger btn-sm"
-                                    onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group['name']; ?> ?');">
-                                    <?php echo __('Delete') ?>
-                            </button>
-                        </form>
-                    </td>
-                    <td>
-                        <form action="" method="post">
-                            <button type="submit" class="btn btn-outline-secondary" name="list<?php echo $group['name'] ?>" value="<?php echo $group['id_group'] ?>">
-                                <span class="dashicons dashicons-arrow-right-alt2"></span>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-
-                    <?php
-                    $id = "list".$group['name'];
-                    if (isset($_POST[$id])) {
-                        $users = $this->getIdUserGroup($_POST[$id]);
-                        foreach ( $users as $user ) {
-	                        ?>
-                            <tr>
-                                <td>
-			                        <?php
-			                        $last_name = $this->getUser($user['user_id'], "last_name");
-                                    echo $last_name[0]['meta_value'];
-			                        $first_name = $this->getUser($user['user_id'], "first_name");
-			                        echo " ".$first_name[0]['meta_value'];
-			                        ?>
-                                </td>
-                                <td colspan="3"></td>
-                                <td>
-                                    <form action="" method="post">
-                                        <button type="submit"
-                                                id="deleteMember"
-                                                name="deleteMember"
-                                                value="<?php echo $user['user_id'].".".$group['id_group'] ?>"
-                                                class="btn btn-outline-danger btn-sm"
-                                                onclick="return confirm('Êtes vous sur de vouloir retirer <?php echo $first_name[0]['meta_value']." ".$last_name[0]['meta_value']; ?> du groupe <?php echo $group['name']; ?> ?');">
-                                                    <?php echo __('Remove') ?>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-	                        <?php
+                        <?php
+                        if (current_user_can('administrator') || current_user_can('responsable')) {
+                        ?>
+                            <form action="" method="post">
+                                <button type="button"
+                                        id="modify"
+                                        name="modify"
+                                        value="<?php echo $group['name'] ?>"
+                                        class="btn btn-outline-secondary btn-sm"
+                                        onclick="location.href='http://localhost/wordpress/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>'">
+                                    Modifier
+                                </button>
+                                <button type="submit"
+                                        id="delete"
+                                        name="delete"
+                                        value="<?php echo $group['name'] ?>"
+                                        class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group['name']; ?> ?');">
+                                        <?php echo __('Delete') ?>
+                                </button>
+                            </form>
+                        <?php
                         }
                         ?>
-                        <?php
-                    }
-                    ?>
-
+                    </td>
+                </tr>
             <?php
             } // end foreach
 ?>
@@ -196,7 +175,6 @@ class ListeGroupeMenu extends IresMenu {
                     <td>Responsable</th>
                     <td>Date de création</th>
                     <td></td>
-                    <td>Membres</td>
                 </tr>
             </tfoot>
 <?php       } // endif ?>
@@ -228,6 +206,8 @@ class ListeGroupeMenu extends IresMenu {
 	/**
 	 * Delete a groups if he exist in database
 	 *
+     * TODO ajouter la suppression de tous les utilisateurs de ce groupe
+     *
 	 * @param string $inputId
 	 * @return true|false if group deleted or not
 	 */
@@ -247,28 +227,6 @@ class ListeGroupeMenu extends IresMenu {
         return false;
 	}
 
-	/**
-	 * @param $group_id the id of the group
-	 *
-	 * @return array|object|null
-	 */
-    private function getIdUserGroup($group_id) {
-        global $wpdb;
-        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups_users WHERE group_id = %d", $group_id),
-            ARRAY_A);
-    }
-
-	/**
-	 * @param $userId
-	 *
-	 * @return array|object|null
-	 */
-    private function getUser($userId, $metaKey) {
-        global $wpdb;
-        return $wpdb->get_results($wpdb->prepare("SELECT meta_value FROM {$wpdb->prefix}usermeta WHERE user_id = %d AND meta_key = %s", $userId, $metaKey),
-            ARRAY_A);
-    }
-
     private function deleteUserGroup($userId, $groupId) {
         global $wpdb;
         return $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
@@ -277,8 +235,6 @@ class ListeGroupeMenu extends IresMenu {
 	/**
 	 * Looking if groups and groups_user table have been created and if they not, create then
 	 *
-	 * @param string $inputId
-	 * @return string input's value
 	 */
 	function create_table() {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -290,6 +246,7 @@ class ListeGroupeMenu extends IresMenu {
                 name char(30) NOT NULL,
                 time_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 creator_id bigint(20) UNSIGNED NOT NULL,
+                id_responsable bigint(20) NOT NULL,
                 FOREIGN KEY (creator_id) REFERENCES wp_users(ID),
                 PRIMARY KEY  (id_group) 
             ) $charset_collate;";
@@ -331,5 +288,39 @@ class ListeGroupeMenu extends IresMenu {
             return true;
 		}
         return false;
+	}
+
+	/**
+	 * @param $group_id integer id of the group
+	 *
+	 * @return array|object|null all the users in the group given in parameter
+	 */
+	private function getIdUserGroup( int $group_id) {
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups_users WHERE group_id = %d", $group_id),
+			ARRAY_A);
+	}
+
+	/**
+	 * @param $userId
+	 * @param $metaKey
+	 *
+	 * @return array|object|null
+	 */
+	private function getUser($userId, $metaKey) {
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT meta_value FROM {$wpdb->prefix}usermeta WHERE user_id = %d AND meta_key = %s", $userId, $metaKey),
+			ARRAY_A);
+	}
+
+	/**
+	 * @param int $group_id
+	 *
+	 * @return array|object|null
+	 */
+	function getIdResponsable(int $group_id) {
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT id_responsable FROM {$wpdb->prefix}groups WHERE id_group = %d", $group_id),
+			ARRAY_A);
 	}
 }

@@ -26,9 +26,6 @@ class ListeGroupeMenu extends IresMenu {
         $user = wp_get_current_user();
 		$groups = self::getGroups();
 
-
-		//var_dump($user);
-		//var_dump($groups[0]);
 		if(isset($_POST['delete'])) {
 			$this->delete_group($_POST['delete']);
 			echo "<meta http-equiv='refresh' content='0'>";
@@ -97,7 +94,7 @@ class ListeGroupeMenu extends IresMenu {
             <thead>
                 <tr>
                     <th scope="col">Nom</th>
-                    <th scope="col">Responsable</th>
+                    <th scope="col">Responsable(s)</th>
                     <th scope="col">Date de création</th>
                     <th scope="col"></th>
                 </tr>
@@ -107,26 +104,33 @@ class ListeGroupeMenu extends IresMenu {
                 foreach ($groups as $group) {
 	                $users = self::getIdUserGroup($group['id_group']);
                     $list_user = [];
-                    foreach ($users as $user) {
-                        array_push($list_user, $user['user_id']);
+                    foreach ($users as $usr) {
+                        array_push($list_user, $usr['user_id']);
                     }
-	                $id_resp = $this->getIdResponsable($group['id_group']);
-	                $id_resp = $id_resp[0]['id_responsable'];
+
+	                $results = $this->getIdResponsable($group['id_group']);
+	                $id_resp = [];
+	                foreach ($results as $result)
+		                array_push($id_resp, (int) $result['user_id']);
                     ?>
                 <tr class="<?php if (in_array(get_current_user_id(), $list_user)) echo "table-primary"; ?>">
                     <!-- Name of the group -->
                     <th scope="row" class="text-primary">
-                        <a class="text-decoration-none" href="http://localhost/wordpress/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>">
+                        <a class="text-decoration-none" href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>">
 	                        <?php echo $group['name'] ?>
                         </a>
                     </th>
                     <!-- Name of the responsible -->
                     <td class="">
-                        <?php
-                        $first_name = self::getUser( $id_resp, "first_name" );
-                        $last_name  = self::getUser( $id_resp, "last_name" );
-                        echo $first_name[0]['meta_value'] . " " . $last_name[0]['meta_value'];
-                        ?>
+	                    <?php
+	                    foreach ($id_resp as $resp) {
+		                    $first_name = self::getUser($resp, "first_name");
+		                    $last_name = self::getUser($resp, "last_name");
+		                    echo $first_name[0]['meta_value']." ".$last_name[0]['meta_value'];
+                            if (sizeof($id_resp) > 1)
+                                echo ", ";
+	                    }
+	                    ?>
                     </td>
                     <!-- Date -->
                     <td>
@@ -134,7 +138,7 @@ class ListeGroupeMenu extends IresMenu {
                     </td>
                     <td>
                         <?php
-                        if (current_user_can('administrator') || current_user_can('responsable')) {
+                        if (current_user_can('administrator') || (current_user_can('responsable') && self::userIsResponsableGroup($user->ID, $group['id_group']))) {
                         ?>
                             <form action="" method="post">
                                 <button type="button"
@@ -142,17 +146,23 @@ class ListeGroupeMenu extends IresMenu {
                                         name="modify"
                                         value="<?php echo $group['name'] ?>"
                                         class="btn btn-outline-secondary btn-sm"
-                                        onclick="location.href='http://localhost/wordpress/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>'">
+                                        onclick="location.href='<?php echo get_site_url() ?>/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>'">
                                     Modifier
                                 </button>
-                                <button type="submit"
-                                        id="delete"
-                                        name="delete"
-                                        value="<?php echo $group['name'] ?>"
-                                        class="btn btn-outline-danger btn-sm"
-                                        onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group['name']; ?> ?');">
+                                <?php
+                                if (current_user_can('administrator')) {
+                                    ?>
+                                    <button type="submit"
+                                            id="delete"
+                                            name="delete"
+                                            value="<?php echo $group['name'] ?>"
+                                            class="btn btn-outline-danger btn-sm"
+                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group['name']; ?> ?');">
                                         <?php echo __('Delete') ?>
-                                </button>
+                                    </button>
+                                    <?php
+                                }
+                                ?>
                             </form>
                         <?php
                         }
@@ -246,7 +256,6 @@ class ListeGroupeMenu extends IresMenu {
                 name char(30) NOT NULL,
                 time_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 creator_id bigint(20) UNSIGNED NOT NULL,
-                id_responsable bigint(20) NOT NULL,
                 FOREIGN KEY (creator_id) REFERENCES wp_users(ID),
                 PRIMARY KEY  (id_group) 
             ) $charset_collate;";
@@ -254,10 +263,13 @@ class ListeGroupeMenu extends IresMenu {
 		$table_name = $wpdb->prefix . 'groups_users';
 
 		$sql_create_user_group = "CREATE TABLE $table_name (
+                ID bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                 user_id bigint(20) UNSIGNED NOT NULL,
                 group_id bigint(20) UNSIGNED NOT NULL,
+                is_responsable int(1) NOT NULL DEFAULT '0',
                 FOREIGN KEY (user_id) REFERENCES wp_users(ID),
-                FOREIGN KEY (group_id) REFERENCES wp_groups(id_group)
+                FOREIGN KEY (group_id) REFERENCES wp_groups(id_group),
+                PRIMARY KEY (ID)
             ) $charset_collate;";
 		maybe_create_table($table_name, $sql_create_user_group );
 	}
@@ -316,11 +328,28 @@ class ListeGroupeMenu extends IresMenu {
 	/**
 	 * @param int $group_id
 	 *
-	 * @return array|object|null
+	 * @return array|object|null l'id du ou des responsables du groupe
 	 */
 	function getIdResponsable(int $group_id) {
 		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT id_responsable FROM {$wpdb->prefix}groups WHERE id_group = %d", $group_id),
+		return $wpdb->get_results($wpdb->prepare("SELECT user_id FROM {$wpdb->prefix}groups_users WHERE group_id = %d AND is_responsable = 1", $group_id),
 			ARRAY_A);
 	}
+
+    /**
+     * @param $user_id
+     * @param $group_id
+     *
+     * @return bool
+     */
+    private function userIsResponsableGroup( $user_id, $group_id ): bool {
+        $list_user = [];
+        $users = $this->getIdResponsable($group_id);
+        foreach ($users as $user) {
+            array_push($list_user, $user['user_id']);
+        }
+        if (in_array($user_id, $list_user))
+            return true;
+        return false;
+    }
 }

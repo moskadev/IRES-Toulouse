@@ -264,6 +264,14 @@ class DetailsGroup extends IresMenu {
 			ARRAY_A);
 	}
 
+    /**
+     * @return array|null with all the groups where a member is responsable
+     */
+    private function getGroupsWhereIdIsResponsable($user_id) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT id_group FROM {$wpdb->prefix}groups JOIN {$wpdb->prefix}groups_users ON id_group = group_id WHERE is_responsable = 1 AND user_id = %d", $user_id), ARRAY_A);
+    }
+
 	/**
 	 * @param int $group_id
 	 *
@@ -371,9 +379,12 @@ class DetailsGroup extends IresMenu {
     private function deleteResponsableGroup($user_id, $group_id): bool {
 	    global $wpdb;
 	    if (self::userIsInGroup($user_id, $group_id) && self::userIsResponsableGroup($user_id, $group_id)) {
-		    $wpdb->get_results($wpdb->prepare("UPDATE {$wpdb->prefix}groups_users SET is_responsable = '0' WHERE user_id = %d AND group_id = %d", $user_id, $group_id));
             $user = get_user_by("id", $user_id);
-            $user->set_role("subscriber");
+            if (sizeof(self::getGroupsWhereIdIsResponsable($user_id)) < 2) {
+                $user->set_role("subscriber");
+            }
+            $wpdb->get_results($wpdb->prepare("UPDATE {$wpdb->prefix}groups_users SET is_responsable = '0' WHERE user_id = %d AND group_id = %d", $user_id, $group_id));
+
             return true;
 	    }
 	    return false;

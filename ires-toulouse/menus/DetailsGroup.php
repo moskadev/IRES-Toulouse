@@ -89,7 +89,9 @@ class DetailsGroup extends IresMenu {
 
         <div class="row">
             <div class="col-auto">
-                <button onclick="location.href='<?php echo get_site_url() ?>/wp-admin/admin.php?page=groupes';" type="button" value="" name="back" class="btn btn-outline-secondary rounded-circle" style="width: 48px; height: 48px"><i class="bi bi-arrow-left"></i></button>
+                <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=groupes" method="post">
+                    <button type="submit" value="" name="back" class="btn btn-outline-secondary rounded-circle" style="width: 48px; height: 48px"><i class="bi bi-arrow-left"></i></button>
+                </form>
             </div>
             <div class="col-auto">
                 <h1 class="wp-heading-inline">Détails du groupe : <b><?php echo $group; ?></b></h1>
@@ -124,16 +126,17 @@ class DetailsGroup extends IresMenu {
                                                 <td>
                                                     <button type="submit" value="<?php echo $resp; ?>" name="deleteResp" class="btn btn-outline-danger btn-sm">Supprimer</button>
                                                 </td>
-                                                <?php if (sizeof($id_resp) < 2) { ?>
-                                                <div class="input-group mb-3">
-                                                    <input type="text" class="form-control" placeholder="Identifiant" name="nameResponsable">
-                                                    <div class="input-group-append">
-                                                        <button class="input-group-text btn-primary" name="submitResponsable">Ajouter</button>
-                                                    </div>
-                                                </div>
-                                                <?php } ?>
                                             </form>
-                                <?php   } ?>
+                                            <?php
+                                            if (sizeof($id_resp) < 2) { ?>
+                                            <form action="" method="post">
+                                                <div class="col-2">
+                                                    <input type="text" class="" placeholder="Identifiant" name="nameResponsable">
+                                                </div>
+                                                <button class="btn btn-primary" name="submitResponsable">Ajouter</button>
+                                            </form>
+                                    <?php   }
+                                        } ?>
                                     </tr>
                         <?php   }
                                 if ((sizeof($id_resp) === 0) && isset($_POST['modifResponsable'])) { ?>
@@ -212,31 +215,40 @@ class DetailsGroup extends IresMenu {
                         </td>
                         <td colspan="2"></td>
                         <td>
-                            <?php
-                            if (current_user_can('administrator') ||
-                                (current_user_can('responsable')  && self::userIsResponsableGroup(get_current_user_id(), $id_group))) { ?>
-                            <form action="" method="post">
-                                <button type="submit"
-                                        class="btn btn-outline-secondary btn-sm"
-                                        onclick="">
-                                    Modifier
-                                </button>
-                                <?php
-                                if (!(get_current_user_id() == $user['user_id'])) {
-                                    ?>
-                                    <button type="submit"
-                                            id="remove"
-                                            name="remove"
-                                            value="<?php echo $user['user_id'] ?>"
-                                            class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Êtes vous sur de vouloir retirer <?php echo $first_name." ".$last_name ?> du groupe : <?php echo $group; ?> ?');">
-                                        <?php echo __('Remove') ?>
-                                    </button>
+                            <div class="row">
+                                <div class="col float-right">
                                     <?php
-                                }
-                                ?>
-                            </form>
-                            <?php } // end if?>
+                                    if (current_user_can('administrator') ||
+                                        (current_user_can('responsable')  && self::userIsResponsableGroup(get_current_user_id(), $id_group))) { ?>
+                                    <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=renseigner_des_informations" method="post">
+                                        <input type="hidden" name="users" value="<?php echo $user['user_id']; ?>">
+                                        <button type="submit"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                onclick="">
+                                            Modifier
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col float-left">
+                                    <?php
+                                    if (!(get_current_user_id() == $user['user_id'])) {
+                                        ?>
+                                    <form action="" method="post">
+                                        <button type="submit"
+                                                id="remove"
+                                                name="remove"
+                                                value="<?php echo $user['user_id'] ?>"
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Êtes vous sur de vouloir retirer <?php echo $first_name." ".$last_name ?> du groupe : <?php echo $group; ?> ?');">
+                                            <?php echo __('Remove') ?>
+                                        </button>
+                                    </form>
+                                        <?php
+                                    }
+                                    ?>
+                                <?php } // end if?>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     <?php

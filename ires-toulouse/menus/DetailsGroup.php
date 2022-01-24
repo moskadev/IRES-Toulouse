@@ -32,36 +32,80 @@ class DetailsGroup extends IresMenu {
         foreach ($results as $result)
 	        array_push($id_resp, (int) $result['user_id']);
 
-        //var_dump($id_resp);
-
+        /*
+         * Poste un message si un membre est ajouté
+         */
 		if (isset($_POST['submitMember']) && isset($_POST['nameMember']) && $_POST['nameMember'] != "") {
 			$user_login = $_POST['nameMember'];
 			$user_id = $this->getIdUser($user_login);
 			$user_id = $user_id[0]['ID'];
 
-			$message = "Erreur, l'identifiant ".$user_login." n'a pas pu être ajouté car il est déjà présent dans le groupe.";
+			$message = "Erreur, l'utilisateur ".$user_login." n'a pas pu être ajouté car il est déjà présent dans le groupe.";
 			$type_message = "error";
 			if (!get_user_by( 'id', $user_id )) {
-				$message = "Erreur, l'identifiant ".$user_login." n'a pas pu être ajouté car il n'existe pas.";
+				$message = "Erreur, l'utilisateur ".$user_login." n'a pas pu être ajouté car il n'existe pas.";
 			} elseif ($this->addUserGroup($user_id, $id_group) && get_user_by( 'id', $user_id )) {
-				$message = "L'identifiant ".$user_login." a été ajouté au groupe ".$group.".";
+				$message = "L'utilisateur ".$user_login." a été ajouté au groupe ".$group.".";
 				$type_message = "updated";
 			}
-			//echo "<meta http-equiv='refresh' content='0'>";
+            ?>
+            <form action="" method="post" id="message">
+                <input type="hidden" name="message" value="<?php echo $message ?>">
+                <input type="hidden" name="type" value="<?php echo $type_message ?>">
+            </form>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+            <?php
 		}
 
+        /*
+         * Poste un message si un membre est retiré du groupe
+         */
         if (isset($_POST['remove'])) {
             self::deleteUserGroup($_POST['remove'], $id_group);
-	        echo "<meta http-equiv='refresh' content='0'>";
+            $message = "L'utilisateur a été supprimé du groupe.";
+            $type_message = "updated";
+            ?>
+            <form action="" method="post" id="message">
+                <input type="hidden" name="message" value="<?php echo $message ?>">
+                <input type="hidden" name="type" value="<?php echo $type_message ?>">
+            </form>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+            <?php
         }
 
+        /*
+         * Poste un message si un responsable est supprimé
+         */
 		if ( isset( $_POST['deleteResp'] ) ) {
 			if (self::deleteResponsableGroup( $_POST['deleteResp'], $id_group )) {
                 $message = $_POST['deleteResp']." a été retiré des responsables du groupe.";
                 $type_message = "updated";
             }
+            ?>
+
+            <form action="" method="post" id="message">
+                <input type="hidden" name="message" value="<?php echo $message ?>">
+                <input type="hidden" name="type" value="<?php echo $type_message ?>">
+            </form>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+            <?php
 		}
 
+        /*
+         * Poste un message si un nouveau responsable est tenté d'être créé
+         */
         if (isset ($_POST['submitResponsable'])) {
             $user_login = $_POST['nameResponsable'];
 	        $user = get_user_by( 'login', $user_login );
@@ -77,16 +121,32 @@ class DetailsGroup extends IresMenu {
 		        $message = "L'identifiant ".$user_login." a été ajouté en tant que responsable du groupe ".$group.".";
 		        $type_message = "updated";
 	        }
+            ?>
+
+            <form action="" method="post" id="message">
+                <input type="hidden" name="message" value="<?php echo $message ?>">
+                <input type="hidden" name="type" value="<?php echo $type_message ?>">
+            </form>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+        <?php
         }
 
-        if ((isset($_POST['submitMember']) && isset($_POST['nameMember']) && $_POST['nameMember'] != "") || isset($_POST['deleteResp']) || isset($_POST['submitResponsable']) ) {?>
+        /*
+         * Affichage d'un message
+         */
+        if (isset($_POST['message']) && isset($_POST['type'])) {?>
             <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
-            <div id="message" class="<?php echo "$type_message";?> notice is-dismissible">
-                <p><strong><?php echo "$message"; ?></strong></p>
+            <div id="message" class="<?php echo $_POST['type'];?> notice is-dismissible">
+                <p><strong><?php echo stripslashes($_POST['message']); ?></strong></p>
             </div>
         <?php
         }?>
 
+        <!-- Bouton retour & titre de la page -->
         <div class="row">
             <div class="col-auto">
                 <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=groupes" method="post">
@@ -99,18 +159,19 @@ class DetailsGroup extends IresMenu {
         </div>
         <hr>
 
+        <!-- Affichage des responsables -->
 		<form action="" method="post">
             <div class="container">
                 <div class="row">
                     <div class="col-3">
                         <label for="addGroup">Responsable<?php if (sizeof($id_resp) >= 2) echo "s"; ?> du groupe :</label>
                     </div>
-                        <div class="col">
+                        <div class="col-7">
                             <table class="table table-hover">
                                 <?php
                                 foreach ($id_resp as $resp) { ?>
                                     <tr>
-                                        <td>
+                                        <td class="col-9">
                                             <?php
                                             $first_name = self::getUser($resp, "first_name");
                                             $last_name = self::getUser($resp, "last_name");
@@ -123,57 +184,64 @@ class DetailsGroup extends IresMenu {
                                          */
                                         if (isset($_POST['modifResponsable'])) { ?>
                                             <form action="" method="post">
-                                                <td>
-                                                    <button type="submit" value="<?php echo $resp; ?>" name="deleteResp" class="btn btn-outline-danger btn-sm">Supprimer</button>
+                                                <td class="col-3">
+                                                    <button type="submit"
+                                                            value="<?php echo $resp; ?>"
+                                                            name="deleteResp"
+                                                            class="btn btn-outline-danger btn-sm"
+                                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $first_name[0]['meta_value']." ".$last_name[0]['meta_value'] ?> ?');">
+                                                        Supprimer
+                                                    </button>
                                                 </td>
                                             </form>
                                             <?php
-                                            if (sizeof($id_resp) < 2) { ?>
-                                            <form action="" method="post">
-                                                <div class="col-2">
-                                                    <input type="text" class="" placeholder="Identifiant" name="nameResponsable">
-                                                </div>
-                                                <button class="btn btn-primary" name="submitResponsable">Ajouter</button>
-                                            </form>
-                                    <?php   }
                                         } ?>
+                                    </tr> <!-- Fin de ligne pour chaque responsable -->
+                        <?php
+                                } // end foreach
+                                /**
+                                 * Affichage de l'ajout d'un nouveau responsable si le nb de responsable < 2
+                                 */
+                                if ((isset($_POST['modifResponsable']) && sizeof($id_resp) < 2) || (sizeof($id_resp) === 0)) { ?>
+                                    <tr>
+                                        <form action="" method="post">
+                                            <td class="col-3">
+                                                <input type="text" class="col-5" placeholder="Nouveau repsonsable" name="nameResponsable" id="nameResponsable">
+                                            </td>
+                                            <td class="col-3">
+                                                <button class="btn btn-primary" name="submitResponsable">Ajouter</button>
+                                            </td>
+                                        </form>
                                     </tr>
-                        <?php   }
-                                if ((sizeof($id_resp) === 0) && isset($_POST['modifResponsable'])) { ?>
-                                    <form action="" method="post">
-                                        <div class="col-xs-3">
-                                            <input type="text" name="nameResponsable" placeholder="Identifiant">
-                                        </div>
-                                        <div class="col-xs-1">
-                                            <button type="submit" name="submitResponsable" class="btn btn-primary">Ajouter</button>
-                                        </div>
-                                    </form>
-	                            <?php } ?>
+                                    <?php
+                                }?>
                             </table>
                         </div>
             <?php       /**
 	                     * Affichage du bouton "Modifier" pour changer les responsables
 	                     */
-                        if (!isset($_POST['modifResponsable']) && current_user_can('administrator')) { ?>
+                        if (!isset($_POST['modifResponsable']) && current_user_can('administrator') && sizeof($id_resp) > 0) { ?>
                             <div class="col">
                                 <button type="submit" value="" name="modifResponsable" class="btn btn-outline-secondary btn-sm">Modifier</button>
                             </div>
-            <?php       }  elseif (isset($_POST['modifResponsable']) && current_user_can('administrator')) {?>
+            <?php       /**
+                         * Affichage du bouton "Annuler" si modifier à été cliqué
+                         */
+                        }  elseif (isset($_POST['modifResponsable']) && current_user_can('administrator')) {?>
                             <div class="col">
                                 <button type="submit" value="" name="" class="btn btn-outline-secondary btn-sm">Annuler</button>
                             </div>
             <?php       }?>
-
-
                 </div>
             </div>
         </form>
 
 
-
         <h1 class="wp-heading-inline">Membres du groupe :</h1><br>
+
+        <!-- Affichage d'un bouton "Ajouter membre" si l'utilisateur est responsable ou administrateur -->
         <?php
-        if (current_user_can('responsable') || current_user_can('administrator')) {
+        if ((current_user_can('responsable') && self::userIsResponsableGroup(get_current_user_id(), $id_group)) || current_user_can('administrator')) {
             if (isset($_POST['addMember'])) {?>
                 <form action="" method="post">
                     <div class="input-group mb-3">
@@ -192,6 +260,8 @@ class DetailsGroup extends IresMenu {
             }
         }
         ?>
+
+        <!-- Affichage de la liste des membres du groupe -->
         <table class="table table-striped table-hover">
             <thead>
                 <th scope="row">Nom</th>
@@ -231,7 +301,9 @@ class DetailsGroup extends IresMenu {
                                 </div>
                                 <div class="col float-left">
                                     <?php
-                                    if (!(get_current_user_id() == $user['user_id'])) {
+                                    if (!(get_current_user_id() == $user['user_id'])
+                                        && !(current_user_can('responsable') && self::userIsResponsableGroup($user['user_id'], $id_group))
+                                        || current_user_can('administrator')) {
                                         ?>
                                     <form action="" method="post">
                                         <button type="submit"
@@ -259,6 +331,14 @@ class DetailsGroup extends IresMenu {
         <?php
 	}
 
+    /**
+     * TODO déplacer les fonctions pour correspondre au format MVC
+     */
+
+    /**
+     * @param $name
+     * @return mixed|null
+     */
 	public static function getParam($name) {
 		if (isset($_GET[$name])) return $_GET[$name];
 		if (isset($_POST[$name])) return $_POST[$name];
@@ -424,13 +504,14 @@ class DetailsGroup extends IresMenu {
 	 * @param $userId
 	 * @param $groupId
 	 *
-	 * @return array|object|null
-	 */
-	private function deleteUserGroup($userId, $groupId) {
+	 * @return void
+     */
+	private function deleteUserGroup($userId, $groupId): void
+    {
 		global $wpdb;
         if ($this->userIsResponsableGroup($userId, $groupId)) {
             self::deleteResponsableGroup($userId, $groupId);
         }
-		return $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
-	}
+        $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
+    }
 }

@@ -53,9 +53,11 @@ class AddUserMenu extends IresMenu {
              * We also reduce it by 1 because the current user is already in the array too,
              * it's useless to count it
              */
-            $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
+            /*$usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
                 return $user->nickname === preg_replace("/\d/", "", $userLogin);
-            })) - 1;
+            })) - 1;*/
+            $usersSameNickCount = $this->getLogin($userLogin);
+
             $correctedUserLogin = $userLogin . ($usersSameNickCount > 0 ? $usersSameNickCount : "");
 
             try{
@@ -160,5 +162,11 @@ class AddUserMenu extends IresMenu {
 
         </form>
     <?php
+    }
+
+    private function getLogin($user_login) {
+        global $wpdb;
+        $results = $wpdb->get_results($wpdb->prepare("SELECT COUNT(*) as count FROM wp_users WHERE user_login LIKE %s", $user_login."%"), ARRAY_A);
+        return $results[0]['count'];
     }
 }

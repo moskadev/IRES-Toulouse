@@ -164,9 +164,14 @@ class AddUserMenu extends IresMenu {
     <?php
     }
 
-    private function getLogin($user_login) {
+    /**
+     * @param $user_login string the login of the futur user
+     * @return int the highest number + 1 of the different login
+     */
+    private function getLogin($user_login): int {
         global $wpdb;
-        $results = $wpdb->get_results($wpdb->prepare("SELECT COUNT(*) as count FROM wp_users WHERE user_login LIKE %s", $user_login."%"), ARRAY_A);
-        return $results[0]['count'];
+        $results = $wpdb->get_results($wpdb->prepare("SELECT user_login FROM wp_users WHERE user_login LIKE %s ORDER BY ID", $user_login."%"), ARRAY_A);
+        $str = (int) explode($user_login, end($results)['user_login'])[1];
+        return $str === 0 ? get_userdatabylogin($user_login) === false ? -1 : 1 : $str + 1;
     }
 }

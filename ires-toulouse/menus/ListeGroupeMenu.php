@@ -17,25 +17,38 @@ class ListeGroupeMenu extends IresMenu {
 		);
 	}
 
-	/**
+    /**
 	 * Contents of the "Create a group" menu
 	 * Allows to :
 	 *      - create a group of user if you are admin
 	 */
 	function getContent(): void {
-        $user = wp_get_current_user();
-		$groups = self::getGroups();
-
+        /*
+         * Supprime un groupe
+         */
 		if(isset($_POST['delete'])) {
-			$this->delete_group($_POST['delete']);
-			echo "<meta http-equiv='refresh' content='0'>";
+            $message = "Le groupe ".$_POST['delete']." n'a pas pu être supprimé.";
+            $type_message = "error";
+            if (self::delete_group($_POST['delete'])) {
+                $message = "Le groupe ".$_POST['delete']." a été supprimé.";
+                $type_message = "updated";
+            }
+            ?>
+            <form action="" method="post" id="message">
+                <input type="hidden" name="message" value="<?php echo $message ?>">
+                <input type="hidden" name="type" value="<?php echo $type_message ?>">
+            </form>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+            <?php
 		}
 
-		if (isset($_POST['deleteMember'])) {
-			$str = explode(".", $_POST['deleteMember']);
-			$this->deleteUserGroup($str[0], $str[1]);
-		}
-
+        /*
+         * Ajoute un groupe si possible
+         */
         if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup'])) {
 	        $message = "Impossible de créer le groupe.";
             $type_message = "error";
@@ -44,29 +57,38 @@ class ListeGroupeMenu extends IresMenu {
 		        $type_message = "updated";
 		        $message = "Le groupe ".$_POST['nameAddGroup']." a été créé.";
             }
-
-            // Rafraichir la page pour afficher le nouveau groupe
-	        // echo "<meta http-equiv='refresh' content='0'>";
-
             ?>
-            <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un groupe -->
-            <div id="message" class="<?php echo "$type_message";?> notice is-dismissible">
-                <p><strong><?php echo "$message"; ?></strong></p>
+            <form action="" method="post" id="message">
+                <input type="hidden" name="message" value="<?php echo $message ?>">
+                <input type="hidden" name="type" value="<?php echo $type_message ?>">
+            </form>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+            <?php
+        }
+
+        /*
+         * Affichage d'un message
+         */
+        if (isset($_POST['message']) && isset($_POST['type'])) {?>
+            <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
+            <div id="message" class="<?php echo $_POST['type'];?> notice is-dismissible">
+                <p><strong><?php echo stripslashes($_POST['message']); ?></strong></p>
             </div>
             <?php
         }
 
-		?>
-        <div>
-            <h1 class="wp-heading-inline">Groupes</h1>
-
-            <?php
-            /**
-             * Ajout d'un groupe si l'utilisateur est administrateur
-             */
-            if (current_user_can('administrator')) {
-                ?>
-
+        /*
+         * Formulaire pour ajouter un groupe
+         *  - Nom du groupe
+         *  - Bouton ajouter
+         */
+        if (current_user_can('administrator')) {
+            ?>
+            <div>
                 <form action="" method="post">
                     <div class="container">
                         <div class="row">
@@ -74,7 +96,7 @@ class ListeGroupeMenu extends IresMenu {
                                 <label for="addGroup">Ajouter un groupe :</label>
                             </div>
                             <div class="col">
-                                <input type="text" class="to-fill" name="nameAddGroup" placeholder="Nom du groupe">
+                                <input type="text" id="addGroup" class="to-fill" name="nameAddGroup" placeholder="Nom du groupe">
                             </div>
                             <div class="col">
                                 <input type="submit" name="addGroup" value="Ajouter" class="btn btn-outline-primary">
@@ -82,14 +104,45 @@ class ListeGroupeMenu extends IresMenu {
                         </div>
                     </div>
                 </form>
+            </div>
+            <?php
+        } // End if
 
-                <?php
-            } // End if
-
+        /*
+         * Affichage des groupes auquel l'utilisateur appartient
+         *
+         * Possibilité de l'afficher si il y a plus de 9 groupes créé afin d'alléger la page :
+         * && sizeof($groups) > 9
+         */
+        if (self::userIsInAGroup(get_currentuserinfo()->ID) ) {
             ?>
-        </div>
+            <h1 class="wp-heading-inline">Vos Groupes</h1>
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Responsable(s)</th>
+                    <th scope="col">Date de création</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                /*
+                 * Affichage de chaque ligne
+                 */
+                foreach (self::getGroupWhereIsUser(get_currentuserinfo()->ID) as $group) {
+                    self::printGroup($group);
+                }
+                ?>
+                </tbody>
+            </table>
+            <?php
+        }
+        ?>
 
 
+        <h1 class="wp-heading-inline">Lite des Groupes</h1>
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -101,148 +154,82 @@ class ListeGroupeMenu extends IresMenu {
             </thead>
             <tbody>
 <?php
+                /*
+                 * Affichage de tous les groupes
+                 */
+                $groups = self::getGroups();
                 foreach ($groups as $group) {
-	                $users = self::getIdUserGroup($group['id_group']);
-                    $list_user = [];
-                    foreach ($users as $usr) {
-                        array_push($list_user, $usr['user_id']);
-                    }
-
-	                $results = $this->getIdResponsable($group['id_group']);
-	                $id_resp = [];
-	                foreach ($results as $result)
-		                array_push($id_resp, (int) $result['user_id']);
-                    ?>
-                <tr class="<?php if (in_array(get_current_user_id(), $list_user)) echo "table-primary"; ?>">
-                    <!-- Name of the group -->
-                    <th scope="row" class="text-primary">
-                        <a class="text-decoration-none" href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>">
-	                        <?php echo $group['name'] ?>
-                        </a>
-                    </th>
-                    <!-- Name of the responsible -->
-                    <td class="">
-	                    <?php
-	                    foreach ($id_resp as $resp) {
-		                    $first_name = self::getUser($resp, "first_name");
-		                    $last_name = self::getUser($resp, "last_name");
-		                    echo $first_name[0]['meta_value']." ".$last_name[0]['meta_value'];
-                            if (sizeof($id_resp) > 1)
-                                echo ", ";
-	                    }
-	                    ?>
-                    </td>
-                    <!-- Date -->
-                    <td>
-                        <?php echo $group['time_created'] ?>
-                    </td>
-                    <td>
-                        <?php
-                        if (current_user_can('administrator') || (current_user_can('responsable') && self::userIsResponsableGroup($user->ID, $group['id_group']))) {
-                        ?>
-                            <form action="" method="post">
-                                <button type="button"
-                                        id="modify"
-                                        name="modify"
-                                        value="<?php echo $group['name'] ?>"
-                                        class="btn btn-outline-secondary btn-sm"
-                                        onclick="location.href='<?php echo get_site_url() ?>/wp-admin/admin.php?page=details&group=<?php echo $group['name'] ?>'">
-                                    Modifier
-                                </button>
-                                <?php
-                                if (current_user_can('administrator')) {
-                                    ?>
-                                    <button type="submit"
-                                            id="delete"
-                                            name="delete"
-                                            value="<?php echo $group['name'] ?>"
-                                            class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group['name']; ?> ?');">
-                                        <?php echo __('Delete') ?>
-                                    </button>
-                                    <?php
-                                }
-                                ?>
-                            </form>
-                        <?php
-                        }
-                        ?>
-                    </td>
-                </tr>
-            <?php
-            } // end foreach
-?>
+                    self::printGroup($group);
+                } // end foreach ?>
             </tbody>
-<?php       if (sizeof($groups) === 0) {?>
+<?php      /*
+            * Affichage d'un message si aucun groupe n'existe
+            */
+            if (sizeof($groups) === 0) { ?>
             <tr>
                 <td colspan="4"><?php _e("No existing group") ?></td>
             </tr>
 <?php       } // endif
+
+            /*
+             * Affichage du bas de page si il y a plus de 9 groupes
+             */
             if (sizeof($groups) > 9) { ?>
             <tfoot>
                 <tr>
                     <td>Nom</td>
-                    <td>Responsable</th>
-                    <td>Date de création</th>
+                    <td>Responsable</td>
+                    <td>Date de création</td>
                     <td></td>
                 </tr>
             </tfoot>
 <?php       } // endif ?>
-        </table>
+        </table> <!-- Fin du tableau de l'affichage de tous les groupes -->
 <?php
-	} // end function
+	} // end function getContent()
 
-	/**
+    /**
 	 * Check if a group already exist in database
 	 *
-	 * @param $groupName name of the group to create
+	 * @param $groupName string name of the group to create
 	 * @return bool return true if the group exist, otherwise return false
 	 */
-	function groupExist($wpdb, $table_name, $groupName): bool
-	{
-		$sql = "SELECT * FROM $table_name WHERE name='$groupName'";
-		return count($wpdb->get_results($sql)) == 0;
+	private function groupExist(string $groupName): bool {
+        global $wpdb;
+		return !empty($wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups WHERE name = %s", $groupName)));
 	}
 
-	/**
+    /**
 	 * @return array|object|null all the groups available
 	 */
-	public static function getGroups() {
+	private function getGroups() {
 		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups ORDER BY name"),
-			ARRAY_A);
+		return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups ORDER BY name"));
 	}
 
-	/**
-	 * Delete a groups if he exist in database
-	 *
-     * TODO ajouter la suppression de tous les utilisateurs de ce groupe
+    /**
+     * Delete a groups if he exist in database
      *
-	 * @param string $inputId
-	 * @return true|false if group deleted or not
-	 */
-	function delete_group ($nameGroup) {
+     * @param $nameGroup
+     * @return void if group deleted or not
+     */
+	private function delete_group ($nameGroup) : bool {
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'groups';
 
-		// If the name group is present 0 times in the database$
-		if (!($this->groupExist($wpdb, $table_name, $nameGroup))) {
+		if (self::groupExist($nameGroup)) {
+            $groupId = self::getGroupByName($nameGroup);
 			$wpdb->delete(
-				$table_name,
+                $wpdb->prefix.'groups',
 				['name'=>$nameGroup],
 				['%s']
 			);
-			return true;
+            $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE group_id = %d", $groupId[0]->id_group));
+            return true;
 		}
         return false;
-	}
-
-    private function deleteUserGroup($userId, $groupId) {
-        global $wpdb;
-        return $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
     }
 
-	/**
+    /**
 	 * Looking if groups and groups_user table have been created and if they not, create then
 	 *
 	 */
@@ -274,7 +261,7 @@ class ListeGroupeMenu extends IresMenu {
 		maybe_create_table($table_name, $sql_create_user_group );
 	}
 
-	/**
+    /**
 	 * Create a groups if it doesn't already exist in database
 	 *
 	 * @param $nameGroup
@@ -283,13 +270,10 @@ class ListeGroupeMenu extends IresMenu {
 	 */
 	function insert_data_group($nameGroup): bool {
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'groups';
-
-		// If the name group is present 0 times in the database$
-		if ($this->groupExist($wpdb, $table_name, $nameGroup)) {
+		if (!(self::groupExist($nameGroup))) {
 			$creator_id = get_current_user_id();
 			$wpdb->insert(
-				$table_name,
+                $wpdb->prefix.'groups',
 				array(
 					'name'=>$nameGroup,
 					'creator_id'=>$creator_id
@@ -302,54 +286,151 @@ class ListeGroupeMenu extends IresMenu {
         return false;
 	}
 
-	/**
-	 * @param $group_id integer id of the group
-	 *
-	 * @return array|object|null all the users in the group given in parameter
-	 */
-	private function getIdUserGroup( int $group_id) {
-		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups_users WHERE group_id = %d", $group_id),
-			ARRAY_A);
-	}
+    /**
+     * Get all the user->id in a group
+     * @param int $groupId id of the group where search the users
+     * @return array|object|null all the user->id
+     */
+    private function getUserInGroup(int $groupId) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups_users WHERE group_id = %d", $groupId));
+    }
 
-	/**
-	 * @param $userId
-	 * @param $metaKey
-	 *
-	 * @return array|object|null
-	 */
-	private function getUser($userId, $metaKey) {
-		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT meta_value FROM {$wpdb->prefix}usermeta WHERE user_id = %d AND meta_key = %s", $userId, $metaKey),
-			ARRAY_A);
-	}
+    /**
+     * Get all the information about a group by his name
+     * @param string $groupName
+     * @return array|object|null all the users in the group given in parameter
+     */
+    private function getGroupByName(string $groupName) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups WHERE name = %s", $groupName));
+    }
 
-	/**
-	 * @param int $group_id
-	 *
-	 * @return array|object|null l'id du ou des responsables du groupe
+    /**
+     * Get the id of the user (if exist) in charge of the group given in parameter
+	 * @param int $group_id the id of the group
+	 * @return array|object|null id of the user(s) in charge of the group
 	 */
 	function getIdResponsable(int $group_id) {
 		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT user_id FROM {$wpdb->prefix}groups_users WHERE group_id = %d AND is_responsable = 1", $group_id),
-			ARRAY_A);
+		return $wpdb->get_results($wpdb->prepare("SELECT user_id FROM {$wpdb->prefix}groups_users WHERE group_id = %d AND is_responsable = 1", $group_id));
 	}
 
     /**
-     * @param $user_id
-     * @param $group_id
-     *
-     * @return bool
+     * Check if a user is in charge of the group
+     * @param $user_id int the id of the user
+     * @param $group_id int the id of the group
+     * @return bool true if the user is in charge of the group, else false
      */
-    private function userIsResponsableGroup( $user_id, $group_id ): bool {
+    private function userIsResponsableGroup(int $user_id, int $group_id ): bool {
         $list_user = [];
         $users = $this->getIdResponsable($group_id);
         foreach ($users as $user) {
-            array_push($list_user, $user['user_id']);
+            array_push($list_user, $user->user_id);
         }
         if (in_array($user_id, $list_user))
             return true;
         return false;
+    }
+
+    /**
+     * Check if the user is in a group
+     * @param $userId int the id of the user
+     * @return bool true if the user is in a group, else false
+     */
+    private function userIsInAGroup(int $userId) : bool {
+        global $wpdb;
+        foreach (self::getGroups() as $group) {
+            $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups_users WHERE group_id = %d AND user_id = %d", $group->id_group, $userId));
+            if (!empty($result)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $userId int the id of the user
+     * @return array|object|null all the group(s) of a user
+     */
+    private function getGroupWhereIsUser(int $userId) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups JOIN {$wpdb->prefix}groups_users ON group_id = id_group WHERE user_id = %d", $userId));
+    }
+
+    /**
+     * Print the row of a table for the group given in parameter
+     * @param $group object the group to print
+     */
+    private function printGroup(object $group) {
+        $user = wp_get_current_user();
+        $users = self::getUserInGroup($group->id_group);
+        $list_user = [];
+        foreach ($users as $usr) {
+            array_push($list_user, $usr->user_id);
+        }
+
+        $results = $this->getIdResponsable($group->id_group);
+        $id_resp = [];
+        foreach ($results as $result)
+            array_push($id_resp, (int) $result->user_id);
+        ?>
+        <tr class="<?php if (in_array(get_current_user_id(), $list_user)) echo "table-primary"; ?>">
+            <!-- Name of the group -->
+            <th scope="row" class="text-primary">
+                <a class="text-decoration-none" href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details&group=<?php echo $group->name ?>">
+                    <?php echo $group->name ?>
+                </a>
+            </th>
+            <!-- Name of the user in charge of the group -->
+            <td class="">
+                <?php
+                $i = 0;
+                foreach ($id_resp as $resp) {
+                    $i++;
+                    echo get_user_meta($resp, "first_name")[0]." ".get_user_meta($resp, "last_name")[0];
+                    if (count($id_resp) > 1 && $i < count($id_resp))
+                        echo ", ";
+                }
+                ?>
+            </td>
+            <!-- Date -->
+            <td>
+                <?php echo $group->time_created ?>
+            </td>
+            <td>
+                <?php
+                if (current_user_can('administrator') || (current_user_can('responsable') && self::userIsResponsableGroup($user->ID, $group->id_group))) {
+                    ?>
+                    <form action="" method="post">
+                        <button type="button"
+                                id="modify"
+                                name="modify"
+                                value="<?php echo $group->name ?>"
+                                class="btn btn-outline-secondary btn-sm"
+                                onclick="location.href='<?php echo get_site_url() ?>/wp-admin/admin.php?page=details&group=<?php echo $group->name ?>'">
+                            Modifier
+                        </button>
+                        <?php
+                        if (current_user_can('administrator')) {
+                            ?>
+                            <button type="submit"
+                                    id="delete"
+                                    name="delete"
+                                    value="<?php echo $group->name ?>"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group->name; ?> ?');">
+                                <?php echo __('Delete') ?>
+                            </button>
+                            <?php
+                        }
+                        ?>
+                    </form>
+                    <?php
+                }
+                ?>
+            </td>
+        </tr>
+<?php
     }
 }

@@ -512,6 +512,6 @@ class DetailsGroup extends IresMenu {
         if ($this->userIsResponsableGroup($userId, $groupId)) {
             self::deleteResponsableGroup($userId, $groupId);
         }
-        $wpdb->get_results($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
+        $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}groups_users WHERE user_id = %d AND group_id = %d", $userId, $groupId));
     }
 }

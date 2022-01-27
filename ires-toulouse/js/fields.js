@@ -93,7 +93,7 @@ forms.forEach(function(form) {
                      * If the regex exists, we test the value, if not, we check
                      * if the input contains a value
                      */
-                    filled = regex ? regex.test(input.value) : input.value;
+                    filled = regex ? (input.value && regex.test(input.value)) : input.value;
                 } else {
                     /*
                      * Checks if the value or the regex is empty, so it is "filled".

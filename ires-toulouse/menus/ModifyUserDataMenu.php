@@ -50,8 +50,8 @@ class ModifyUserDataMenu extends IresMenu {
      * Constructing the menu and link to the admin page
      */
     public function __construct() {
-        parent::__construct("Modifier les informations supplémentaires", // Page title when the menu is selected
-            "Renseigner des informations", // Name of the menu
+        parent::__construct("Consultation du profil IRES", // Page title when the menu is selected
+            "Consulter le profil IRES", // Name of the menu
             0, // Menu access security level
             "dashicons-id-alt", // Menu icon
             3 // Page position in the list
@@ -63,7 +63,7 @@ class ModifyUserDataMenu extends IresMenu {
      */
     public function getContent() : void {
         $isAdmin = in_array("administrator",  wp_get_current_user()->roles); ?>
-        <h1>Renseigner des informations supplémentaires</h1> <?php
+        <h1>Consulter les informations relatives à votre profil IRES</h1> <?php
         if(count(get_users()) > 1){
             /**
              * If admin, it gets the last created user or chosen user

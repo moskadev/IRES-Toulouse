@@ -23,7 +23,6 @@ abstract class IresMenu {
 	 */
 	public static function init() : void{
 		IresMenu::register("admin_menu", new AddUserMenu());
-		IresMenu::register("admin_menu", new AffectionRoleMenu());
 		IresMenu::register("admin_menu", new ModifyUserDataMenu());
 		IresMenu::register("admin_menu", new InformationUserMenu());
 		IresMenu::register("admin_menu", new ListeGroupeMenu());

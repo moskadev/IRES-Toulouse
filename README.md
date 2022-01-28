@@ -8,3 +8,4 @@ L'**équipe Scrum** est composée d'un(e) :
 - **équipe de développement** : MAY Yohann et EMIROT Teo
 
 Cliquez [ici](https://app.zenhub.com/workspaces/quipe-scrum-61790fc1a3037000169c559a/board?invite=true) pour accéder à la plateforme Zenhub
+Cliquez [ici](https://github.com/moskadev/IRES-Toulouse.git) pour accéder au Github

@@ -23,8 +23,8 @@ class Group extends IresElement {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         $db = Database::get();
 
-        $charset_collate  = $db->get_charset_collate();
-        $table_name       = $db->prefix . 'groups';
+        $charset_collate = $db->get_charset_collate();
+        $table_name = $db->prefix . 'groups';
         $sql_create_group = "CREATE TABLE $table_name (
                 id_group bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                 name char(30) NOT NULL,
@@ -55,7 +55,7 @@ class Group extends IresElement {
      *
      * @return bool true if the group is created, else false
      */
-    public static function register(string $name): bool {
+    public static function register(string $name) : bool {
         $db = Database::get();
 
         if (self::fromName($name) === null) {
@@ -78,18 +78,20 @@ class Group extends IresElement {
      *
      * @return bool true if the group exist, otherwise return false
      */
-    public static function exists(int $id): bool {
+    public static function exists(int $id) : bool {
         $db = Database::get();
 
-        return count($db->get_results(
-                $db->prepare("SELECT * FROM {$db->prefix}groups WHERE id_group = %d", $id)
-            )) > 0;
+        return count(
+                $db->get_results(
+                    $db->prepare("SELECT * FROM {$db->prefix}groups WHERE id_group = %d", $id)
+                )
+            ) > 0;
     }
 
     /**
      * @return Group[] all the groups available
      */
-    public static function all(): array {
+    public static function all() : array {
         $db = Database::get();
 
         return array_map(function ($group) {
@@ -109,12 +111,14 @@ class Group extends IresElement {
      *
      * @return bool true if group deleted or not
      */
-    public static function delete(int $id): bool {
+    public static function delete(int $id) : bool {
         $db = Database::get();
 
         if (self::exists($id)) {
             $db->delete($db->prefix . 'groups', ['group_id' => $id], ['%s']);
-            $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d", $id));
+            $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d", 
+                $id)
+            );
 
             return true;
         }
@@ -127,10 +131,11 @@ class Group extends IresElement {
      *
      * @return Group[] all the group(s) of this user
      */
-    public static function getUserGroups(\WP_User $user): array {
-        $db      = Database::get();
+    public static function getUserGroups(\WP_User $user) : array {
+        $db = Database::get();
         $request = $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON group_id = id_group WHERE user_id = %d",
-            $user->ID));
+            $user->ID)
+        );
         if (count($request) === 0) {
             return [];
         }
@@ -148,7 +153,9 @@ class Group extends IresElement {
         $db = Database::get();
 
         return $db->get_results(
-            $db->prepare("SELECT id_group FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON id_group = group_id WHERE is_responsable = 1 AND user_id = %d", $user->ID),
+            $db->prepare("SELECT id_group FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON id_group = group_id WHERE is_responsable = 1 AND user_id = %d",
+                $user->ID
+            ),
             ARRAY_A
         );
     }
@@ -157,14 +164,16 @@ class Group extends IresElement {
      * Get all the users in a group
      * @return \WP_User[] all the users
      */
-    public function getUsers(): array {
+    public function getUsers() : array {
         $db = Database::get();
 
         return array_map(function ($u) {
             return get_user_by("id", $u["user_id"]);
         }, $db->get_results(
-            $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d", $this->id)
-        ));
+            $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d",
+                $this->id
+            ))
+        );
     }
 
     /**
@@ -172,7 +181,7 @@ class Group extends IresElement {
      *
      * @return Group|null the group found by its name
      */
-    public static function fromName(string $groupName): ?Group {
+    public static function fromName(string $groupName) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($groupName) {
             return $g->getName() === $groupName;
         });
@@ -185,7 +194,7 @@ class Group extends IresElement {
      *
      * @return Group|null the group found by its id
      */
-    public static function fromId(string $id): ?Group {
+    public static function fromId(string $id) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($id) {
             return $g->getId() === $id;
         });
@@ -202,20 +211,20 @@ class Group extends IresElement {
     public function __construct(string $id, string $name, string $creationTime, \WP_User $creator) {
         parent::__construct($id, $name);
         $this->creationTime = $creationTime;
-        $this->creator      = $creator;
+        $this->creator = $creator;
     }
 
     /**
      * @return string the creation time
      */
-    public function getCreationTime(): string {
+    public function getCreationTime() : string {
         return $this->creationTime;
     }
 
     /**
      * @return \WP_User the group's creator
      */
-    public function getCreator(): \WP_User {
+    public function getCreator() : \WP_User {
         return $this->creator;
     }
 
@@ -229,19 +238,21 @@ class Group extends IresElement {
         return array_map(function ($u) {
             return get_user_by("id", $u["user_id"]);
         }, $db->get_results(
-            $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
-                $this->id)
-        ));
+                $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
+                    $this->id
+                )
+            )
+        );
     }
 
     /**
      * Check if a user is in charge of the group
      * @return bool true if the user is in charge of the group
      */
-    public function isUserResponsable(\WP_User $search): bool {
+    public function isUserResponsable(\WP_User $search) : bool {
         return count(array_filter($this->getResponsables(), function ($u) use ($search) {
-                return $search->ID === $u->ID;
-            })) > 0;
+            return $search->ID === $u->ID;
+        })) > 0;
     }
 
     /**
@@ -251,10 +262,10 @@ class Group extends IresElement {
      *
      * @return bool true if the user is in a group
      */
-    public function userExists(\WP_User $search): bool {
+    public function userExists(\WP_User $search) : bool {
         return count(array_filter($this->getUsers(), function ($u) use ($search) {
-                return $search->ID === $u->ID;
-            })) > 0;
+            return $search->ID === $u->ID;
+        })) > 0;
     }
 
     /**
@@ -265,16 +276,22 @@ class Group extends IresElement {
      *
      * @return bool true if the responsable was added successfully
      */
-    public function addResponsable(\WP_User $user): bool {
+    public function addResponsable(\WP_User $user) : bool {
         $db = Database::get();
         if (!$this->userExists($user)) {
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '1')", $user->ID, $this->id));
+            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '1')",
+                $user->ID,
+                $this->id)
+            );
             $user->set_role("responsable");
 
             return true;
         }
         if (!$this->isUserResponsable($user)) {
-            $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d", $user->ID, $this->id));
+            $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d",
+                $user->ID,
+                $this->id)
+            );
             $user->set_role("responsable");
 
             return true;
@@ -288,7 +305,7 @@ class Group extends IresElement {
      *
      * @return bool
      */
-    public function removeResponsable(\WP_User $user): bool {
+    public function removeResponsable(\WP_User $user) : bool {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
             $db = Database::get();
 
@@ -297,7 +314,10 @@ class Group extends IresElement {
             }
             $db->get_results(
                 $db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '0' WHERE user_id = %d AND group_id = %d",
-                    $user->ID, $this->id));
+                    $user->ID,
+                    $this->id
+                )
+            );
 
             return true;
         }
@@ -312,10 +332,12 @@ class Group extends IresElement {
      *
      * @return bool
      */
-    public function addUser(\WP_User $user): bool {
+    public function addUser(\WP_User $user) : bool {
         if (!$this->userExists($user)) {
             $db = Database::get();
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')", $user->ID));
+            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')",
+                $user->ID)
+            );
 
             return true;
         }
@@ -330,15 +352,17 @@ class Group extends IresElement {
      *
      * @return bool true if the removing was a success
      */
-    public function removeUser(\WP_User $user): bool {
+    public function removeUser(\WP_User $user) : bool {
         if ($this->userExists($user)) {
             if ($this->isUserResponsable($user)) {
                 $this->removeResponsable($user);
             }
             $db = Database::get();
             $db->query(
-                $db->prepare("DELETE FROM {$db->prefix}groups_users WHERE user_id = %d AND group_id = %d",/**/
-                    $user->ID, $this->id)
+                $db->prepare("DELETE FROM {$db->prefix}groups_users WHERE user_id = %d AND group_id = %d",
+                    $user->ID,
+                    $this->id
+                )
             );
 
             return true;

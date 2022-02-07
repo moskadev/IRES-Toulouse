@@ -46,16 +46,6 @@ forms.forEach(function(form) {
     }
 
     /**
-     * @returns {string} generate the identifier of
-     *                   the user for its login
-     */
-    function generateUserLogin(){
-        return ((String(form.querySelector("#first_name").value).substr(0, 1) +
-            form.querySelector("#last_name").value).toLowerCase())
-            .replaceAll(/(\s|\W)+/g, "-");
-    }
-
-    /**
      * @param element the targeted element
      * @returns {string|*} uppercased value if the data is true
      */
@@ -93,7 +83,7 @@ forms.forEach(function(form) {
                      * If the regex exists, we test the value, if not, we check
                      * if the input contains a value
                      */
-                    filled = regex ? (input.value && regex.test(input.value)) : input.value;
+                    filled = regex ? regex.test(input.value) : input.value;
                 } else {
                     /*
                      * Checks if the value or the regex is empty, so it is "filled".

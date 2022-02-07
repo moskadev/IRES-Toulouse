@@ -36,6 +36,7 @@ class AddUserMenu extends IresMenu {
     public function getContent(): void {
         $creating = isset($_POST["createuser"]);
         $userId = -1;
+        $isUserCreate = false;
 
         if($creating) {
             $userFirstname = isset($_POST["first_name"]) ? wp_unslash($_POST["first_name"]) : "";
@@ -80,10 +81,11 @@ class AddUserMenu extends IresMenu {
                 }
                 UserInputData::registerExtraMetas($userId);?>
                 <div id="message" class="updated notice is-dismissible">
-                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> (ID: <?php echo $userId ?>) a été bien
+                    <p><strong>L'utilisateur <?php echo $correctedUserLogin ?> a bien été
                             enregistré, <a href='admin.php?page=<?php echo ModifyUserDataMenu::getInstance()->getId() ?>'>
                                 vous pouvez renseigner ses informations ici</a></strong></p>
                 </div> <?php
+                $isUserCreate = true;
             } catch(\Exception $e) {?>
                 <div id="message" class="error notice is-dismissible">
                     <p><strong><?php echo "$correctedUserLogin : " . $e->getMessage() ?></strong></p>
@@ -108,9 +110,15 @@ class AddUserMenu extends IresMenu {
             $inputFormType = $inputData->getFormType();
             $inputId = $inputData->getId();
 
-             if(!in_array($inputId, ["nickname", "first_name", "last_name", "email"])){
-                 continue;
-             }?>
+            if ($isUserCreate) {
+                if(!in_array($inputId, ["nickname", "first_name", "last_name", "email"])){
+                    continue;
+                }
+            } else {
+                if(!in_array($inputId, ["first_name", "last_name", "email"])){
+                    continue;
+                }
+            }?>
              <table class='form-table' role='presentation'>
                  <tr class="form-field form-required">
                      <th>
@@ -131,7 +139,8 @@ class AddUserMenu extends IresMenu {
                                      type='<?php echo htmlspecialchars($inputFormType) ?>'
                                      id='<?php echo htmlspecialchars($inputId) ?>'
                                      name='<?php echo htmlspecialchars($inputId) ?>'
-                                     value='<?php echo $creating && isset($_POST[$inputId]) ? wp_unslash($_POST[$inputId]) : "" ?>'>
+                                     value='<?php if($inputId === "nickname") {echo $correctedUserLogin;} 
+                                                  else {echo $creating && isset($_POST[$inputId]) ? wp_unslash($_POST[$inputId]) : "";} ?>'>
                              <?php
                              if(!empty($inputData->getDescription())){?>
                                  <p class="description"><?php _e($inputData->getDescription()) ?></p>

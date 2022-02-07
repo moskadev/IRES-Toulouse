@@ -57,17 +57,14 @@ class Group extends IresElement {
      */
     public static function register(string $name) : bool {
         $db = Database::get();
-
         if (self::fromName($name) === null) {
             $db->insert(
                 $db->prefix . 'groups',
-                ['name' => $name, 'creator_id ' => get_current_user_id()],
+                ['name' => $name, 'creator_id' => get_current_user_id()],
                 ['%s', '%d']
             );
-
             return true;
         }
-
         return false;
     }
 
@@ -109,14 +106,12 @@ class Group extends IresElement {
         $db = Database::get();
 
         if (self::exists($id)) {
-            $db->delete($db->prefix . 'groups', ['group_id' => $id], ['%s']);
+            $db->delete($db->prefix . 'groups', ['id_group' => $id], ['%s']);
             $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d",
                 $id)
             );
-
             return true;
         }
-
         return false;
     }
 
@@ -177,9 +172,9 @@ class Group extends IresElement {
      */
     public static function fromName(string $groupName) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($groupName) {
-            return $g->getName() === $groupName;
+            return $g->name === $groupName;
         });
-        return $group[0] ?? null;
+        return $group[array_key_first($group)] ?? null;
     }
 
     /**
@@ -189,11 +184,9 @@ class Group extends IresElement {
      */
     public static function fromId(string $id) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($id) {
-            return $g->getId() === $id;
+            return $g->id === $id;
         });
-
-        var_dump($group);
-        return $group[0] ?? null;
+        return $group[array_key_first($group)] ?? null;
     }
 
     /**
@@ -247,7 +240,7 @@ class Group extends IresElement {
         $responsable = array_filter($this->getResponsables(), function ($u) use ($search) {
             return $search->ID === $u->ID;
         });
-        return $group[0] ?? false;
+        return isset($responsable[array_key_first($responsable)]);
     }
 
     /**
@@ -261,7 +254,7 @@ class Group extends IresElement {
         $user = array_filter($this->getUsers(), function ($u) use ($search) {
             return $search->ID === $u->ID;
         });
-        return $user[0] ?? false;
+        return isset($user[array_key_first($user)]);
     }
 
     /**
@@ -314,7 +307,6 @@ class Group extends IresElement {
                     $this->id
                 )
             );
-
             return true;
         }
 
@@ -332,12 +324,10 @@ class Group extends IresElement {
         if (!$this->userExists($user)) {
             $db = Database::get();
             $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')",
-                $user->ID)
+                $user->ID, $this->id)
             );
-
             return true;
         }
-
         return false;
     }
 

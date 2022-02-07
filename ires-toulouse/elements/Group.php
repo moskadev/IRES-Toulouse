@@ -79,13 +79,7 @@ class Group extends IresElement {
      * @return bool true if the group exist, otherwise return false
      */
     public static function exists(int $id) : bool {
-        $db = Database::get();
-
-        return count(
-                $db->get_results(
-                    $db->prepare("SELECT * FROM {$db->prefix}groups WHERE id_group = %d", $id)
-                )
-            ) > 0;
+        return Group::fromId($id) !== null;
     }
 
     /**
@@ -96,10 +90,10 @@ class Group extends IresElement {
 
         return array_map(function ($group) {
             return new Group(
-                $group["id_group"],
-                $group["name"],
-                $group["time_created"],
-                get_user_by("id", $group["creator_id"])
+                $group->id_group,
+                $group->name,
+                $group->time_created,
+                get_user_by("id", $group->creator_id)
             );
         }, $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups ORDER BY name")));
     }
@@ -116,7 +110,7 @@ class Group extends IresElement {
 
         if (self::exists($id)) {
             $db->delete($db->prefix . 'groups', ['group_id' => $id], ['%s']);
-            $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d", 
+            $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d",
                 $id)
             );
 
@@ -141,7 +135,7 @@ class Group extends IresElement {
         }
 
         return array_map(function ($group) {
-            return self::fromName($group["name"]);
+            return self::fromName($group->name);
         }, $request);
     }
 
@@ -168,7 +162,7 @@ class Group extends IresElement {
         $db = Database::get();
 
         return array_map(function ($u) {
-            return get_user_by("id", $u["user_id"]);
+            return get_user_by("id", $u->user_id);
         }, $db->get_results(
             $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d",
                 $this->id
@@ -185,8 +179,7 @@ class Group extends IresElement {
         $group = array_filter(self::all(), function ($g) use ($groupName) {
             return $g->getName() === $groupName;
         });
-
-        return count($group) > 0 ? $group[0] : null;
+        return $group[0] ?? null;
     }
 
     /**
@@ -199,7 +192,8 @@ class Group extends IresElement {
             return $g->getId() === $id;
         });
 
-        return count($group) > 0 ? $group[0] : null;
+        var_dump($group);
+        return $group[0] ?? null;
     }
 
     /**
@@ -236,7 +230,7 @@ class Group extends IresElement {
         $db = Database::get();
 
         return array_map(function ($u) {
-            return get_user_by("id", $u["user_id"]);
+            return get_user_by("id", $u->user_id);
         }, $db->get_results(
                 $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
                     $this->id
@@ -250,9 +244,10 @@ class Group extends IresElement {
      * @return bool true if the user is in charge of the group
      */
     public function isUserResponsable(\WP_User $search) : bool {
-        return count(array_filter($this->getResponsables(), function ($u) use ($search) {
+        $responsable = array_filter($this->getResponsables(), function ($u) use ($search) {
             return $search->ID === $u->ID;
-        })) > 0;
+        });
+        return $group[0] ?? false;
     }
 
     /**
@@ -263,9 +258,10 @@ class Group extends IresElement {
      * @return bool true if the user is in a group
      */
     public function userExists(\WP_User $search) : bool {
-        return count(array_filter($this->getUsers(), function ($u) use ($search) {
+        $user = array_filter($this->getUsers(), function ($u) use ($search) {
             return $search->ID === $u->ID;
-        })) > 0;
+        });
+        return $user[0] ?? false;
     }
 
     /**

@@ -1,2 +1,6 @@
 .idea
 .DS_Store
+
+#ignore temporairement ces fichiers
+#potentiel refonte total de la récupération des données d'un utilisateur
+ires-toulouse/user

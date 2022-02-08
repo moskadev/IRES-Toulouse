@@ -53,9 +53,11 @@ class AddUserMenu extends IresMenu {
              * We also reduce it by 1 because the current user is already in the array too,
              * it's useless to count it
              */
-            $usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
+            /*$usersSameNickCount = count(array_filter(get_users(), function ($user) use ($userLogin) {
                 return $user->nickname === preg_replace("/\d/", "", $userLogin);
-            })) - 1;
+            })) - 1;*/
+            $usersSameNickCount = $this->getLogin($userLogin);
+
             $correctedUserLogin = $userLogin . ($usersSameNickCount > 0 ? $usersSameNickCount : "");
 
             try{
@@ -160,5 +162,16 @@ class AddUserMenu extends IresMenu {
 
         </form>
     <?php
+    }
+
+    /**
+     * @param $user_login string the login of the futur user
+     * @return int the highest number + 1 of the different login
+     */
+    private function getLogin($user_login): int {
+        global $wpdb;
+        $results = $wpdb->get_results($wpdb->prepare("SELECT user_login FROM wp_users WHERE user_login LIKE %s ORDER BY ID", $user_login."%"), ARRAY_A);
+        $str = (int) explode($user_login, end($results)['user_login'])[1];
+        return $str === 0 ? get_userdatabylogin($user_login) === false ? -1 : 1 : $str + 1;
     }
 }

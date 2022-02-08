@@ -22,12 +22,9 @@ abstract class IresMenu {
 	 * Initialize all menus
 	 */
 	public static function init() : void{
-		IresMenu::register("admin_menu", new AddUserMenu());
-		IresMenu::register("admin_menu", new AffectionRoleMenu());
-		IresMenu::register("admin_menu", new ModifyUserDataMenu());
-		IresMenu::register("admin_menu", new InformationUserMenu());
-		IresMenu::registerSub("admin_menu", new CreationGroupeMenu(), array(new ModificationGroupeMenu(), new ListeGroupeMenu(), new SuppressionGroupMenu()));
-	}
+        IresMenu::registerSub("admin_menu", new ListUser(), array(new AddUserMenu(), new ListeGroupeMenu(), new ModifyUserDataMenu()));
+        IresMenu::registerInvisibleSub("admin_menu", new DetailsGroup(), "Groupes");
+    }
 
 	/**
 	 * Adding the menu in the dashboard of the WordPress administration
@@ -47,6 +44,23 @@ abstract class IresMenu {
 					echo "</div>";
 				},
 				$menu->getIconUrl(),
+				$menu->getPosition());
+		});
+	}
+
+	public static function registerInvisibleSub(string $destMenu, IresMenu $menu, $parentSlug) : void{
+		add_action($destMenu, function () use ($menu) {
+			add_submenu_page(
+				null,
+				$menu->getPageTitle(),
+				$menu->getPageMenu(),
+				$menu->getLvlAccess(),
+				$menu->getId(),
+				function () use ($menu) {
+					echo "<div class='wrap'>";
+					$menu->getContent();
+					echo "</div>";
+				},
 				$menu->getPosition());
 		});
 	}
@@ -73,13 +87,6 @@ abstract class IresMenu {
 				$menuDefault->getIconUrl(),
 				$menuDefault->getPosition()
 			);
-			add_submenu_page(
-				$menuDefault->getId(),
-				$menuDefault->getPageTitle(),
-				$menuDefault->getPageMenu(),
-				$menuDefault->getLvlAccess(),
-				$menuDefault->getId()
-			);
 		});
 		foreach ($menu as $browseMenu) {
 			add_action($destSubMenu, function () use ($menuDefault, $browseMenu) {
@@ -95,47 +102,6 @@ abstract class IresMenu {
 					});
 			});
 		}
-	}
-
-	/**
-	 * Adding the submenu in the dashboard of the WordPress administration
-	 *
-	 * @param string $destSubMenu
-	 * @param IresMenu $menu
-	 */
-	public static function registerSubSave(string $destSubMenu, IresMenu $menu, IresMenu $menuDefault) : void{
-		add_action($destSubMenu, function () use ($menu, $menuDefault) {
-			add_menu_page($menu->getPageTitle(),
-				$menuDefault->getPageMenu(),
-				$menuDefault->getLvlAccess(),
-				$menuDefault->getId(),
-				function () use ($menuDefault) {
-					echo "<div class='wrap'>";
-					$menuDefault->getContent();
-					echo "</div>";
-				},
-				$menuDefault->getIconUrl(),
-				$menu->getPosition()
-			);
-			add_submenu_page($menuDefault->getId(),
-				$menuDefault->getPageTitle(),
-				$menuDefault->getPageMenu(),
-				$menuDefault->getLvlAccess(),
-				$menuDefault->getId()
-			);
-		});
-		add_action($destSubMenu, function () use ($menu, $menuDefault) {
-			add_submenu_page($menuDefault->getId(),
-				$menu->getPageTitle(),
-				$menu->getPageMenu(),
-				$menu->getLvlAccess(),
-				$menu->getId(),
-				function () use ($menu) {
-					echo "<div class='wrap'>";
-					$menu->getContent();
-					echo "</div>";
-				});
-		});
 	}
 
 	/** @var string */

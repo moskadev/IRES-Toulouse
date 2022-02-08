@@ -14,11 +14,9 @@ require_once("menus/IresMenu.php");
 require_once("menus/AddUserMenu.php");
 require_once("menus/ModifyUserDataMenu.php");
 require_once("menus/InformationUserMenu.php");
-require_once("menus/AffectionRoleMenu.php");
-require_once("menus/CreationGroupeMenu.php");
+require_once("menus/ListUser.php");
 require_once("menus/ListeGroupeMenu.php");
-require_once("menus/ModificationGroupeMenu.php");
-require_once("menus/SuppressionGroupMenu.php");
+require_once("menus/DetailsGroup.php");
 
 
 require_once("elements/IresElement.php");
@@ -74,3 +72,18 @@ add_action("admin_enqueue_scripts", function () {
     wp_enqueue_script("ires-script-fields", "/wp-content/plugins/ires-toulouse/js/fields.js", [], false, true);
 });
 
+function change_post_menu_label() {
+    global $menu;
+    global $submenu;
+
+    if (current_user_can('responsable') || current_user_can('administrator')) {
+        $submenu['comptes_ires'][0][0] = 'Tous les comptes IRES';   // Name of the submenu
+        $submenu['comptes_ires'][0][3] = 'Tous les comptes IRES';   // Name on the navbar
+    } else {
+        $menu[1][0] = "Profil IRES";                        // Name of the category
+        $menu[1][3] = "Profil IRES";                        // Name of the category
+        $submenu['comptes_ires'][0][0] = 'Comptes IRES';    // Name of the submenu
+        $submenu['comptes_ires'][0][3] = 'Comptes IRES';    // Name on the navbar
+    }
+}
+add_action( 'admin_menu', 'change_post_menu_label' );

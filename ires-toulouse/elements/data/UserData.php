@@ -3,7 +3,6 @@
 namespace irestoulouse\elements\input;
 
 use irestoulouse\elements\IresElement;
-use irestoulouse\elements\Discipline;
 
 class UserData extends IresElement {
 
@@ -12,73 +11,26 @@ class UserData extends IresElement {
     public const VALUE_TYPE_STRING = 2;
     public const VALUE_TYPE_BOOL = 3;
 
-    public const DATAS = ["name", "formType", "id",
-        "description", "parent", "uppercase", "required", "regex",
-        "extraData", "disabled"];
-    public const FORM_TYPES = ["label", "text", "email",
-        "checklist", "radio", "dropdown"];
-
-    /**
-     * @return UserData[] all the user's necessary data
-     */
-    public static function all(bool $labelIncluded = true) : array{
-        $datas = [];
-        $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
-        foreach ($jsonData as $d){
-            if($labelIncluded || $d["formType"] !== "label"){
-                $datas[] = new UserData(...array_values(UserData::formatData($d)));
-
-            }
-        }
-        return $datas;
-    }
-
-    /**
-     * Register all new metas for the IRES Toulouse to the user
-     *
-     * @param int $userId the user's id
-     */
-    public static function registerExtraMetas(int $userId) : void{
-        foreach (self::all(false) as $m){
-            if($m->getFormType() === "email"){
-                continue;
-            }
-            add_user_meta($userId, $m->getId(), $m->getDefaultValue(), true);
-        }
-    }
-
-    /**
-     * Find the user input's data from its ID
-     *
-     * @param string $searchedId the data identifier
-     *
-     * @return UserData|null the user data which can be null
-     */
-    public static function fromId(string $searchedId) : ?UserData{
-        $filter = array_filter(self::all(), function ($a) use ($searchedId){
-            return $a->getId() === $searchedId;
-        });
-        return array_values($filter)[array_key_first($filter)] ?? null;
-    }
-
-    /**
-     * Should be used only to organize parameters when creating a new
-     * UserInputData class from a JSON object
-     *
-     * @param array $data the data to convert
-     * @return array the organized data
-     */
-    private static function formatData(array $data) : array{
-        $newData = [];
-        foreach (self::DATAS as $valid){
-            $newData[$valid] = null; // init a value to avoid exceptions
-        }
-        foreach ($data as $key => $d){
-            $newData[$key] = $d;
-        }
-        return $newData;
-    }
-
+    public const DATAS = [
+        "name",
+        "formType",
+        "id",
+        "description",
+        "parent",
+        "uppercase",
+        "required",
+        "regex",
+        "extraData",
+        "disabled"
+    ];
+    public const FORM_TYPES = [
+        "label",
+        "text",
+        "email",
+        "checklist",
+        "radio",
+        "dropdown"
+    ];
     /** @var string */
     private string $formType;
     /** @var string */
@@ -108,10 +60,12 @@ class UserData extends IresElement {
      * @param null $extraData
      * @param bool|null $disabled
      */
-    public function __construct(string $name, string $formType,
-                                ?string $id, ?string $description, ?string $parent = null,
-                                ?bool $uppercase = null, ?bool $required = null,
-                                ?string $regex = null, $extraData = null, ?bool $disabled = null) {
+    public function __construct(
+        string $name, string $formType,
+        ?string $id, ?string $description, ?string $parent = null,
+        ?bool $uppercase = null, ?bool $required = null,
+        ?string $regex = null, $extraData = null, ?bool $disabled = null
+    ) {
         parent::__construct($id, $name);
         $this->parent = $parent ?? "";
         $this->formType = $formType;
@@ -128,10 +82,11 @@ class UserData extends IresElement {
      * and have to be dynamically converted here
      *
      * @param $dataToConvert string|array desired data to convert
+     *
      * @return array converted data
      */
-    private function convertExtraData($dataToConvert) : array{
-        if($dataToConvert !== "disciplines"){ // TODO groups
+    private function convertExtraData($dataToConvert) : array {
+        if ($dataToConvert !== "disciplines") { // TODO groups
             return $dataToConvert ?? [];
         }
         // TODO refaire les disciplines et appliquer les groupes
@@ -142,26 +97,68 @@ class UserData extends IresElement {
     }
 
     /**
-     * @return int the type of the input
+     * Register all new metas for the IRES Toulouse to the user
+     *
+     * @param int $userId the user's id
      */
-    public function getValueType() : int {
-        // TODO check type from json
-        //if($this->formType === "text"){
-        //    return self::VALUE_TYPE_INT;
-        //} else if(is_float($this->formType)){
-        //    return self::VALUE_TYPE_FLOAT;
-        if($this->formType === "radio"){
-            return self::VALUE_TYPE_BOOL;
+    public static function registerExtraMetas(int $userId) : void {
+        foreach (self::all(false) as $m) {
+            if ($m->getFormType() === "email") {
+                continue;
+            }
+            add_user_meta($userId, $m->getId(), $m->getDefaultValue(), true);
         }
-        return self::VALUE_TYPE_STRING;
+    }
+
+    /**
+     * @return UserData[] all the user's necessary data
+     */
+    public static function all(bool $labelIncluded = true) : array {
+        $datas = [];
+        $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
+        foreach ($jsonData as $d) {
+            if ($labelIncluded || $d["formType"] !== "label") {
+                $datas[] = new UserData(...array_values(UserData::formatData($d)));
+
+            }
+        }
+
+        return $datas;
+    }
+
+    /**
+     * Should be used only to organize parameters when creating a new
+     * UserInputData class from a JSON object
+     *
+     * @param array $data the data to convert
+     *
+     * @return array the organized data
+     */
+    private static function formatData(array $data) : array {
+        $newData = [];
+        foreach (self::DATAS as $valid) {
+            $newData[$valid] = null; // init a value to avoid exceptions
+        }
+        foreach ($data as $key => $d) {
+            $newData[$key] = $d;
+        }
+
+        return $newData;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormType() : string {
+        return $this->formType;
     }
 
     /**
      * @return string the default value depending on its type
      */
-    public function getDefaultValue() : string{
+    public function getDefaultValue() : string {
         $valueType = $this->getValueType();
-        switch ($valueType){
+        switch ($valueType) {
             case self::VALUE_TYPE_INT:
                 return "0";
             case self::VALUE_TYPE_FLOAT:
@@ -174,44 +171,68 @@ class UserData extends IresElement {
     }
 
     /**
-     * @return string
+     * @return int the type of the input
      */
-    public function getFormType(): string {
-        return $this->formType;
+    public function getValueType() : int {
+        // TODO check type from json
+        //if($this->formType === "text"){
+        //    return self::VALUE_TYPE_INT;
+        //} else if(is_float($this->formType)){
+        //    return self::VALUE_TYPE_FLOAT;
+        if ($this->formType === "radio") {
+            return self::VALUE_TYPE_BOOL;
+        }
+
+        return self::VALUE_TYPE_STRING;
+    }
+
+    /**
+     * Find the user input's data from its ID
+     *
+     * @param string $searchedId the data identifier
+     *
+     * @return UserData|null the user data which can be null
+     */
+    public static function fromId(string $searchedId) : ?UserData {
+        $filter = array_filter(self::all(), function ($a) use ($searchedId) {
+            return $a->getId() === $searchedId;
+        });
+
+        return array_values($filter)[array_key_first($filter)] ?? null;
     }
 
     /**
      * @return string
      */
-    public function getDescription(): string {
+    public function getDescription() : string {
         return $this->description;
     }
 
     /**
      * @return string
      */
-    public function getParent(): string {
+    public function getParent() : string {
         return $this->parent;
     }
 
     /**
      * @return bool
      */
-    public function isUppercase(): bool {
+    public function isUppercase() : bool {
         return $this->uppercase;
     }
 
     /**
      * @return bool
      */
-    public function isRequired(): bool {
+    public function isRequired() : bool {
         return $this->required;
     }
 
     /**
      * @return string
      */
-    public function getRegex(): string {
+    public function getRegex() : string {
         return $this->regex;
     }
 
@@ -219,10 +240,11 @@ class UserData extends IresElement {
      * If the regex exists, check if the values matches it
      *
      * @param string $value to check
+     *
      * @return bool true if it matches
      */
-    public function matches(string $value): bool{
-        return empty($this->regex) || 
+    public function matches(string $value) : bool {
+        return empty($this->regex) ||
             (!$this->required && empty($value)) ||
             preg_match("/^$this->regex$/", $value);
     }
@@ -230,21 +252,21 @@ class UserData extends IresElement {
     /**
      * @return array|null
      */
-    public function getExtraData(): ?array {
+    public function getExtraData() : ?array {
         return $this->extraData;
     }
 
     /**
      * @return bool
      */
-    public function isDisabled(): bool {
+    public function isDisabled() : bool {
         return $this->disabled;
     }
 
     /**
      * @return array
      */
-    public function toArray(): array {
+    public function toArray() : array {
         return array_merge(parent::toArray(), [
             "parent" => $this->parent,
             "formType" => $this->formType,

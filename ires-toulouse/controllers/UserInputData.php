@@ -4,13 +4,14 @@ namespace irestoulouse\controllers;
 
 use irestoulouse\elements\input\UserData;
 use irestoulouse\exceptions\InvalidInputValueException;
+use WP_User;
 
-class UserInputData extends Controller{
+class UserInputData extends Controller {
 
-    /** @var \WP_User */
-    private \WP_User $user;
+    /** @var WP_User */
+    private WP_User $user;
 
-    public function __construct(\WP_User $user) {
+    public function __construct(WP_User $user) {
         $this->user = $user;
     }
 

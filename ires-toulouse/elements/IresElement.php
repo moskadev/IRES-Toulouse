@@ -23,20 +23,6 @@ class IresElement {
     }
 
     /**
-     * @return string the name of the discipline
-     */
-    public function getName(): string {
-        return $this->name;
-    }
-
-    /**
-     * @return string the discipline identifier
-     */
-    public function getId(): string {
-        return $this->id;
-    }
-
-    /**
      * @return string[]
      */
     public function toArray() : array {
@@ -44,6 +30,20 @@ class IresElement {
             "name" => $this->getName(),
             "id" => $this->getId()
         ];
+    }
+
+    /**
+     * @return string the name of the discipline
+     */
+    public function getName() : string {
+        return $this->name;
+    }
+
+    /**
+     * @return string the discipline identifier
+     */
+    public function getId() : string {
+        return $this->id;
     }
 
 }

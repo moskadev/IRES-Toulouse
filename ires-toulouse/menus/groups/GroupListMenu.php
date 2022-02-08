@@ -134,7 +134,7 @@ class GroupListMenu extends IresMenu {
      * Show depending on the content that has been sent
      * different error/warning/success messages
      */
-    private function showMessages(){
+    private function showMessages() {
         /*
          * Supprime un groupe
          */

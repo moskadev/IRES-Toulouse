@@ -5,5 +5,4 @@ namespace irestoulouse\utils;
 class HtmlElement {
 
 
-
 }

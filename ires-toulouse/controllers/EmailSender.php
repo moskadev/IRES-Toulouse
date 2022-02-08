@@ -2,20 +2,18 @@
 
 namespace irestoulouse\controllers;
 
+use WP_User;
+
 class EmailSender extends Controller {
 
-    /** @var \WP_User */
-    private \WP_User $toUser;
+    /** @var WP_User */
+    private WP_User $toUser;
 
-    public function __construct(\WP_User $to) {
+    public function __construct(WP_User $to) {
         $this->toUser = $to;
     }
 
-    public function send(string $subject, string $message) : bool {
-        return wp_mail($this->toUser->user_email, $subject, $message);
-    }
-
-    public function confirm(string $password) : bool{
+    public function confirm(string $password) : bool {
         $message = 'Bonjour,
            
  Vous avez été invité à rejoindre le site %2$s avec le role de %3$s.
@@ -47,6 +45,11 @@ class EmailSender extends Controller {
             home_url("/wp-admin/admin.php?page=profil_ires")
         );
         $email = apply_filters("invited_user_email", $email, $this->toUser, $this->toUser->roles[0], $password);
+
         return $this->send($email["subject"], $email["message"]);
+    }
+
+    public function send(string $subject, string $message) : bool {
+        return wp_mail($this->toUser->user_email, $subject, $message);
     }
 }

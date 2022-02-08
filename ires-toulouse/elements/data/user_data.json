@@ -54,7 +54,16 @@
     "parent": "info_perso",
     "formType": "checklist",
     "id": "diplomes",
-    "extraData": ["CAPES", "CAPET", "AGREGATION", "CRPE", "CAFFA", "CAPLP", "CAPPEI", "THÈSE"],
+    "extraData": [
+      "CAPES",
+      "CAPET",
+      "AGREGATION",
+      "CRPE",
+      "CAFFA",
+      "CAPLP",
+      "CAPPEI",
+      "THÈSE"
+    ],
     "description": "Enfoncez Ctrl (^) ou Cmd (⌘) sur Mac pour sélectionner de multiples choix"
   },
   {
@@ -62,14 +71,24 @@
     "parent": "info_perso",
     "formType": "dropdown",
     "id": "situation_pro",
-    "extraData": ["En activité", "Retraité"]
+    "extraData": [
+      "En activité",
+      "Retraité"
+    ]
   },
   {
     "name": "Type d'établissement",
     "parent": "info_perso",
     "formType": "dropdown",
     "id": "type_etablissement",
-    "extraData": ["Primaire", "Collège", "Lycée", "Classes prépas", "Université", "Autre"]
+    "extraData": [
+      "Primaire",
+      "Collège",
+      "Lycée",
+      "Classes prépas",
+      "Université",
+      "Autre"
+    ]
   },
   {
     "name": "Nom de l'établissement",

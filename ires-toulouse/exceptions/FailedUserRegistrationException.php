@@ -2,7 +2,9 @@
 
 namespace exceptions;
 
-class FailedUserRegistrationException extends \Exception {
+use Exception;
+
+class FailedUserRegistrationException extends Exception {
 
     /**
      * @param string $login

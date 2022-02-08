@@ -3,6 +3,7 @@
 namespace irestoulouse\elements;
 
 use irestoulouse\sql\Database;
+use WP_User;
 
 /**
  * Groups have their own name and identifier.
@@ -13,8 +14,20 @@ class Group extends IresElement {
 
     /** @var string */
     private string $creationTime;
-    /** @var \WP_User */
-    private \WP_User $creator;
+    /** @var WP_User */
+    private WP_User $creator;
+
+    /**
+     * @param string $id
+     * @param string $name
+     * @param string $creationTime
+     * @param WP_User $creator
+     */
+    public function __construct(string $id, string $name, string $creationTime, WP_User $creator) {
+        parent::__construct($id, $name);
+        $this->creationTime = $creationTime;
+        $this->creator = $creator;
+    }
 
     /**
      * Looking if groups and groups_user table have been created and if they not, create then
@@ -63,20 +76,24 @@ class Group extends IresElement {
                 ['name' => $name, 'creator_id' => get_current_user_id()],
                 ['%s', '%d']
             );
+
             return true;
         }
+
         return false;
     }
 
     /**
-     * Check if a group already exist in database
+     * @param string $groupName the group's name that we're looking for
      *
-     * @param int $id the group's id
-     *
-     * @return bool true if the group exist, otherwise return false
+     * @return Group|null the group found by its name
      */
-    public static function exists(int $id) : bool {
-        return Group::fromId($id) !== null;
+    public static function fromName(string $groupName) : ?Group {
+        $group = array_filter(self::all(), function ($g) use ($groupName) {
+            return strtolower($g->name) === strtolower($groupName);
+        });
+
+        return $group[array_key_first($group)] ?? null;
     }
 
     /**
@@ -108,94 +125,25 @@ class Group extends IresElement {
         if (self::exists($id)) {
             $db->delete($db->prefix . 'groups', ['id_group' => $id], ['%s']);
             $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d",
-                $id)
+                $id
+            )
             );
+
             return true;
         }
+
         return false;
     }
 
     /**
-     * @param $user \WP_User the user that we're looking for
+     * Check if a group already exist in database
      *
-     * @return Group[] all the group(s) of this user
-     */
-    public static function getUserGroups(\WP_User $user) : array {
-        $db = Database::get();
-        $request = $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON group_id = id_group WHERE user_id = %d",
-            $user->ID)
-        );
-        if (count($request) === 0) {
-            return [];
-        }
-
-        return array_map(function ($group) {
-            return self::fromName($group->name);
-        }, $request);
-    }
-
-
-    /**
-     * @return array|null containing all the groups where an user is responsable
-     */
-    public static function allWhereUserResponsable(\WP_User $user) {
-        $groups = [];
-        foreach (self::getUserGroups($user) as $g){
-            if(in_array($user, $g->getResponsables())){
-                $groups[] = $g;
-            }
-        }
-        return $groups;
-    }
-
-    /**
-     * Get all the users for who $user_id is responsible
-     * @return array|null all the id of the users
-     */
-    public static function getSeeableUsers(\WP_User $from) {
-        if(in_array("administrator", $from->roles)){
-            return get_users();
-        }
-        $users = [];
-        foreach (Group::allWhereUserResponsable($from) as $group) {
-            $users = array_merge($users, $group->getUsers());
-        }
-        $users = array_filter($users, function ($u) use ($from){
-            return !in_array("administrator", $u->roles) ||
-                !in_array("responsable", $u->roles);
-        });
-        if(!in_array($from, $users)){
-            $users[] = $from;
-        }
-        return $users;
-    }
-
-    /**
-     * Get all the users in a group
-     * @return \WP_User[] all the users
-     */
-    public function getUsers() : array {
-        $db = Database::get();
-
-        return array_map(function ($u) {
-            return get_user_by("id", $u->user_id);
-        }, $db->get_results(
-            $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d",
-                $this->id
-            ))
-        );
-    }
-
-    /**
-     * @param string $groupName the group's name that we're looking for
+     * @param int $id the group's id
      *
-     * @return Group|null the group found by its name
+     * @return bool true if the group exist, otherwise return false
      */
-    public static function fromName(string $groupName) : ?Group {
-        $group = array_filter(self::all(), function ($g) use ($groupName) {
-            return strtolower($g->name) === strtolower($groupName);
-        });
-        return $group[array_key_first($group)] ?? null;
+    public static function exists(int $id) : bool {
+        return Group::fromId($id) !== null;
     }
 
     /**
@@ -207,19 +155,82 @@ class Group extends IresElement {
         $group = array_filter(self::all(), function ($g) use ($id) {
             return $g->id === $id;
         });
+
         return $group[array_key_first($group)] ?? null;
     }
 
     /**
-     * @param string $id
-     * @param string $name
-     * @param string $creationTime
-     * @param \WP_User $creator
+     * Get all the users for who $user_id is responsible
+     * @return array|null all the id of the users
      */
-    public function __construct(string $id, string $name, string $creationTime, \WP_User $creator) {
-        parent::__construct($id, $name);
-        $this->creationTime = $creationTime;
-        $this->creator = $creator;
+    public static function getSeeableUsers(WP_User $from) {
+        if (in_array("administrator", $from->roles)) {
+            return get_users();
+        }
+        $users = [];
+        foreach (Group::allWhereUserResponsable($from) as $group) {
+            $users = array_merge($users, $group->getUsers());
+        }
+        $users = array_filter($users, function ($u) use ($from) {
+            return !in_array("administrator", $u->roles) ||
+                !in_array("responsable", $u->roles);
+        });
+        if (!in_array($from, $users)) {
+            $users[] = $from;
+        }
+
+        return $users;
+    }
+
+    /**
+     * @return array|null containing all the groups where an user is responsable
+     */
+    public static function allWhereUserResponsable(WP_User $user) {
+        $groups = [];
+        foreach (self::getUserGroups($user) as $g) {
+            if (in_array($user, $g->getResponsables())) {
+                $groups[] = $g;
+            }
+        }
+
+        return $groups;
+    }
+
+    /**
+     * @param $user WP_User the user that we're looking for
+     *
+     * @return Group[] all the group(s) of this user
+     */
+    public static function getUserGroups(WP_User $user) : array {
+        $db = Database::get();
+        $request = $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON group_id = id_group WHERE user_id = %d",
+            $user->ID
+        )
+        );
+        if (count($request) === 0) {
+            return [];
+        }
+
+        return array_map(function ($group) {
+            return self::fromName($group->name);
+        }, $request);
+    }
+
+    /**
+     * Get the users (if exist) in charge of the group given in parameter
+     * @return WP_User[] the user(s) in charge of the group
+     */
+    public function getResponsables() {
+        $db = Database::get();
+
+        return array_map(function ($u) {
+            return get_user_by("id", $u->user_id);
+        }, $db->get_results(
+            $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
+                $this->id
+            )
+        )
+        );
     }
 
     /**
@@ -230,38 +241,44 @@ class Group extends IresElement {
     }
 
     /**
-     * @return \WP_User the group's creator
+     * @return WP_User the group's creator
      */
-    public function getCreator() : \WP_User {
+    public function getCreator() : WP_User {
         return $this->creator;
     }
 
     /**
-     * Get the users (if exist) in charge of the group given in parameter
-     * @return \WP_User[] the user(s) in charge of the group
+     * Adds a manager if he is already in the group
+     * Adds the user to the group as a manager if he is not already there
+     *
+     * @param WP_User $user
+     *
+     * @return bool true if the responsable was added successfully
      */
-    public function getResponsables() {
+    public function addResponsable(WP_User $user) : bool {
         $db = Database::get();
-
-        return array_map(function ($u) {
-            return get_user_by("id", $u->user_id);
-        }, $db->get_results(
-                $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
-                    $this->id
-                )
+        if (!$this->userExists($user)) {
+            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '1')",
+                $user->ID,
+                $this->id
             )
-        );
-    }
+            );
+            $user->set_role("responsable");
 
-    /**
-     * Check if a user is in charge of the group
-     * @return bool true if the user is in charge of the group
-     */
-    public function isUserResponsable(\WP_User $search) : bool {
-        $responsable = array_filter($this->getResponsables(), function ($u) use ($search) {
-            return $search->ID === $u->ID;
-        });
-        return isset($responsable[array_key_first($responsable)]);
+            return true;
+        }
+        if (!$this->isUserResponsable($user)) {
+            $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d",
+                $user->ID,
+                $this->id
+            )
+            );
+            $user->set_role("responsable");
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -271,38 +288,57 @@ class Group extends IresElement {
      *
      * @return bool true if the user is in a group
      */
-    public function userExists(\WP_User $search) : bool {
+    public function userExists(WP_User $search) : bool {
         $user = array_filter($this->getUsers(), function ($u) use ($search) {
             return $search->ID === $u->ID;
         });
+
         return isset($user[array_key_first($user)]);
     }
 
     /**
-     * Adds a manager if he is already in the group
-     * Adds the user to the group as a manager if he is not already there
-     *
-     * @param \WP_User $user
-     *
-     * @return bool true if the responsable was added successfully
+     * Get all the users in a group
+     * @return WP_User[] all the users
      */
-    public function addResponsable(\WP_User $user) : bool {
+    public function getUsers() : array {
         $db = Database::get();
-        if (!$this->userExists($user)) {
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '1')",
-                $user->ID,
-                $this->id)
-            );
-            $user->set_role("responsable");
 
-            return true;
-        }
-        if (!$this->isUserResponsable($user)) {
-            $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d",
-                $user->ID,
-                $this->id)
+        return array_map(function ($u) {
+            return get_user_by("id", $u->user_id);
+        }, $db->get_results(
+            $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d",
+                $this->id
+            )
+        )
+        );
+    }
+
+    /**
+     * Check if a user is in charge of the group
+     * @return bool true if the user is in charge of the group
+     */
+    public function isUserResponsable(WP_User $search) : bool {
+        $responsable = array_filter($this->getResponsables(), function ($u) use ($search) {
+            return $search->ID === $u->ID;
+        });
+
+        return isset($responsable[array_key_first($responsable)]);
+    }
+
+    /**
+     * Ajoute l'utilisateur s'il n'est pas déjà présent et s'il existe
+     *
+     * @param WP_User $user
+     *
+     * @return bool
+     */
+    public function addUser(WP_User $user) : bool {
+        if (!$this->userExists($user)) {
+            $db = Database::get();
+            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')",
+                $user->ID, $this->id
+            )
             );
-            $user->set_role("responsable");
 
             return true;
         }
@@ -311,11 +347,37 @@ class Group extends IresElement {
     }
 
     /**
-     * @param \WP_User $user
+     * Remove the user from this group
+     *
+     * @param WP_User $user the user that we wanted to be removed
+     *
+     * @return bool true if the removing was a success
+     */
+    public function removeUser(WP_User $user) : bool {
+        if ($this->userExists($user)) {
+            if ($this->isUserResponsable($user)) {
+                $this->removeResponsable($user);
+            }
+            $db = Database::get();
+            $db->query(
+                $db->prepare("DELETE FROM {$db->prefix}groups_users WHERE user_id = %d AND group_id = %d",
+                    $user->ID,
+                    $this->id
+                )
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param WP_User $user
      *
      * @return bool
      */
-    public function removeResponsable(\WP_User $user) : bool {
+    public function removeResponsable(WP_User $user) : bool {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
             $db = Database::get();
 
@@ -324,49 +386,6 @@ class Group extends IresElement {
             }
             $db->get_results(
                 $db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '0' WHERE user_id = %d AND group_id = %d",
-                    $user->ID,
-                    $this->id
-                )
-            );
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Ajoute l'utilisateur s'il n'est pas déjà présent et s'il existe
-     *
-     * @param \WP_User $user
-     *
-     * @return bool
-     */
-    public function addUser(\WP_User $user) : bool {
-        if (!$this->userExists($user)) {
-            $db = Database::get();
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')",
-                $user->ID, $this->id)
-            );
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Remove the user from this group
-     *
-     * @param \WP_User $user the user that we wanted to be removed
-     *
-     * @return bool true if the removing was a success
-     */
-    public function removeUser(\WP_User $user) : bool {
-        if ($this->userExists($user)) {
-            if ($this->isUserResponsable($user)) {
-                $this->removeResponsable($user);
-            }
-            $db = Database::get();
-            $db->query(
-                $db->prepare("DELETE FROM {$db->prefix}groups_users WHERE user_id = %d AND group_id = %d",
                     $user->ID,
                     $this->id
                 )

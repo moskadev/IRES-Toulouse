@@ -13,11 +13,12 @@ class Dataset {
      *
      * @return string
      */
-    public static function allFrom(UserData $userData) : string{
+    public static function allFrom(UserData $userData) : string {
         $datasetHtml = "";
-        foreach ($userData->toArray() as $name => $value){
+        foreach ($userData->toArray() as $name => $value) {
             $datasetHtml .= "data-$name='" . htmlspecialchars(is_array($value) ? implode(",", $value) : $value) . "' ";
         }
+
         return $datasetHtml;
     }
 }

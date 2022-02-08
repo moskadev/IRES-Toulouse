@@ -2,8 +2,9 @@
 
 namespace irestoulouse\menus;
 
-use irestoulouse\controllers\UserInputData;
+use Exception;
 use irestoulouse\controllers\UserConnection;
+use irestoulouse\controllers\UserInputData;
 use irestoulouse\elements\input\UserData;
 use irestoulouse\utils\Dataset;
 
@@ -55,7 +56,7 @@ class UserRegisterMenu extends IresMenu {
                                 vous pouvez renseigner ses informations ici</a></strong>
                     </p>
                 </div> <?php
-            } catch (\Exception $e) { ?>
+            } catch (Exception $e) { ?>
                 <div id="message" class="error notice is-dismissible">
                     <p><strong><?php echo $e->getMessage() ?></strong></p>
                 </div>
@@ -91,12 +92,15 @@ class UserRegisterMenu extends IresMenu {
                         </th>
                         <td>
                             <?php
-                            if (in_array($inputData->getFormType(), ["text", "email"])) {?>
+                            if (in_array($inputData->getFormType(), [
+                                "text",
+                                "email"
+                            ])) { ?>
                                 <input <?php echo Dataset::allFrom($inputData) ?>
                                         type='<?php echo htmlspecialchars($inputFormType) ?>'
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value='<?php echo ($inputId === "nickname" && $loggedUser !== null ?
+                                        value='<?php echo($inputId === "nickname" && $loggedUser !== null ?
                                             $loggedUser->user_login : ($_POST[$inputId] ?? "")) ?>'>
                                 <?php
                                 if (!empty($inputData->getDescription())) {

@@ -2,21 +2,23 @@
 
 namespace irestoulouse\controllers;
 
+use Exception;
 use irestoulouse\elements\input\UserData;
+use WP_User;
 
-class UserModification extends Controller{
+class UserModification extends Controller {
 
-    /** @var \WP_User */
-    private \WP_User $user;
+    /** @var WP_User */
+    private WP_User $user;
 
-    public function __construct(\WP_User $user) {
+    public function __construct(WP_User $user) {
         $this->user = $user;
     }
 
     /**
-     * @return \WP_User
+     * @return WP_User
      */
-    public function getUser() : \WP_User {
+    public function getUser() : WP_User {
         return $this->user;
     }
 
@@ -37,9 +39,9 @@ class UserModification extends Controller{
      * which are in another table in the database, but we should not forget
      * about the main user's metadata
      *
-     * @throws \Exception If an error occurred with Wordpress registration
+     * @throws Exception If an error occurred with Wordpress registration
      */
-    public function updateAllUserData() : \WP_User {
+    public function updateAllUserData() : WP_User {
         foreach ($_POST as $meta => $data) {
             if (get_user_meta($this->user->ID, $meta) !== false) {
                 /**
@@ -60,7 +62,7 @@ class UserModification extends Controller{
             "user_email" => get_user_meta($this->user->ID, "email", true)
         ]);
         if (is_wp_error($userId)) {
-            throw new \Exception("ID {$this->user->ID} : Problème lors de l'enregistrement d'une donnée");
+            throw new Exception("ID {$this->user->ID} : Problème lors de l'enregistrement d'une donnée");
         }
 
         return get_user_by("id", $userId);

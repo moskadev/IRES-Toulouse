@@ -2,6 +2,8 @@
 
 namespace irestoulouse\utils;
 
+use WP_User;
+
 class Identifier {
 
     /**
@@ -25,9 +27,9 @@ class Identifier {
     }
 
     /**
-     * @return \WP_User
+     * @return WP_User
      */
-    public static function getLastRegisteredUser() : \WP_User {
+    public static function getLastRegisteredUser() : WP_User {
         return get_users([
             "orderby" => "registered",
             "order" => "DESC",

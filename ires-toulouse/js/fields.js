@@ -1,11 +1,11 @@
 const forms = document.querySelectorAll(".verifiy-form");
-forms.forEach(function(form) {
+forms.forEach(function (form) {
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
     const nickname = form.querySelector("#nickname");
     // disable all inputs if the data is set
     formInputs.forEach(function (element) {
-        if(element.dataset?.disabled){
+        if (element.dataset?.disabled) {
             element.classList.add("disabled");
             element.disabled = true;
         }
@@ -13,22 +13,22 @@ forms.forEach(function(form) {
 
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
-        if(!String(event.target.type).includes("select")) {
+        if (!String(event.target.type).includes("select")) {
             // uppercase caracters if necessary
             event.target.value = uppercase(event.target);
 
             // if a regex is present for the input
-            if(event.target.dataset?.regex) {
+            if (event.target.dataset?.regex) {
                 updateValueFromRegex(event.target);
             }
-            if(nickname != null){
+            if (nickname != null) {
                 nickname.value = generateUserLogin();
             }
         }
         buttonCreate.disabled = !areCorrectlyFilled();
         //buttonCreate.style.cursor = areCorrectlyFilled() ? "pointer" : "not-allowed";
     });
-    if(!nickname.value) {
+    if (!nickname.value) {
         form.querySelector("#nickname").value = generateUserLogin();
     }
 
@@ -38,9 +38,9 @@ forms.forEach(function(form) {
      *
      * @param inout to update
      */
-    function updateValueFromRegex(inout){
+    function updateValueFromRegex(inout) {
         const regex = new RegExp(inout.dataset.regex, "g").exec(inout.value);
-        if(regex !== null) { // analyze the input value
+        if (regex !== null) { // analyze the input value
             inout.value = regex[0]; // change the value corresponding to the regex
         }
     }
@@ -49,7 +49,7 @@ forms.forEach(function(form) {
      * @returns {string} generate the identifier of
      *                   the user for its login
      */
-    function generateUserLogin(){
+    function generateUserLogin() {
         return ((String(form.querySelector("#first_name").value).substr(0, 1) +
             form.querySelector("#last_name").value).toLowerCase())
             .replaceAll(/(\s|\W)+/g, "-");
@@ -59,7 +59,7 @@ forms.forEach(function(form) {
      * @param element the targeted element
      * @returns {string|*} uppercased value if the data is true
      */
-    function uppercase(element){
+    function uppercase(element) {
         return element.dataset?.uppercase ?
             String(element.value).toUpperCase() :
             element.value;
@@ -86,9 +86,9 @@ forms.forEach(function(form) {
              *
              * The value of the inputs are also verified on the back-end
              */
-            if(filled && input.dataset.formtype) {
+            if (filled && input.dataset.formtype) {
                 const regex = input.dataset.regex ? new RegExp("^" + input.dataset.regex + "$") : "";
-                if(input.dataset.required) {
+                if (input.dataset.required) {
                     /*
                      * If the regex exists, we test the value, if not, we check
                      * if the input contains a value

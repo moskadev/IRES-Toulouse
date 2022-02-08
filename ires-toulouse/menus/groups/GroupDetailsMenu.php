@@ -21,7 +21,7 @@ class GroupDetailsMenu extends IresMenu {
      */
     public function getContent() : void {
         $group = Group::fromId($_GET["group"]);
-        if($group !== null){
+        if ($group !== null) {
             /*
              * Poste un message si un membre est ajouté
              */
@@ -132,7 +132,8 @@ class GroupDetailsMenu extends IresMenu {
              */
             if (isset($_POST['message']) && isset($_POST['type'])) { ?>
                 <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
-                <div id="message" class="<?php echo $_POST['type']; ?> notice is-dismissible">
+                <div id="message"
+                     class="<?php echo $_POST['type']; ?> notice is-dismissible">
                     <p><strong><?php echo stripslashes($_POST['message']); ?></strong></p>
                 </div>
                 <?php
@@ -150,7 +151,8 @@ class GroupDetailsMenu extends IresMenu {
                     </form>
                 </div>
                 <div class="col-auto">
-                    <h1 class="wp-heading-inline"><b><?php echo $group->getName(); ?></b></h1>
+                    <h1 class="wp-heading-inline"><b><?php echo $group->getName(); ?></b>
+                    </h1>
                 </div>
             </div>
             <hr>
@@ -250,12 +252,13 @@ class GroupDetailsMenu extends IresMenu {
             <?php
             if ((current_user_can('responsable') &&
                     $group->isUserResponsable(wp_get_current_user())) ||
-                    current_user_can('administrator')
+                current_user_can('administrator')
             ) {
                 if (isset($_POST['addMember'])) { ?>
                     <form action="" method="post">
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Identifiant"
+                            <input type="text" class="form-control"
+                                   placeholder="Identifiant"
                                    name="nameMember">
                             <div class="input-group-append">
                                 <button class="input-group-text btn-primary"
@@ -267,7 +270,8 @@ class GroupDetailsMenu extends IresMenu {
                     <?php
                 } else { ?>
                     <form action="" method="post">
-                        <button type="submit" class="btn btn-primary btn-sm" name="addMember">
+                        <button type="submit" class="btn btn-primary btn-sm"
+                                name="addMember">
                             Ajouter un membre
                         </button>
                     </form>
@@ -349,7 +353,7 @@ class GroupDetailsMenu extends IresMenu {
                 </tbody>
             </table>
             <?php
-        } else {?>
+        } else { ?>
             <div id="message" class="error notice">
                 <p><strong>Le groupe à modifier n'existe pas</strong></p>
             </div>

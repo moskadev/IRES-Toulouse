@@ -4,6 +4,7 @@ namespace irestoulouse\menus;
 
 include_once("IresMenu.php");
 
+use Exception;
 use irestoulouse\controllers\UserInputData;
 use irestoulouse\controllers\UserModification;
 use irestoulouse\elements\Group;
@@ -97,7 +98,7 @@ class UserProfileMenu extends IresMenu {
                             <?php echo $editingUser->user_login ?> ont été bien
                             effectuées </strong></p>
                 </div> <?php
-            } catch (\Exception $e) { ?>
+            } catch (Exception $e) { ?>
                 <div id="message" class="error notice is-dismissible">
                     <p><strong>Erreur : <?php echo $e->getMessage() ?></strong></p>
                 </div>
@@ -233,7 +234,7 @@ class UserProfileMenu extends IresMenu {
                 </table>
                 <?php
             }
-            if(!$disableAll) {
+            if (!$disableAll) {
                 submit_button(__("Modifier les informations"), "primary",
                     "profile-page", true,
                     ["id" => "profile-page-sub", "disabled" => "true"]

@@ -2,7 +2,7 @@ const forms = document.querySelectorAll(".verifiy-form");
 forms.forEach(function(form) {
     const formInputs = [...form.querySelectorAll("input")];
     const buttonCreate = form.querySelector("input[type=submit]");
-
+    const nickname = form.querySelector("#nickname");
     // disable all inputs if the data is set
     formInputs.forEach(function (element) {
         if(element.dataset?.disabled){
@@ -21,16 +21,16 @@ forms.forEach(function(form) {
             if(event.target.dataset?.regex) {
                 updateValueFromRegex(event.target);
             }
-
-            const nickname = form.querySelector(".update-nickname");
             if(nickname != null){
                 nickname.value = generateUserLogin();
             }
         }
         buttonCreate.disabled = !areCorrectlyFilled();
-        buttonCreate.style.cursor = areCorrectlyFilled() ? "pointer" : "not-allowed";
+        //buttonCreate.style.cursor = areCorrectlyFilled() ? "pointer" : "not-allowed";
     });
-    form.querySelector("#nickname").value = generateUserLogin();
+    if(!nickname.value) {
+        form.querySelector("#nickname").value = generateUserLogin();
+    }
 
     /**
      * Dynamically update the value in the input from

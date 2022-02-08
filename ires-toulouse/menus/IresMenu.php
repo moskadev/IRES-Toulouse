@@ -2,29 +2,25 @@
 
 namespace irestoulouse\menus;
 
-use irestoulouse\elements\input\UserInputData;
+use irestoulouse\elements\input\UserData;
 use irestoulouse\exceptions\InvalidInputValueException;
 use irestoulouse\utils\Identifier;
 
+use irestoulouse\menus\groups\GroupListMenu;
+use irestoulouse\menus\groups\GroupDetailsMenu;
+use menus\UserListMenu;
+
 abstract class IresMenu {
-
-	/** @var IresMenu */
-	private static IresMenu $instance;
-
-	/**
-	 * @return IresMenu
-	 */
-	public static function getInstance(): IresMenu {
-		return self::$instance;
-	}
 
 	/**
 	 * Initialize all menus
 	 */
 	public static function init() : void{
-        IresMenu::registerSub("admin_menu", new ListUser(), array(new AddUserMenu(), new ListeGroupeMenu(), new ModifyUserDataMenu()));
-        IresMenu::registerInvisibleSub("admin_menu", new DetailsGroup(), "Groupes");
-    }
+        IresMenu::registerSub("admin_menu", new UserListMenu(),
+            [new UserRegisterMenu(), new GroupListMenu(), new UserProfileMenu()]
+        );
+        IresMenu::registerInvisibleSub("admin_menu", new GroupDetailsMenu());
+	}
 
 	/**
 	 * Adding the menu in the dashboard of the WordPress administration
@@ -38,32 +34,28 @@ abstract class IresMenu {
 				$menu->getPageMenu(),
 				$menu->getLvlAccess(),
 				$menu->getId(),
-				function () use ($menu) {
-					echo "<div class='wrap'>";
-					$menu->getContent();
-					echo "</div>";
-				},
+                function () use ($menu) {
+                    $menu->generateContent();
+                },
 				$menu->getIconUrl(),
 				$menu->getPosition());
 		});
 	}
 
-	public static function registerInvisibleSub(string $destMenu, IresMenu $menu, $parentSlug) : void{
-		add_action($destMenu, function () use ($menu) {
-			add_submenu_page(
-				null,
-				$menu->getPageTitle(),
-				$menu->getPageMenu(),
-				$menu->getLvlAccess(),
-				$menu->getId(),
-				function () use ($menu) {
-					echo "<div class='wrap'>";
-					$menu->getContent();
-					echo "</div>";
-				},
-				$menu->getPosition());
-		});
-	}
+    public static function registerInvisibleSub(string $destMenu, IresMenu $menu) : void{
+        add_action($destMenu, function () use ($menu) {
+            add_submenu_page(
+                null,
+                $menu->getPageTitle(),
+                $menu->getPageMenu(),
+                $menu->getLvlAccess(),
+                $menu->getId(),
+                function () use ($menu) {
+                    $menu->generateContent();
+                },
+                $menu->getPosition());
+        });
+    }
 
 	/**
 	 * Adding a submenu in the dashboard of the WordPress administration
@@ -73,21 +65,7 @@ abstract class IresMenu {
 	 * @param array $menu composed of the number of sub-menus you want to add at your panel
 	 */
 	public static function registerSub(string $destSubMenu, IresMenu $menuDefault, array $menu) : void{
-		add_action($destSubMenu, function () use ($menu, $menuDefault) {
-			add_menu_page(
-				$menuDefault->getPageTitle(),
-				$menuDefault->getPageMenu(),
-				$menuDefault->getLvlAccess(),
-				$menuDefault->getId(),
-				function () use ($menuDefault, $menu) {
-					echo "<div class='wrap'>";
-					$menuDefault->getContent();
-					echo "</div>";
-				},
-				$menuDefault->getIconUrl(),
-				$menuDefault->getPosition()
-			);
-		});
+        self::register($destSubMenu, $menuDefault);
 		foreach ($menu as $browseMenu) {
 			add_action($destSubMenu, function () use ($menuDefault, $browseMenu) {
 				add_submenu_page($menuDefault->getId(),
@@ -95,11 +73,10 @@ abstract class IresMenu {
 					$browseMenu->getPageMenu(),
 					$browseMenu->getLvlAccess(),
 					$browseMenu->getId(),
-					function () use ($browseMenu) {
-						echo "<div class='wrap'>";
-						$browseMenu->getContent();
-						echo "</div>";
-					});
+                    function () use ($browseMenu) {
+                        $browseMenu->generateContent();
+                    },
+                );
 			});
 		}
 	}
@@ -130,8 +107,6 @@ abstract class IresMenu {
 		$this->lvlAccess = $lvlAccess;
 		$this->iconUrl = $iconUrl;
 		$this->position = $position;
-
-		self::$instance = $this;
 	}
 
 	/**
@@ -176,21 +151,15 @@ abstract class IresMenu {
 		return $this->position;
 	}
 
+    protected function generateContent() : void{
+        echo "<div class='wrap'>";
+            echo "<h1 class='wp-heading-inline'>" . $this->pageTitle . "</h1>";
+            $this->getContent();
+        echo "</div>";
+    }
+
 	/**
 	 * Content of the page
 	 */
 	public abstract function getContent() : void;
-
-	/**
-	 * Check each input data that needs to be verified by its regex
-	 * @throws InvalidInputValueException if the value doesn't match the regex
-	 */
-	public function verifyPostData() : void{
-		foreach ($_POST as $key => $value){
-			$data = UserInputData::fromId($key);
-			if(!is_array($value) && $data !== null && !$data->matches($value)){
-				throw new InvalidInputValueException($data->getName());
-			}
-		}
-	}
 }

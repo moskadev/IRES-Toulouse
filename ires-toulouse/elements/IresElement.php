@@ -2,8 +2,6 @@
 
 namespace irestoulouse\elements;
 
-use irestoulouse\utils\Identifier;
-
 class IresElement {
 
     /** @var string */
@@ -19,9 +17,9 @@ class IresElement {
      * @param string $name
      * @param string|null $id
      */
-    public function __construct(string $name, ?string $id = null) {
+    public function __construct(string $id, string $name = "") {
         $this->name = $name;
-        $this->id = $id ?? Identifier::fromName($name);
+        $this->id = $id;
     }
 
     /**

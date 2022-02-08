@@ -57,7 +57,7 @@ class Group extends IresElement {
      */
     public static function register(string $name) : bool {
         $db = Database::get();
-        if (self::fromName($name) === null) {
+        if (self::fromName($name) === null && self::fromName(strtolower($name)) === null) {
             $db->insert(
                 $db->prefix . 'groups',
                 ['name' => $name, 'creator_id' => get_current_user_id()],
@@ -138,15 +138,36 @@ class Group extends IresElement {
     /**
      * @return array|null containing all the groups where an user is responsable
      */
-    public static function getAllWhereUserResponsable(\WP_User $user) {
-        $db = Database::get();
+    public static function allWhereUserResponsable(\WP_User $user) {
+        $groups = [];
+        foreach (self::getUserGroups($user) as $g){
+            if(in_array($user, $g->getResponsables())){
+                $groups[] = $g;
+            }
+        }
+        return $groups;
+    }
 
-        return $db->get_results(
-            $db->prepare("SELECT id_group FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON id_group = group_id WHERE is_responsable = 1 AND user_id = %d",
-                $user->ID
-            ),
-            ARRAY_A
-        );
+    /**
+     * Get all the users for who $user_id is responsible
+     * @return array|null all the id of the users
+     */
+    public static function getSeeableUsers(\WP_User $from) {
+        if(in_array("administrator", $from->roles)){
+            return get_users();
+        }
+        $users = [];
+        foreach (Group::allWhereUserResponsable($from) as $group) {
+            $users = array_merge($users, $group->getUsers());
+        }
+        $users = array_filter($users, function ($u) use ($from){
+            return !in_array("administrator", $u->roles) ||
+                !in_array("responsable", $u->roles);
+        });
+        if(!in_array($from, $users)){
+            $users[] = $from;
+        }
+        return $users;
     }
 
     /**
@@ -172,7 +193,7 @@ class Group extends IresElement {
      */
     public static function fromName(string $groupName) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($groupName) {
-            return $g->name === $groupName;
+            return strtolower($g->name) === strtolower($groupName);
         });
         return $group[array_key_first($group)] ?? null;
     }
@@ -298,7 +319,7 @@ class Group extends IresElement {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
             $db = Database::get();
 
-            if (count(self::getAllWhereUserResponsable($user)) < 2) {
+            if (count(self::allWhereUserResponsable($user)) < 2) {
                 $user->set_role("subscriber");
             }
             $db->get_results(

@@ -5,7 +5,7 @@ namespace irestoulouse\elements\input;
 use irestoulouse\elements\IresElement;
 use irestoulouse\elements\Discipline;
 
-class UserInputData extends IresElement {
+class UserData extends IresElement {
 
     public const VALUE_TYPE_INT = 0;
     public const VALUE_TYPE_FLOAT = 1;
@@ -19,14 +19,15 @@ class UserInputData extends IresElement {
         "checklist", "radio", "dropdown"];
 
     /**
-     * @return UserInputData[] all the user's necessary data
+     * @return UserData[] all the user's necessary data
      */
     public static function all(bool $labelIncluded = true) : array{
         $datas = [];
-        $jsonData = json_decode(file_get_contents(__DIR__ . "/user_input_data.json"), true);
+        $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
         foreach ($jsonData as $d){
             if($labelIncluded || $d["formType"] !== "label"){
-                $datas[] = new UserInputData(...array_values(UserInputData::formatData($d)));
+                $datas[] = new UserData(...array_values(UserData::formatData($d)));
+
             }
         }
         return $datas;
@@ -35,10 +36,13 @@ class UserInputData extends IresElement {
     /**
      * Register all new metas for the IRES Toulouse to the user
      *
-     * @param int $userId the user id
+     * @param int $userId the user's id
      */
     public static function registerExtraMetas(int $userId) : void{
         foreach (self::all(false) as $m){
+            if($m->getFormType() === "email"){
+                continue;
+            }
             add_user_meta($userId, $m->getId(), $m->getDefaultValue(), true);
         }
     }
@@ -47,13 +51,14 @@ class UserInputData extends IresElement {
      * Find the user input's data from its ID
      *
      * @param string $searchedId the data identifier
-     * @return UserInputData|null the user data which can be null
+     *
+     * @return UserData|null the user data which can be null
      */
-    public static function fromId(string $searchedId) : ?UserInputData{
+    public static function fromId(string $searchedId) : ?UserData{
         $filter = array_filter(self::all(), function ($a) use ($searchedId){
             return $a->getId() === $searchedId;
         });
-        return count($filter) > 0 ? array_values($filter)[0] : null;
+        return array_values($filter)[array_key_first($filter)] ?? null;
     }
 
     /**
@@ -107,7 +112,7 @@ class UserInputData extends IresElement {
                                 ?string $id, ?string $description, ?string $parent = null,
                                 ?bool $uppercase = null, ?bool $required = null,
                                 ?string $regex = null, $extraData = null, ?bool $disabled = null) {
-        parent::__construct($name, $id);
+        parent::__construct($id, $name);
         $this->parent = $parent ?? "";
         $this->formType = $formType;
         $this->description = $description ?? "";
@@ -126,12 +131,14 @@ class UserInputData extends IresElement {
      * @return array converted data
      */
     private function convertExtraData($dataToConvert) : array{
-        if($dataToConvert !== "disciplines"){ // TODO groups and roles
+        if($dataToConvert !== "disciplines"){ // TODO groups
             return $dataToConvert ?? [];
         }
-        return array_map(function ($d){
-            return $d["name"];
-        }, Discipline::all());
+        // TODO refaire les disciplines et appliquer les groupes
+        //return array_map(function ($d){
+        //    return $d["name"];
+        //}, Discipline::all());
+        return [];
     }
 
     /**

@@ -10,7 +10,7 @@
     "formType": "text",
     "id": "nickname",
     "disabled": true,
-    "description": "L'identifiant ne sera plus modifiable et sera attribué automatiquement"
+    "description": "L'identifiant n'est plus modifiable et est attribué automatiquement"
   },
   {
     "name": "Nom",
@@ -39,7 +39,7 @@
     "required": true,
     "id": "email",
     "regex": "\\S+@\\S+\\.\\S+",
-    "description": "Si vous modifiez cela nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé."
+    "description": "Nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé."
   },
   {
     "name": "Téléphone",

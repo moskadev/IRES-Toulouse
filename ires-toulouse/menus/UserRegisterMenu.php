@@ -38,8 +38,9 @@ class UserRegisterMenu extends IresMenu {
      */
     public function getContent() : void {
         $loggedUser = null;
+        $created = isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["email"]);
 
-        if (isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["email"])) {
+        if ($created) {
             $userFirstname = $_POST["first_name"] ?? "";
             $userLastname = $_POST["last_name"] ?? "";
             $userEmail = $_POST["email"] ?? "";
@@ -69,12 +70,11 @@ class UserRegisterMenu extends IresMenu {
                 $inputFormType = $inputData->getFormType();
                 $inputId = $inputData->getId();
 
-                if (!in_array($inputId, [
-                    "nickname",
-                    "first_name",
-                    "last_name",
-                    "email"
-                ])) {
+                $shownInputs = ["nickname", "first_name", "last_name", "email"];
+                if(!$created){
+                    unset($shownInputs[0]);
+                }
+                if (!in_array($inputId, $shownInputs)) {
                     continue;
                 } ?>
                 <table class='form-table' role='presentation'>
@@ -97,7 +97,7 @@ class UserRegisterMenu extends IresMenu {
                                 "email"
                             ])) { ?>
                                 <input <?php echo Dataset::allFrom($inputData) ?>
-                                        class='form-control <?php if($inputId === "nickname") echo "update-nickname" ?>'
+                                        class='form-control'
                                         type='<?php echo htmlspecialchars($inputFormType) ?>'
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'

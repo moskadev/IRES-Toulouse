@@ -2,7 +2,6 @@ const forms = document.querySelectorAll(".verifiy-form");
 forms.forEach(function (form) {
     const formInputs = [...form.querySelectorAll("input")];
     const buttonSubmit = form.querySelector(".menu-submit");
-    const nickname = form.querySelector(".update-nickname");
     // disable all inputs if the data is set
     formInputs.forEach(function (element) {
         if (element.dataset?.disabled) {
@@ -22,16 +21,10 @@ forms.forEach(function (form) {
             if (event.target.dataset?.regex) {
                 updateValueFromRegex(event.target);
             }
-            if (nickname != null) {
-                nickname.value = generateUserLogin();
-            }
             checkCorrectlyFilled(event.target);
         }
         changeSubmitState();
     });
-    if (nickname !== null && !nickname?.value) {
-        nickname.value = generateUserLogin();
-    }
     formInputs.forEach(input => checkCorrectlyFilled(input));
 
     /**
@@ -45,16 +38,6 @@ forms.forEach(function (form) {
         if (regex !== null) { // analyze the input value
             inout.value = regex[0]; // change the value corresponding to the regex
         }
-    }
-
-    /**
-     * @returns {string} generate the identifier of
-     *                   the user for its login
-     */
-    function generateUserLogin() {
-        return ((String(form.querySelector("#first_name").value).substr(0, 1) +
-            form.querySelector("#last_name").value).toLowerCase())
-            .replaceAll(/(\s|\W)+/g, "-");
     }
 
     /**

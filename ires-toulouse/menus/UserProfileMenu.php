@@ -50,11 +50,11 @@ class UserProfileMenu extends IresMenu {
      * Constructing the menu and link to the admin page
      */
     public function __construct() {
-        parent::__construct("Consulter les informations relatifs à votre profil IRES", // Page title when the menu is selected
-            "Profil IRES", // Name of the menu
-            0, // Menu access security level
-            "dashicons-id-alt", // Menu icon
-            3 // Page position in the list
+        parent::__construct("Consulter les informations relatifs à votre profil IRES",
+            "Profil IRES",
+            0,
+            "dashicons-id-alt",
+            3
         );
     }
 
@@ -175,12 +175,12 @@ class UserProfileMenu extends IresMenu {
                                         type='<?php echo htmlspecialchars($inputFormType) ?>'
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value='<?php echo htmlspecialchars($inputsData->getInputValue($inputId)); ?>'
+                                        value='<?php echo htmlspecialchars($inputData->getValue($editingUser)); ?>'
                                     <?php if ($disableAll)
                                         echo "disabled" ?>>
                                 <?php
                             } else if ($inputFormType === "radio") {
-                                $value = filter_var($inputsData->getInputValue($inputId), FILTER_VALIDATE_BOOLEAN); ?>
+                                $value = filter_var($inputData->getValue($editingUser), FILTER_VALIDATE_BOOLEAN); ?>
                                 Oui <input <?php echo Dataset::allFrom($inputData) ?>
                                         class="form-control"
                                         type="radio"

@@ -27,26 +27,4 @@ class UserInputData extends Controller {
             }
         }
     }
-
-    /**
-     * Looking for the value to put in the input
-     * Special check for the emails which should be checked in
-     * the other table of the user
-     *
-     * @param string $inputId
-     *
-     * @return string input's value
-     */
-    public function getInputValue(string $inputId) : string {
-        if (get_user_meta($this->user->ID, $inputId, true) === false) {
-            add_user_meta($this->user->ID, $inputId, UserData::fromId($inputId)->getDefaultValue(), true);
-        }
-        if ($inputId === "email") {
-            $value = $this->user->user_email;
-        } else {
-            $value = get_user_meta($this->user->ID, $inputId, true);
-        }
-
-        return $value;
-    }
 }

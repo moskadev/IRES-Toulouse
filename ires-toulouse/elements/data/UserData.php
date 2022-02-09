@@ -3,6 +3,7 @@
 namespace irestoulouse\elements\input;
 
 use irestoulouse\elements\IresElement;
+use WP_User;
 
 class UserData extends IresElement {
 
@@ -127,6 +128,21 @@ class UserData extends IresElement {
     }
 
     /**
+     * Find the user input's data from its ID
+     *
+     * @param string $searchedId the data identifier
+     *
+     * @return UserData|null the user data which can be null
+     */
+    public static function fromId(string $searchedId) : ?UserData {
+        $filter = array_filter(self::all(), function ($a) use ($searchedId) {
+            return $a->getId() === $searchedId;
+        });
+
+        return array_values($filter)[array_key_first($filter)] ?? null;
+    }
+
+    /**
      * Should be used only to organize parameters when creating a new
      * UserInputData class from a JSON object
      *
@@ -187,18 +203,23 @@ class UserData extends IresElement {
     }
 
     /**
-     * Find the user input's data from its ID
+     * Looking for the value to put in the input
+     * Special check for the emails which should be checked in
+     * the other table of the user
      *
-     * @param string $searchedId the data identifier
-     *
-     * @return UserData|null the user data which can be null
+     * @return string input's value
      */
-    public static function fromId(string $searchedId) : ?UserData {
-        $filter = array_filter(self::all(), function ($a) use ($searchedId) {
-            return $a->getId() === $searchedId;
-        });
+    public function getValue(WP_User $user) : string {
+        if (get_user_meta($user->ID, $this->id, true) === false) {
+            add_user_meta($user->ID, $this->id, $this->getDefaultValue(), true);
+        }
+        if ($this->id === "email") {
+            $value = $user->user_email;
+        } else {
+            $value = get_user_meta($user->ID, $this->id, true);
+        }
 
-        return array_values($filter)[array_key_first($filter)] ?? null;
+        return $value;
     }
 
     /**

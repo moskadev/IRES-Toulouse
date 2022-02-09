@@ -42,7 +42,12 @@ class UserModification extends Controller {
      * @throws Exception If an error occurred with Wordpress registration
      */
     public function updateAllUserData() : WP_User {
+        $email = $this->user->user_email;
         foreach ($_POST as $meta => $data) {
+            if($meta === "email"){ // TODO très moche, une refonte sera nécessaire plus tard
+                $email = $data;
+                continue;
+            }
             if (get_user_meta($this->user->ID, $meta) !== false) {
                 /**
                  * Some values can be arrays of multiple values, so we stick them with a comma
@@ -59,10 +64,11 @@ class UserModification extends Controller {
             "ID" => $this->user->ID,
             "first_name" => get_user_meta($this->user->ID, "first_name", true),
             "last_name" => get_user_meta($this->user->ID, "last_name", true),
-            "user_email" => get_user_meta($this->user->ID, "email", true)
+            "user_email" => $email
         ]);
         if (is_wp_error($userId)) {
-            throw new Exception("ID {$this->user->ID} : Problème lors de l'enregistrement d'une donnée");
+            throw new Exception($this->user->user_login . " : " .
+                $userId->get_error_message());
         }
 
         return get_user_by("id", $userId);

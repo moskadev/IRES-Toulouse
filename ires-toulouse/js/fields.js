@@ -1,8 +1,8 @@
 const forms = document.querySelectorAll(".verifiy-form");
 forms.forEach(function (form) {
     const formInputs = [...form.querySelectorAll("input")];
-    const buttonCreate = form.querySelector("input[type=submit]");
-    const nickname = form.querySelector("#nickname");
+    const buttonSubmit = form.querySelector(".menu-submit");
+    const nickname = form.querySelector(".update-nickname");
     // disable all inputs if the data is set
     formInputs.forEach(function (element) {
         if (element.dataset?.disabled) {
@@ -10,6 +10,7 @@ forms.forEach(function (form) {
             element.disabled = true;
         }
     });
+    changeSubmitState();
 
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
@@ -25,11 +26,10 @@ forms.forEach(function (form) {
                 nickname.value = generateUserLogin();
             }
         }
-        buttonCreate.disabled = !areCorrectlyFilled();
-        //buttonCreate.style.cursor = areCorrectlyFilled() ? "pointer" : "not-allowed";
+        changeSubmitState();
     });
-    if (!nickname.value) {
-        form.querySelector("#nickname").value = generateUserLogin();
+    if (nickname !== null && !nickname?.value) {
+        nickname.value = generateUserLogin();
     }
 
     /**
@@ -63,6 +63,17 @@ forms.forEach(function (form) {
         return element.dataset?.uppercase ?
             String(element.value).toUpperCase() :
             element.value;
+    }
+
+    function changeSubmitState() {
+        buttonSubmit.disabled = !areCorrectlyFilled();
+        if(areCorrectlyFilled()){
+            buttonSubmit.classList.remove("btn-outline-primary");
+            buttonSubmit.classList.add("btn-primary");
+        } else {
+            buttonSubmit.classList.add("btn-outline-primary");
+            buttonSubmit.classList.remove("btn-primary");
+        }
     }
 
     /**
@@ -100,6 +111,13 @@ forms.forEach(function (form) {
                      * If the value and regex exists, we test the value
                      */
                     filled = !input.value || !regex || regex.test(input.value);
+                }
+                if(filled){
+                    input.classList.add("is-valid");
+                    input.classList.remove("is-invalid");
+                } else {
+                    input.classList.add("is-invalid");
+                    input.classList.remove("is-valid");
                 }
             }
         });

@@ -2,7 +2,7 @@
 
 namespace irestoulouse\elements;
 
-use irestoulouse\sql\Database;
+use irestoulouse\elements\sql\Database;
 use WP_User;
 
 /**
@@ -76,10 +76,8 @@ class Group extends IresElement {
                 ['name' => $name, 'creator_id' => get_current_user_id()],
                 ['%s', '%d']
             );
-
             return true;
         }
-
         return false;
     }
 
@@ -125,13 +123,10 @@ class Group extends IresElement {
         if (self::exists($id)) {
             $db->delete($db->prefix . 'groups', ['id_group' => $id], ['%s']);
             $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d",
-                $id
-            )
+                $id)
             );
-
             return true;
         }
-
         return false;
     }
 
@@ -204,13 +199,11 @@ class Group extends IresElement {
     public static function getUserGroups(WP_User $user) : array {
         $db = Database::get();
         $request = $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON group_id = id_group WHERE user_id = %d",
-            $user->ID
-        )
+            $user->ID)
         );
         if (count($request) === 0) {
             return [];
         }
-
         return array_map(function ($group) {
             return self::fromName($group->name);
         }, $request);
@@ -228,8 +221,7 @@ class Group extends IresElement {
         }, $db->get_results(
             $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
                 $this->id
-            )
-        )
+            ))
         );
     }
 
@@ -260,24 +252,19 @@ class Group extends IresElement {
         if (!$this->userExists($user)) {
             $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '1')",
                 $user->ID,
-                $this->id
-            )
+                $this->id)
             );
             $user->set_role("responsable");
-
             return true;
         }
         if (!$this->isUserResponsable($user)) {
             $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d",
                 $user->ID,
-                $this->id
-            )
+                $this->id)
             );
             $user->set_role("responsable");
-
             return true;
         }
-
         return false;
     }
 
@@ -308,8 +295,7 @@ class Group extends IresElement {
         }, $db->get_results(
             $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d",
                 $this->id
-            )
-        )
+            ))
         );
     }
 
@@ -321,7 +307,6 @@ class Group extends IresElement {
         $responsable = array_filter($this->getResponsables(), function ($u) use ($search) {
             return $search->ID === $u->ID;
         });
-
         return isset($responsable[array_key_first($responsable)]);
     }
 
@@ -337,8 +322,7 @@ class Group extends IresElement {
             $db = Database::get();
             $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')",
                 $user->ID, $this->id
-            )
-            );
+            ));
 
             return true;
         }
@@ -365,10 +349,8 @@ class Group extends IresElement {
                     $this->id
                 )
             );
-
             return true;
         }
-
         return false;
     }
 
@@ -390,10 +372,8 @@ class Group extends IresElement {
                     $this->id
                 )
             );
-
             return true;
         }
-
         return false;
     }
 }

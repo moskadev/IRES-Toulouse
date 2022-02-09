@@ -41,9 +41,10 @@ class UserInputData extends Controller {
         if (get_user_meta($this->user->ID, $inputId, true) === false) {
             add_user_meta($this->user->ID, $inputId, UserData::fromId($inputId)->getDefaultValue(), true);
         }
-        $value = get_user_meta($this->user->ID, $inputId, true);
         if ($inputId === "email") {
             $value = $this->user->user_email;
+        } else {
+            $value = get_user_meta($this->user->ID, $inputId, true);
         }
 
         return $value;

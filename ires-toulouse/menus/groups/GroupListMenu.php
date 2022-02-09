@@ -60,6 +60,7 @@ class GroupListMenu extends IresMenu {
          */
         if (count(Group::getUserGroups(wp_get_current_user())) > 0) {
             ?>
+            <h2>Groupes dont vous appartenez : </h2>
             <table class="table table-striped table-hover">
                 <thead>
                 <tr>
@@ -84,7 +85,7 @@ class GroupListMenu extends IresMenu {
         }
         ?>
 
-        <h3>Groupes : </h3>
+        <h2>Groupes : </h2>
         <table class="table table-striped table-hover">
             <thead>
             <tr>

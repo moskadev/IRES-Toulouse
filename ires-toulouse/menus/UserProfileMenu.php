@@ -108,34 +108,34 @@ class UserProfileMenu extends IresMenu {
         if ($isResp) { ?>
             <form method='post' name='to-modify-user' id='to-modify-user'
                   class='validate' novalidate='novalidate'>
-            <table class='form-table' role='presentation'>
-                <tr class="form-field form-required">
-                    <th>
-                        <label for='editingUserId'>
-                            Sélectionnez l'utilisateur à modifier
-                        </label>
-                    </th>
-                    <td>
-                        <select name="editingUserId"><?php
-                            foreach ($seeableUsers as $user) {
-                                ?>
-                                <option value='<?php echo $user->ID ?>' <?php if ($user == $editingUser)
-                                    echo "selected" ?>>
-                                    <?php echo $user->nickname ?>
-                                </option>
-                            <?php }
-                            ?></select>
-                        </select>
-                    </td>
-                </tr>
-            </table> <?php
-            submit_button(__("Modifier cet utilisateur"), "button action",
-                "to-modify", true,
-                ["id" => "to-modify-user-btn"]
-            );
-            ?>
-            <span class='description'>Veuillez valider si vous avez sélectionné un nouveau utilisateur</span>
-            </form><?php
+                <table class='form-table' role='presentation'>
+                    <tr class="form-field form-required">
+                        <th>
+                            <label for='editingUserId'>
+                                Sélectionnez l'utilisateur à modifier
+                            </label>
+                        </th>
+                        <td>
+                            <select name="editingUserId"><?php
+                                foreach ($seeableUsers as $user) {
+                                    ?>
+                                    <option value='<?php echo $user->ID ?>' <?php if ($user == $editingUser)
+                                        echo "selected" ?>>
+                                        <?php echo $user->nickname ?>
+                                    </option>
+                                <?php }
+                                ?></select>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <button class="btn btn-success" type="submit" id="to-modify-user-btn">
+                    Modifier cet utilisateur
+                </button>
+                <p class='description'>Veuillez valider si vous avez sélectionné
+                    un nouveau utilisateur</p>
+            </form>
+            <?php
         } else {
             $disableAll = true;
         }
@@ -143,6 +143,8 @@ class UserProfileMenu extends IresMenu {
 
         <form method='post' name='modify-user' id='modify-user'
               class='verifiy-form validate' novalidate='novalidate'>
+            <input name='editingUserId' type='hidden'
+                   value='<?php echo $editingUser->ID ?>'>
             <input name='action' type='hidden' value='modifyuser'><?php
             foreach (UserData::all() as $inputData) {
                 $inputFormType = $inputData->getFormType();
@@ -169,6 +171,7 @@ class UserProfileMenu extends IresMenu {
                             if (in_array($inputFormType, ["text", "email"])) {
                                 ?>
                                 <input <?php echo Dataset::allFrom($inputData) ?>
+                                        class="form-control"
                                         type='<?php echo htmlspecialchars($inputFormType) ?>'
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
@@ -179,6 +182,7 @@ class UserProfileMenu extends IresMenu {
                             } else if ($inputFormType === "radio") {
                                 $value = filter_var($inputsData->getInputValue($inputId), FILTER_VALIDATE_BOOLEAN); ?>
                                 Oui <input <?php echo Dataset::allFrom($inputData) ?>
+                                        class="form-control"
                                         type="radio"
                                         id='<?php echo htmlspecialchars($inputId) ?>_oui'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
@@ -189,6 +193,7 @@ class UserProfileMenu extends IresMenu {
                                         echo "disabled" ?>>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 Non <input <?php echo Dataset::allFrom($inputData) ?>
+                                        class="form-control"
                                         type="radio"
                                         id='<?php echo htmlspecialchars($inputId) ?>_non'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
@@ -205,6 +210,7 @@ class UserProfileMenu extends IresMenu {
                                 <select <?php if ($inputFormType === "checklist")
                                     echo "multiple" ?>
                                         name='<?php echo $inputId ?>[]'
+                                        class="form-control"
                                         id='<?php echo $inputId ?>'
                                     <?php if ($disableAll)
                                         echo "disabled" ?>> <?php
@@ -234,12 +240,12 @@ class UserProfileMenu extends IresMenu {
                 </table>
                 <?php
             }
-            if (!$disableAll) {
-                submit_button(__("Modifier les informations"), "primary",
-                    "profile-page", true,
-                    ["id" => "profile-page-sub", "disabled" => "true"]
-                );
-            }
+            if (!$disableAll) { ?>
+                <button class="btn btn-outline-primary menu-submit" type="submit"
+                        name="profile-page" id="profile-page-sub" disabled>
+                    Modifier les informations
+                </button>
+            <?php }
             ?>
         </form> <?php
     }

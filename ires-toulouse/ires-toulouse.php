@@ -32,8 +32,8 @@ require_once("menus/UserListMenu.php");
 require_once("exceptions/InvalidInputValueException.php");
 require_once("exceptions/FailedUserRegistrationException.php");
 
-require_once("sql/Database.php");
-require_once("sql/SqlRequest.php");
+require_once("elements/sql/Database.php");
+require_once("elements/sql/SqlRequest.php");
 
 require_once("utils/Identifier.php");
 require_once("utils/Dataset.php");

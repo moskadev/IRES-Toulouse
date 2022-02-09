@@ -122,8 +122,8 @@ abstract class IresMenu {
 
     protected function generateContent() : void {
         echo "<div class='wrap'>";
-        echo "<h1 class='wp-heading-inline'>" . $this->pageTitle . "</h1>";
-        $this->getContent();
+            echo "<h1 class='wp-heading-inline'>" . $this->pageTitle . "</h1>";
+            $this->getContent();
         echo "</div>";
     }
 

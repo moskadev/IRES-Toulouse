@@ -1,6 +1,6 @@
 <?php
 
-namespace irestoulouse;
+namespace irestoulouse\elements\sql;
 
 interface SqlRequest {
 

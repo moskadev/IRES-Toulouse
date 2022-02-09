@@ -97,6 +97,7 @@ class UserRegisterMenu extends IresMenu {
                                 "email"
                             ])) { ?>
                                 <input <?php echo Dataset::allFrom($inputData) ?>
+                                        class='form-control <?php if($inputId === "nickname") echo "update-nickname" ?>'
                                         type='<?php echo htmlspecialchars($inputFormType) ?>'
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
@@ -112,11 +113,8 @@ class UserRegisterMenu extends IresMenu {
                     </tr>
                 </table>
                 <?php
-            }
-            submit_button(__("Add New User"), "primary", "createuser",
-                true, ["id" => "createusersub", "disabled" => "true"]
-            );
-            ?>
+            } ?>
+            <button class="btn btn-outline-primary menu-submit" type="submit" id="createusersub" name="createuser" disabled>Créer un nouveau compte IRES</button>
         </form>
         <?php
     }

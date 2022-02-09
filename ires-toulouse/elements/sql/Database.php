@@ -1,6 +1,6 @@
 <?php
 
-namespace irestoulouse\sql;
+namespace irestoulouse\elements\sql;
 
 class Database {
 

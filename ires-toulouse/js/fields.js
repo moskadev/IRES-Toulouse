@@ -97,7 +97,9 @@ forms.forEach(function (form) {
              *
              * The value of the inputs are also verified on the back-end
              */
-            if (filled && input.dataset.formtype) {
+            if ((input.dataset.formtype === "text" || input.dataset.formtype === "email") &&
+                filled && input.dataset.formtype
+            ) {
                 const regex = input.dataset.regex ? new RegExp("^" + input.dataset.regex + "$") : "";
                 if (input.dataset.required) {
                     /*

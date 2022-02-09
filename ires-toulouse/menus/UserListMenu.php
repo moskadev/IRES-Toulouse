@@ -10,7 +10,7 @@ class UserListMenu extends IresMenu {
         $hasAboveRole = current_user_can('responsable') || current_user_can('administrator');
         parent::__construct(
             "Liste des profils de l'IRES de Toulouse",
-            $hasAboveRole ? "Gestion IRES" : "Menu IRES",
+            $hasAboveRole ? "Comptes IRES" : "Profil IRES",
             0,
             "dashicons-id-alt",
             3

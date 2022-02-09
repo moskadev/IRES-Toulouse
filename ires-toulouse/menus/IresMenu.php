@@ -41,10 +41,28 @@ abstract class IresMenu {
      * Initialize all menus
      */
     public static function init() : void {
-        IresMenu::registerSub("admin_menu", new UserListMenu(),
-            [new UserRegisterMenu(), new GroupListMenu(), new UserProfileMenu()]
+        global $menu;
+        global $submenu;
+
+        $hasAboveRole = current_user_can('responsable') ||
+            current_user_can('administrator');
+
+        $mainMenu = $hasAboveRole ? new UserListMenu() : new UserProfileMenu();
+        IresMenu::registerSub("admin_menu", $mainMenu,
+            $hasAboveRole ?
+                [new UserRegisterMenu(), new GroupListMenu(), new UserProfileMenu()] :
+                [new UserRegisterMenu(), new UserListMenu(), new GroupListMenu()]
         );
-        IresMenu::registerInvisibleSub("admin_menu", new GroupDetailsMenu());
+        IresMenu::register("admin_menu", new GroupDetailsMenu(), true);
+
+        //TODO comprendre pourquoi cela ne fonctionne pas
+        if($hasAboveRole){
+            if(isset($submenu[$mainMenu->getId()])) {
+                $submenu[$mainMenu->getId()][0][0] = "Tous les comptes IRES";
+            }
+        } else {
+            $menu[$mainMenu->getPosition() - 1][0] = "Profil IRES";
+        }
     }
 
     /**
@@ -52,7 +70,7 @@ abstract class IresMenu {
      *
      * @param string $destSubMenu
      * @param IresMenu $menuDefault it's the menu by default on the panel
-     * @param array $menu composed of the number of sub-menus you want to add at your panel
+     * @param array $menu composed of sub-menus you want to add at your panel
      */
     public static function registerSub(string $destSubMenu, IresMenu $menuDefault, array $menu) : void {
         self::register($destSubMenu, $menuDefault);
@@ -76,19 +94,34 @@ abstract class IresMenu {
      *
      * @param string $destMenu
      * @param IresMenu $menu
+     * @param bool $invisible
      */
-    public static function register(string $destMenu, IresMenu $menu) : void {
-        add_action($destMenu, function () use ($menu) {
-            add_menu_page($menu->getPageTitle(),
-                $menu->getPageMenu(),
-                $menu->getLvlAccess(),
-                $menu->getId(),
-                function () use ($menu) {
-                    $menu->generateContent();
-                },
-                $menu->getIconUrl(),
-                $menu->getPosition()
-            );
+    public static function register(string $destMenu, IresMenu $menu, bool $invisible = false) : void {
+        add_action($destMenu, function () use ($menu, $invisible) {
+            if(!$invisible) {
+                add_menu_page($menu->getPageTitle(),
+                    $menu->getPageMenu(),
+                    $menu->getLvlAccess(),
+                    $menu->getId(),
+                    function () use ($menu) {
+                        $menu->generateContent();
+                    },
+                    $menu->getIconUrl(),
+                    $menu->getPosition()
+                );
+            } else {
+                add_submenu_page(
+                    null,
+                    $menu->getPageTitle(),
+                    $menu->getPageMenu(),
+                    $menu->getLvlAccess(),
+                    $menu->getId(),
+                    function () use ($menu) {
+                        $menu->generateContent();
+                    },
+                    $menu->getPosition()
+                );
+            }
         });
     }
 
@@ -120,6 +153,10 @@ abstract class IresMenu {
         return Identifier::fromName($this->pageMenu);
     }
 
+    /**
+     * Generate content adapted to the Wordpress page
+     * and adds the title of the menu
+     */
     protected function generateContent() : void {
         echo "<div class='wrap'>";
             echo "<h1 class='wp-heading-inline'>" . $this->pageTitle . "</h1>";
@@ -144,21 +181,5 @@ abstract class IresMenu {
      */
     public function getPosition() : int {
         return $this->position;
-    }
-
-    public static function registerInvisibleSub(string $destMenu, IresMenu $menu) : void {
-        add_action($destMenu, function () use ($menu) {
-            add_submenu_page(
-                null,
-                $menu->getPageTitle(),
-                $menu->getPageMenu(),
-                $menu->getLvlAccess(),
-                $menu->getId(),
-                function () use ($menu) {
-                    $menu->generateContent();
-                },
-                $menu->getPosition()
-            );
-        });
     }
 }

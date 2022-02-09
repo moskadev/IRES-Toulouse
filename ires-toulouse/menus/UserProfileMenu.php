@@ -51,7 +51,7 @@ class UserProfileMenu extends IresMenu {
      */
     public function __construct() {
         parent::__construct("Consulter les informations relatifs à votre profil IRES",
-            "Profil IRES",
+            "Mon profil IRES",
             0,
             "dashicons-id-alt",
             3
@@ -64,7 +64,6 @@ class UserProfileMenu extends IresMenu {
     public function getContent() : void {
         $isResp = current_user_can("responsable") || current_user_can('administrator');
         $seeableUsers = Group::getSeeableUsers(wp_get_current_user());
-        $disableAll = false;
 
         if (count($seeableUsers) > 0) {
             $editingUser = isset($_POST["editingUserId"]) ?
@@ -87,7 +86,6 @@ class UserProfileMenu extends IresMenu {
             $editingUser = wp_get_current_user();
         }
         $modification = new UserModification($editingUser);
-        $inputsData = new UserInputData($editingUser);
 
         if (isset($_POST["action"]) && $_POST["action"] == "modifyuser") {
             try {
@@ -117,14 +115,12 @@ class UserProfileMenu extends IresMenu {
                         </th>
                         <td>
                             <select name="editingUserId"><?php
-                                foreach ($seeableUsers as $user) {
-                                    ?>
-                                    <option value='<?php echo $user->ID ?>' <?php if ($user == $editingUser)
+                                foreach ($seeableUsers as $user) { ?>
+                                    <option value='<?php echo $user->ID ?>' <?php if ($user === $editingUser)
                                         echo "selected" ?>>
                                         <?php echo $user->nickname ?>
                                     </option>
-                                <?php }
-                                ?></select>
+                                <?php } ?>
                             </select>
                         </td>
                     </tr>
@@ -136,8 +132,6 @@ class UserProfileMenu extends IresMenu {
                     un nouveau utilisateur</p>
             </form>
             <?php
-        } else {
-            $disableAll = true;
         }
         ?>
 
@@ -175,9 +169,7 @@ class UserProfileMenu extends IresMenu {
                                         type='<?php echo htmlspecialchars($inputFormType) ?>'
                                         id='<?php echo htmlspecialchars($inputId) ?>'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value='<?php echo htmlspecialchars($inputData->getValue($editingUser)); ?>'
-                                    <?php if ($disableAll)
-                                        echo "disabled" ?>>
+                                        value='<?php echo htmlspecialchars($inputData->getValue($editingUser)); ?>'>
                                 <?php
                             } else if ($inputFormType === "radio") {
                                 $value = filter_var($inputData->getValue($editingUser), FILTER_VALIDATE_BOOLEAN); ?>
@@ -187,10 +179,7 @@ class UserProfileMenu extends IresMenu {
                                         id='<?php echo htmlspecialchars($inputId) ?>_oui'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
                                         value="true"
-                                    <?php if ($value == true)
-                                        echo "checked" ?>
-                                    <?php if ($disableAll)
-                                        echo "disabled" ?>>
+                                        <?php if ($value == true) echo "checked" ?>>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 Non <input <?php echo Dataset::allFrom($inputData) ?>
                                         class="form-control"
@@ -198,22 +187,14 @@ class UserProfileMenu extends IresMenu {
                                         id='<?php echo htmlspecialchars($inputId) ?>_non'
                                         name='<?php echo htmlspecialchars($inputId) ?>'
                                         value="false"
-                                    <?php if ($value == false)
-                                        echo "checked" ?>
-                                    <?php if ($disableAll)
-                                        echo "disabled" ?>>
+                                        <?php if ($value == false)echo "checked" ?>>
                                 <?php
-                            } else if (in_array($inputFormType, [
-                                "dropdown",
-                                "checklist"
-                            ])) { ?>
+                            } else if (in_array($inputFormType, ["dropdown", "checklist"])) { ?>
                                 <select <?php if ($inputFormType === "checklist")
                                     echo "multiple" ?>
                                         name='<?php echo $inputId ?>[]'
                                         class="form-control"
-                                        id='<?php echo $inputId ?>'
-                                    <?php if ($disableAll)
-                                        echo "disabled" ?>> <?php
+                                        id='<?php echo $inputId ?>'> <?php
                                     /**
                                      * Extra data are checked individually and put in the dropdown or checklist
                                      * Multiple items can be selected for checklist, so we check if the user
@@ -224,7 +205,7 @@ class UserProfileMenu extends IresMenu {
                                         <!-- value of the option -->
                                         <option value='<?php echo $data ?>'
                                             <?php if ($modification->containsExtraData($inputData, $data))
-                                                echo "selected" ?>>
+                                                echo "selected"; var_dump($modification->containsExtraData($inputData, $data), $data); ?>>
                                             <!-- check if the extra data has been selected by the user -->
                                             <?php echo $data ?>
                                             <!-- the option's text -->
@@ -239,14 +220,11 @@ class UserProfileMenu extends IresMenu {
                     </tr>
                 </table>
                 <?php
-            }
-            if (!$disableAll) { ?>
-                <button class="btn btn-outline-primary menu-submit" type="submit"
-                        name="profile-page" id="profile-page-sub" disabled>
-                    Modifier les informations
-                </button>
-            <?php }
-            ?>
+            } ?>
+            <button class="btn btn-outline-primary menu-submit" type="submit"
+                    name="profile-page" id="profile-page-sub" disabled>
+                Modifier les informations
+            </button>
         </form> <?php
     }
 }

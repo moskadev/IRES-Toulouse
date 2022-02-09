@@ -21,7 +21,7 @@ class UserRegisterMenu extends IresMenu {
     public function __construct() {
         parent::__construct(
             "Création d'un profil IRES", // Page title when the menu is selected
-            "Créer un profil", // Name of the menu
+            "Ajouter un compte", // Name of the menu
             2, // Menu access security level
             "dashicons-admin-users", // Menu icon
             3 // Page position in the list
@@ -52,7 +52,7 @@ class UserRegisterMenu extends IresMenu {
                 ?>
                 <div id="message" class="updated notice is-dismissible">
                     <p><strong>L'utilisateur <?php echo $loggedUser->user_login ?> a
-                            été bien enregistré, <a href='admin.php?page=profil_ires'>
+                            été bien enregistré, <a href='admin.php?page=mon_profil_ires'>
                                 vous pouvez renseigner ses informations ici</a></strong>
                     </p>
                 </div> <?php

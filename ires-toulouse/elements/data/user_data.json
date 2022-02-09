@@ -50,8 +50,36 @@
     "description": "+33 X XX XX XX XX, 0X XX XX XX XX, 0X.XX.XX.XX.XX..."
   },
   {
+    "name": "Activités à l'IRES de TOULOUSE",
+    "formType": "label",
+    "id": "activites_ires"
+  },
+  {
+    "name": "Groupe de recherche-action",
+    "formType": "text",
+    "id": "groupe_recherche_action",
+    "parent": "activites_ires"
+  },
+  {
+    "name": "Responsable du groupe",
+    "id": "responsable_groupe",
+    "formType": "text",
+    "parent": "activites_ires"
+  },
+  {
+    "name": "Manifestation",
+    "formType": "text",
+    "id": "manifestation",
+    "parent": "activites_ires"
+  },
+  {
+    "name": "Informations complémentaires",
+    "formType": "label",
+    "id": "info_complementaires"
+  },
+  {
     "name": "Diplomes",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "checklist",
     "id": "diplomes",
     "extraData": [
@@ -68,7 +96,7 @@
   },
   {
     "name": "Situation professionnelle",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "dropdown",
     "id": "situation_pro",
     "extraData": [
@@ -78,7 +106,7 @@
   },
   {
     "name": "Type d'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "dropdown",
     "id": "type_etablissement",
     "extraData": [
@@ -92,7 +120,7 @@
   },
   {
     "name": "Nom de l'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "nom_etablissement",
     "uppercase": true,
@@ -101,7 +129,7 @@
   },
   {
     "name": "Ville de l'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "ville_etablissement",
     "uppercase": true,
@@ -110,7 +138,7 @@
   },
   {
     "name": "Code UAI/RNE de l'établissement scolaire",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "code_uai_rne",
     "uppercase": true,
@@ -119,7 +147,7 @@
   },
   {
     "name": "Nom du chef de l'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "nom_chef_etablissement",
     "uppercase": true,
@@ -129,7 +157,7 @@
   {
     "name": "Discipline enseignée",
     "formType": "dropdown",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "id": "discipline_enseignee",
     "extraData": "disciplines"
   },
@@ -207,28 +235,5 @@
     "formType": "text",
     "id": "membre_association_autre",
     "parent": "assoc_societes_savantes"
-  },
-  {
-    "name": "Activités de l'IRES de TOULOUSE",
-    "formType": "label",
-    "id": "activites_ires"
-  },
-  {
-    "name": "Groupe de recherche-action",
-    "formType": "text",
-    "id": "groupe_recherche_action",
-    "parent": "activites_ires"
-  },
-  {
-    "name": "Responsable du groupe",
-    "id": "responsable_groupe",
-    "formType": "text",
-    "parent": "activites_ires"
-  },
-  {
-    "name": "Manifestation",
-    "formType": "text",
-    "id": "manifestation",
-    "parent": "activites_ires"
   }
 ]

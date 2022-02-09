@@ -9,7 +9,7 @@ class GroupListMenu extends IresMenu {
 
     public function __construct() {
         parent::__construct("Liste des groupes de l'IRES de Toulouse", // Page title when the menu is selected
-            "Groupes", // Name of the menu
+            "Groupes IRES", // Name of the menu
             0, // Menu access security level
             "dashicons-businesswoman", // Menu icon
             3 // Page position in the list

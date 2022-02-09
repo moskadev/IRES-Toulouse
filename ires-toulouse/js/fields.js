@@ -25,12 +25,14 @@ forms.forEach(function (form) {
             if (nickname != null) {
                 nickname.value = generateUserLogin();
             }
+            checkCorrectlyFilled(event.target);
         }
         changeSubmitState();
     });
     if (nickname !== null && !nickname?.value) {
         nickname.value = generateUserLogin();
     }
+    formInputs.forEach(input => checkCorrectlyFilled(input));
 
     /**
      * Dynamically update the value in the input from
@@ -77,6 +79,51 @@ forms.forEach(function (form) {
     }
 
     /**
+     * Verification of an input of the form by evaluating if they
+     * have a value and is correctly filled
+     *
+     * @returns {boolean} true if the value of this input has
+     *                    been entered and follows the imposed format
+     */
+    function checkCorrectlyFilled(input) {
+        let filled = true;
+        /*
+         * Checks if it's the right input we're looking for with its formType.
+         * If the var "filled" is on true, we check again each value :
+         * - Required case : we check if the RegEx exists and we test
+         *   with the value of the input. If not, we check if the input is not empty
+         * - Not required case : it means that if the value or RegEx is empty, it is "filled".
+         *   But if the RegEx exists, we check if the value follows it.
+         *
+         * The value of the inputs are also verified on the back-end
+         */
+        if ((input.dataset.formtype === "text" || input.dataset.formtype === "email") && input.dataset.formtype) {
+            const regex = input.dataset.regex ? new RegExp("^" + input.dataset.regex + "$") : "";
+            if (input.dataset.required) {
+                /*
+                 * If the regex exists, we test the value, if not, we check
+                 * if the input contains a value
+                 */
+                filled = regex ? (input.value && regex.test(input.value)) : input.value;
+            } else {
+                /*
+                 * Checks if the value or the regex is empty, so it is "filled".
+                 * If the value and regex exists, we test the value
+                 */
+                filled = !input.value || !regex || regex.test(input.value);
+            }
+            if(filled){
+                input.classList.add("is-valid");
+                input.classList.remove("is-invalid");
+            } else {
+                input.classList.add("is-invalid");
+                input.classList.remove("is-valid");
+            }
+        }
+        return filled;
+    }
+
+    /**
      * Verification of each input of the form by evaluating if they
      * have a value.
      *
@@ -85,42 +132,9 @@ forms.forEach(function (form) {
      */
     function areCorrectlyFilled() {
         let filled = true;
-
         formInputs.some(input => {
-            /*
-             * Checks if it's the right input we're looking for with its formType.
-             * If the var "filled" is on true, we check again each value :
-             * - Required case : we check if the RegEx exists and we test
-             *   with the value of the input. If not, we check if the input is not empty
-             * - Not required case : it means that if the value or RegEx is empty, it is "filled".
-             *   But if the RegEx exists, we check if the value follows it.
-             *
-             * The value of the inputs are also verified on the back-end
-             */
-            if ((input.dataset.formtype === "text" || input.dataset.formtype === "email") &&
-                filled && input.dataset.formtype
-            ) {
-                const regex = input.dataset.regex ? new RegExp("^" + input.dataset.regex + "$") : "";
-                if (input.dataset.required) {
-                    /*
-                     * If the regex exists, we test the value, if not, we check
-                     * if the input contains a value
-                     */
-                    filled = regex ? (input.value && regex.test(input.value)) : input.value;
-                } else {
-                    /*
-                     * Checks if the value or the regex is empty, so it is "filled".
-                     * If the value and regex exists, we test the value
-                     */
-                    filled = !input.value || !regex || regex.test(input.value);
-                }
-                if(filled){
-                    input.classList.add("is-valid");
-                    input.classList.remove("is-invalid");
-                } else {
-                    input.classList.add("is-invalid");
-                    input.classList.remove("is-valid");
-                }
+            if(filled){
+                filled = checkCorrectlyFilled(input);
             }
         });
         return filled;

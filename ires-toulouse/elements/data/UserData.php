@@ -226,9 +226,14 @@ class UserData extends IresElement {
          * For others, nothing changes
          */
         $value = implode(",", !is_array($value) ? [$value] : $value);
-        if(!$this->wordpressMeta) {
-            update_user_meta($user->ID, $this->id, $value);
-        } else {
+
+        /*
+         * We are still trying to save it, some Wordpress metadata appears
+         * in the new ones like first_name or last_name
+         */
+        update_user_meta($user->ID, $this->id, $value);
+
+        if($this->wordpressMeta) {
             $userId = wp_update_user(["ID" => $user->ID, $this->id => $value]);
             if (is_wp_error($userId)) {
                 throw new Exception($user->user_login . " : " .

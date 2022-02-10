@@ -56,7 +56,7 @@ class GroupDetailsMenu extends IresMenu {
              * Poste un message si un membre est retiré du groupe
              */
             if (isset($_POST['removeMember'])) {
-                $group->removeUser(get_user_by("id", $_POST['removeMember']));
+                $group->removeUser(get_userdata($_POST['removeMember']));
 
                 $message = "L'utilisateur a été supprimé du groupe.";
                 $type_message = "updated";
@@ -77,7 +77,7 @@ class GroupDetailsMenu extends IresMenu {
              * Poste un message si un responsable est supprimé
              */
             if (isset($_POST['deleteResp'])) {
-                $deletedResponsable = get_user_by("id", $_POST['deleteResp']);
+                $deletedResponsable = get_userdata($_POST['deleteResp']);
                 if ($deletedResponsable !== false && $group->removeResponsable($deletedResponsable)) {
                     $message = $deletedResponsable->user_login . " a été retiré des responsables du groupe.";
                     $type_message = "updated";
@@ -142,7 +142,7 @@ class GroupDetailsMenu extends IresMenu {
             <!-- Bouton retour & titre de la page -->
             <div class="row">
                 <div class="col-auto">
-                    <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=groupes"
+                    <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=groupes_ires"
                           method="post">
                         <button type="submit" value="" name="back"
                                 class="btn btn-outline-secondary rounded-circle"
@@ -293,7 +293,7 @@ class GroupDetailsMenu extends IresMenu {
                 foreach ($members as $user) {
                     $first_name = $user->first_name;
                     $last_name = $user->last_name; ?>
-                    <tr class="<?php if (wp_get_current_user() === $user) {
+                    <tr class="<?php if (get_current_user_id() === $user->ID) {
                         echo "table-primary";
                     } ?>">
                         <td class="">
@@ -325,7 +325,7 @@ class GroupDetailsMenu extends IresMenu {
                                 </div>
                                 <div class="col float-left">
                                     <?php
-                                    if (wp_get_current_user() === $user
+                                    if (get_current_user_id() === $user->ID
                                         && !(current_user_can('responsable') && $group->isUserResponsable($user))
                                         || current_user_can('administrator')) {
                                         ?>

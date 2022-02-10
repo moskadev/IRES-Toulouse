@@ -8,9 +8,10 @@
     "name": "Identifiant",
     "parent": "info_perso",
     "formType": "text",
-    "id": "nickname",
+    "id": "user_login",
     "disabled": true,
-    "description": "L'identifiant n'est plus modifiable et est attribué automatiquement"
+    "description": "L'identifiant n'est plus modifiable et est attribué automatiquement",
+    "wordpressMeta": true
   },
   {
     "name": "Nom",
@@ -20,7 +21,8 @@
     "uppercase": true,
     "required": true,
     "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
-    "description": "En majuscules uniquement, sans chiffres"
+    "description": "En majuscules uniquement, sans chiffres",
+    "wordpressMeta": true
   },
   {
     "name": "Prénom",
@@ -30,16 +32,18 @@
     "uppercase": true,
     "required": true,
     "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
-    "description": "En majuscules uniquement, sans chiffres"
+    "description": "En majuscules uniquement, sans chiffres",
+    "wordpressMeta": true
   },
   {
     "name": "E-mail",
     "parent": "info_perso",
     "formType": "email",
     "required": true,
-    "id": "email",
+    "id": "user_email",
     "regex": "\\S+@\\S+\\.\\S+",
-    "description": "Nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé."
+    "description": "Nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé.",
+    "wordpressMeta": true
   },
   {
     "name": "Téléphone",
@@ -58,18 +62,23 @@
     "name": "Groupe de recherche-action",
     "formType": "text",
     "id": "groupe_recherche_action",
-    "parent": "activites_ires"
+    "parent": "activites_ires",
+    "disabled": true,
+    "extraData": "user_groups"
   },
   {
     "name": "Responsable du groupe",
     "id": "responsable_groupe",
     "formType": "text",
-    "parent": "activites_ires"
+    "parent": "activites_ires",
+    "disabled": true,
+    "extraData": "user_groups_responsables"
   },
   {
     "name": "Manifestation",
     "formType": "text",
     "id": "manifestation",
+    "disabled": true,
     "parent": "activites_ires"
   },
   {

@@ -27,13 +27,20 @@ class Identifier {
     }
 
     /**
-     * @return WP_User
+     * @param array $users
+     *
+     * @return WP_User|null
      */
-    public static function getLastRegisteredUser() : WP_User {
-        return get_users([
-            "orderby" => "registered",
-            "order" => "DESC",
-            "number" => 1
-        ])[0];
+    public static function getLastRegisteredUser(array $users = []) : ?WP_User {
+        if($users === []){
+            $users = get_users();
+        }
+        $maxId = get_current_user_id();
+        foreach ($users as $user){
+            if($user instanceof WP_User) {
+                $maxId = $user->ID > $maxId ? $user->ID : $maxId;
+            }
+        }
+        return ($user = get_userdata($maxId)) === false ? null : $user;
     }
 }

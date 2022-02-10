@@ -6,10 +6,11 @@ include_once("IresMenu.php");
 
 use Exception;
 use irestoulouse\controllers\UserInputData;
-use irestoulouse\controllers\UserModification;
 use irestoulouse\elements\Group;
 use irestoulouse\elements\input\UserData;
 use irestoulouse\utils\Dataset;
+use irestoulouse\utils\Identifier;
+use WP_User;
 
 /**
  * Creation of the plugin page
@@ -46,6 +47,12 @@ use irestoulouse\utils\Dataset;
  */
 class UserProfileMenu extends IresMenu {
 
+    /** @var WP_User[] */
+    private array $visibleUsers;
+
+    /** @var WP_User */
+    private WP_User $lastRegisteredUser;
+
     /**
      * Constructing the menu and link to the admin page
      */
@@ -56,27 +63,30 @@ class UserProfileMenu extends IresMenu {
             "dashicons-id-alt",
             3
         );
+        $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
+        $this->lastRegisteredUser = Identifier::getLastRegisteredUser($this->visibleUsers)
+            ?? wp_get_current_user();
     }
 
     /**
      * Content of the page
      */
     public function getContent() : void {
-        $isResp = current_user_can("responsable") || current_user_can('administrator');
-        $seeableUsers = Group::getSeeableUsers(wp_get_current_user());
+        $isResp = current_user_can("responsable") ||
+            current_user_can('administrator');
 
-        if (count($seeableUsers) > 0) {
+        if (count($this->visibleUsers) > 0) {
             $editingUser = isset($_POST["editingUserId"]) ?
-                get_user_by("id", $_POST["editingUserId"] ?? get_current_user_id()) :
-                wp_get_current_user();
+                get_userdata($_POST["editingUserId"] ?? get_current_user_id()) :
+                $this->lastRegisteredUser;
 
             /**
              * If admin, it gets the last created user or chosen user
              * If responsable, verify if he's responsible for the user
              * else chose itself
              */
-            if (!in_array($editingUser, $seeableUsers)) {
-                $seeableUsers = wp_get_current_user(); ?>
+            if (!in_array($editingUser, $this->visibleUsers)) {
+                $editingUser = wp_get_current_user(); ?>
                 <div id="message" class="error notice is-dismissible">
                     <p><strong>Vous n'avez pas la permission de modifier cet
                             utilisateur.</strong></p>
@@ -85,12 +95,15 @@ class UserProfileMenu extends IresMenu {
         } else {
             $editingUser = wp_get_current_user();
         }
-        $modification = new UserModification($editingUser);
-
+        
         if (isset($_POST["action"]) && $_POST["action"] == "modifyuser") {
             try {
                 UserInputData::checkSentData();
-                $modification->updateAllUserData(); ?>
+                foreach ($_POST as $dataId => $dataValue){
+                    if(($data = UserData::fromId($dataId)) !== null){
+                        $data->updateValue($dataValue, $editingUser);
+                    }
+                }?>
                 <div id="message" class="updated notice is-dismissible">
                     <p><strong>Modification des informations de l'utilisateur
                             <?php echo $editingUser->user_login ?> ont été bien
@@ -103,128 +116,135 @@ class UserProfileMenu extends IresMenu {
             <?php }
         }
 
-        if ($isResp) { ?>
-            <form method='post' name='to-modify-user' id='to-modify-user'
-                  class='validate' novalidate='novalidate'>
-                <table class='form-table' role='presentation'>
-                    <tr class="form-field form-required">
-                        <th>
-                            <label for='editingUserId'>
-                                Sélectionnez l'utilisateur à modifier
-                            </label>
-                        </th>
-                        <td>
-                            <select name="editingUserId"><?php
-                                foreach ($seeableUsers as $user) { ?>
-                                    <option value='<?php echo $user->ID ?>' <?php if ($user === $editingUser)
-                                        echo "selected" ?>>
-                                        <?php echo $user->nickname ?>
-                                    </option>
-                                <?php } ?>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-                <button class="btn btn-success" type="submit" id="to-modify-user-btn">
-                    Modifier cet utilisateur
-                </button>
-                <p class='description'>Veuillez valider si vous avez sélectionné
-                    un nouveau utilisateur</p>
-            </form>
-            <?php
-        }
-        ?>
+        if ($isResp) {
+            $this->chooseUserForm($editingUser);
+        } ?>
 
         <form method='post' name='modify-user' id='modify-user'
               class='verifiy-form validate' novalidate='novalidate'>
             <input name='editingUserId' type='hidden'
                    value='<?php echo $editingUser->ID ?>'>
-            <input name='action' type='hidden' value='modifyuser'><?php
-            foreach (UserData::all() as $inputData) {
-                $inputFormType = $inputData->getFormType();
-                $inputId = $inputData->getId();
-
-                if ($inputFormType === "label") {
-                    echo "<h2>" . $inputData->getName() . "</h2>";
-                    continue;
-                } ?>
-                <table class='form-table' role='presentation'>
+            <input name='action' type='hidden' value='modifyuser'>
+            <table class='form-table' role='presentation'><?php
+                foreach (UserData::all() as $data) {
+                    $formType = $data->getFormType();
+                    $dataId = $data->getId();
+                    $isLabel = $formType === "label"; ?>
                     <tr class="form-field form-required">
-                        <th>
+                        <th class='<?php if ($isLabel)echo "title-label" ?>'>
                             <!-- Creating the title of input -->
-                            <label for='<?php echo $inputId ?>'> <?php
-                                _e($inputData->getName());
-                                if ($inputData->isRequired()) {
-                                    ?>
-                                    <span class='description'><?php _e("(required)") ?></span> <?php
-                                } ?>
-                            </label>
-                        </th>
-                        <td>
-                            <?php
-                            if (in_array($inputFormType, ["text", "email"])) {
-                                ?>
-                                <input <?php echo Dataset::allFrom($inputData) ?>
-                                        class="form-control"
-                                        type='<?php echo htmlspecialchars($inputFormType) ?>'
-                                        id='<?php echo htmlspecialchars($inputId) ?>'
-                                        name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value='<?php echo htmlspecialchars($inputData->getValue($editingUser)); ?>'>
-                                <?php
-                            } else if ($inputFormType === "radio") {
-                                $value = filter_var($inputData->getValue($editingUser), FILTER_VALIDATE_BOOLEAN); ?>
-                                Oui <input <?php echo Dataset::allFrom($inputData) ?>
-                                        class="form-control"
-                                        type="radio"
-                                        id='<?php echo htmlspecialchars($inputId) ?>_oui'
-                                        name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value="true"
-                                        <?php if ($value == true) echo "checked" ?>>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                Non <input <?php echo Dataset::allFrom($inputData) ?>
-                                        class="form-control"
-                                        type="radio"
-                                        id='<?php echo htmlspecialchars($inputId) ?>_non'
-                                        name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value="false"
-                                        <?php if ($value == false)echo "checked" ?>>
-                                <?php
-                            } else if (in_array($inputFormType, ["dropdown", "checklist"])) { ?>
-                                <select <?php if ($inputFormType === "checklist")
-                                    echo "multiple" ?>
-                                        name='<?php echo $inputId ?>[]'
-                                        class="form-control"
-                                        id='<?php echo $inputId ?>'> <?php
-                                    /**
-                                     * Extra data are checked individually and put in the dropdown or checklist
-                                     * Multiple items can be selected for checklist, so we check if the user
-                                     * has those extra data
-                                     */
-                                    foreach ($inputData->getExtraData() as $data) {
-                                        ?>
-                                        <!-- value of the option -->
-                                        <option value='<?php echo $data ?>'
-                                            <?php if ($modification->containsExtraData($inputData, $data))
-                                                echo "selected"; var_dump($modification->containsExtraData($inputData, $data), $data); ?>>
-                                            <!-- check if the extra data has been selected by the user -->
-                                            <?php echo $data ?>
-                                            <!-- the option's text -->
-                                        </option> <?php
+                            <?php if ($isLabel) {
+                                echo $data->getName();
+                            } else { ?>
+                                <label for='<?php echo $dataId ?>'> <?php
+                                    _e($data->getName());
+                                    if ($data->isRequired()) { ?>
+                                        <span class='description'><?php _e("(required)") ?></span> <?php
                                     } ?>
-                                </select> <?php
-                            }
-                            if (!empty($inputData->getDescription())) { ?>
-                                <p class="description"><?php _e($inputData->getDescription()) ?></p>
+                                </label>
                             <?php } ?>
-                        </td>
+                        </th>
+                        <?php if (!$isLabel) { ?>
+                            <td>
+                                <?php
+                                if (in_array($formType, ["text", "email"])) { ?>
+                                    <input <?php echo Dataset::allFrom($data) ?>
+                                            class="form-control"
+                                            type='<?php echo htmlspecialchars($formType) ?>'
+                                            id='<?php echo $dataId ?>'
+                                            name='<?php echo $dataId ?>'
+                                            value='<?php echo htmlspecialchars($data->getValue($editingUser)); ?>'>
+                                    <?php
+                                } else if ($formType === "radio") {
+                                    $value = filter_var($data->getValue($editingUser),
+                                        FILTER_VALIDATE_BOOLEAN); ?>
+                                    Oui <input <?php echo Dataset::allFrom($data) ?>
+                                            class="form-control"
+                                            type="radio"
+                                            id='<?php echo $dataId ?>_oui'
+                                            name='<?php echo $dataId ?>'
+                                            value="true"
+                                            <?php if ($value == true)echo "checked" ?>>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    Non <input <?php echo Dataset::allFrom($data) ?>
+                                            class="form-control"
+                                            type="radio"
+                                            id='<?php echo $dataId ?>_non'
+                                            name='<?php echo $dataId ?>'
+                                            value="false"
+                                            <?php if ($value == false) echo "checked" ?>>
+                                    <?php
+                                } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
+                                    <select <?php if ($formType === "checklist")
+                                        echo "multiple" ?>
+                                            name='<?php echo $dataId ?>[]'
+                                            class="form-control"
+                                            id='<?php echo $dataId ?>'> <?php
+                                        /**
+                                         * Extra data are checked individually and put in the dropdown or checklist
+                                         * Multiple items can be selected for checklist, so we check if the user
+                                         * has those extra data
+                                         */
+                                        foreach ($data->getExtraData() as $extraDatum) { ?>
+                                            <!-- value of the option -->
+                                            <option value='<?php echo $extraDatum ?>'
+                                                <?php if ($data->containsExtraData($extraDatum, $editingUser))
+                                                    echo "selected" ?>>
+                                                <!-- check if the extra data has been selected by the user -->
+                                                <?php echo $extraDatum ?>
+                                                <!-- the option's text -->
+                                            </option> <?php
+                                        } ?>
+                                    </select> <?php
+                                }
+                                if (!empty($data->getDescription())) { ?>
+                                    <p class="description"><?php _e($data->getDescription()) ?></p>
+                                <?php } ?>
+                            </td>
+                        <?php } ?>
                     </tr>
-                </table>
-                <?php
-            } ?>
+                    <?php
+                } ?>
+            </table>
             <button class="btn btn-outline-primary menu-submit" type="submit"
                     name="profile-page" id="profile-page-sub" disabled>
                 Modifier les informations
             </button>
         </form> <?php
     }
+
+    /**
+     * @param WP_User $editingUser
+     */
+    public function chooseUserForm(WP_User $editingUser) { ?>
+        <form method='post' name='to-modify-user' id='to-modify-user'
+              class='validate' novalidate='novalidate'>
+            <table class='form-table' role='presentation'>
+                <tr class="form-field form-required">
+                    <th>
+                        <label for='editingUserId'>
+                            Sélectionnez l'utilisateur à modifier
+                        </label>
+                    </th>
+                    <td>
+                        <select name="editingUserId"><?php
+                            foreach ($this->visibleUsers as $user) { ?>
+                                <option value='<?php echo $user->ID ?>' <?php if ($user->ID === $editingUser->ID)
+                                    echo "selected" ?>>
+                                    <?php echo $user->user_login ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <button class="btn btn-success" type="submit" id="to-modify-user-btn">
+                Modifier cet utilisateur
+            </button>
+            <p class='description'>Veuillez valider si vous avez sélectionné
+                un nouveau
+                utilisateur <?php if ($editingUser->ID === $this->lastRegisteredUser->ID)
+                    echo "(le dernier utilisateur créé a été sélectionné par défaut)" ?></p>
+        </form>
+    <?php }
 }

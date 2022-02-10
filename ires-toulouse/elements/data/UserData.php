@@ -2,6 +2,7 @@
 
 namespace irestoulouse\elements\input;
 
+use Exception;
 use irestoulouse\elements\IresElement;
 use WP_User;
 
@@ -22,7 +23,8 @@ class UserData extends IresElement {
         "required",
         "regex",
         "extraData",
-        "disabled"
+        "disabled",
+        "wordpressMeta"
     ];
     public const FORM_TYPES = [
         "label",
@@ -48,6 +50,8 @@ class UserData extends IresElement {
     private array $extraData;
     /** @var bool */
     private bool $disabled;
+    /** @var bool */
+    private bool $wordpressMeta;
 
     /**
      * @param string $name
@@ -60,12 +64,14 @@ class UserData extends IresElement {
      * @param string|null $regex
      * @param null $extraData
      * @param bool|null $disabled
+     * @param bool|null
      */
     public function __construct(
         string $name, string $formType,
         ?string $id, ?string $description, ?string $parent = null,
         ?bool $uppercase = null, ?bool $required = null,
-        ?string $regex = null, $extraData = null, ?bool $disabled = null
+        ?string $regex = null, $extraData = null, ?bool $disabled = null,
+        ?bool $wordpressMeta = null
     ) {
         parent::__construct($id, $name);
         $this->parent = $parent ?? "";
@@ -76,6 +82,7 @@ class UserData extends IresElement {
         $this->regex = $regex ?? "";
         $this->extraData = $this->convertExtraData($extraData);
         $this->disabled = $disabled ?? false;
+        $this->wordpressMeta = $wordpressMeta ?? false;
     }
 
     /**
@@ -87,14 +94,8 @@ class UserData extends IresElement {
      * @return array converted data
      */
     private function convertExtraData($dataToConvert) : array {
-        if ($dataToConvert !== "disciplines") { // TODO groups
-            return $dataToConvert ?? [];
-        }
         // TODO refaire les disciplines et appliquer les groupes
-        //return array_map(function ($d){
-        //    return $d["name"];
-        //}, Discipline::all());
-        return [];
+        return is_string($dataToConvert) ? [] : ($dataToConvert ?? []);
     }
 
     /**
@@ -103,11 +104,10 @@ class UserData extends IresElement {
      * @param int $userId the user's id
      */
     public static function registerExtraMetas(int $userId) : void {
-        foreach (self::all(false) as $m) {
-            if ($m->getFormType() === "email") {
-                continue;
+        foreach (self::all(false) as $meta) {
+            if (($user = get_userdata($userId)) !== false) {
+                $meta->register($user);
             }
-            add_user_meta($userId, $m->getId(), $m->getDefaultValue(), true);
         }
     }
 
@@ -120,10 +120,8 @@ class UserData extends IresElement {
         foreach ($jsonData as $d) {
             if ($labelIncluded || $d["formType"] !== "label") {
                 $datas[] = new UserData(...array_values(UserData::formatData($d)));
-
             }
         }
-
         return $datas;
     }
 
@@ -135,11 +133,12 @@ class UserData extends IresElement {
      * @return UserData|null the user data which can be null
      */
     public static function fromId(string $searchedId) : ?UserData {
-        $filter = array_filter(self::all(), function ($a) use ($searchedId) {
-            return $a->getId() === $searchedId;
-        });
-
-        return array_values($filter)[array_key_first($filter)] ?? null;
+        $filter = array_filter(self::all(false),
+            function ($a) use ($searchedId) {
+                return $a->getId() === $searchedId;
+            }
+        );
+        return array_values($filter)[0] ?? null;
     }
 
     /**
@@ -204,22 +203,53 @@ class UserData extends IresElement {
 
     /**
      * Looking for the value to put in the input
-     * Special check for the emails which should be checked in
-     * the other table of the user
+     * Special check for the Wordpress original meta
      *
      * @return string input's value
      */
     public function getValue(WP_User $user) : string {
-        if (get_user_meta($user->ID, $this->id, true) === false) {
-            add_user_meta($user->ID, $this->id, $this->getDefaultValue(), true);
-        }
-        if ($this->id === "email") {
-            $value = $user->user_email;
-        } else {
-            $value = get_user_meta($user->ID, $this->id, true);
-        }
+        $dataId = $this->id;
+        return $this->wordpressMeta ?
+            ($user->$dataId ?? "") :
+            get_user_meta($user->ID, $dataId, true);
+    }
 
-        return $value;
+    /**
+     * @param $value
+     * @param WP_User $user
+     *
+     * @throws Exception
+     */
+    public function updateValue($value, WP_User $user){
+        /*
+         * Some values can be arrays of multiple values, so we stick them with a comma
+         * For others, nothing changes
+         */
+        $value = implode(",", !is_array($value) ? [$value] : $value);
+        if(!$this->wordpressMeta) {
+            update_user_meta($user->ID, $this->id, $value);
+        } else {
+            $userId = wp_update_user(["ID" => $user->ID, $this->id => $value]);
+            if (is_wp_error($userId)) {
+                throw new Exception($user->user_login . " : " .
+                    $userId->get_error_message());
+            }
+        }
+    }
+
+    /**
+     * @param WP_User $user the user where the new meta will be registered
+     *
+     * @return bool true if the meta has been registered
+     */
+    public function register(WP_User $user) : bool {
+        if($this->wordpressMeta){
+            return true;
+        }
+        if(add_user_meta($user->ID, $this->id, $this->getDefaultValue(), true) !== false){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -271,6 +301,14 @@ class UserData extends IresElement {
     }
 
     /**
+     * @param string $dataToAnalyse metadata that should be checked
+     * @return bool true if the metadata has been found
+     */
+    public function containsExtraData(string $dataToAnalyse, WP_User $user) : bool {
+        return in_array($dataToAnalyse, explode(",", $this->getValue($user)));
+    }
+
+    /**
      * @return array|null
      */
     public function getExtraData() : ?array {
@@ -285,18 +323,20 @@ class UserData extends IresElement {
     }
 
     /**
+     * @return bool
+     */
+    public function isWordpressMeta() : bool {
+        return $this->wordpressMeta;
+    }
+
+    /**
      * @return array
      */
     public function toArray() : array {
-        return array_merge(parent::toArray(), [
-            "parent" => $this->parent,
-            "formType" => $this->formType,
-            "description" => $this->description,
-            "uppercase" => $this->uppercase,
-            "required" => $this->required,
-            "regex" => $this->regex,
-            "extraData" => $this->extraData,
-            "disabled" => $this->disabled
-        ]);
+        $array = parent::toArray();
+        foreach (self::DATAS as $d){
+            $array[$d] = $this->$d;
+        }
+        return $array;
     }
 }

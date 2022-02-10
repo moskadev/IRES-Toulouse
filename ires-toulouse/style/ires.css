@@ -2,8 +2,12 @@ h1 {
     margin-bottom: 30px !important;
 }
 
-h2 {
-    margin-top: 40px;
+h2, .title-label {
+    margin-top: 40px !important;
+}
+
+.title-label {
+    font-size: 2em !important;
 }
 
 .disabled {

@@ -62,7 +62,7 @@ class UserConnection extends Controller {
         if (is_wp_error($userId)) {
             throw new FailedUserRegistrationException($login, $userId->get_error_message());
         }
-        $user = get_user_by("id", $userId);
+        $user = get_userdata($userId);
         if (isset($password) && !empty($password)) {
             (new EmailSender($user))->confirm($password);
         }
@@ -72,8 +72,8 @@ class UserConnection extends Controller {
     }
 
     /**
-     * We verify if the same nickname/user login, and so we count the quantity of users
-     * with the same nickname by deleting the numbers
+     * We verify if the same user login, and so we count the quantity of users
+     * with the same user's login by deleting the numbers
      * We also reduce it by 1 because the current user is already in the array too,
      * it's useless to count it
      *

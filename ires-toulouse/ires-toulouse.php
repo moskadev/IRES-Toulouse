@@ -14,7 +14,6 @@ require_once("controllers/Controller.php");
 require_once("controllers/EmailSender.php");
 require_once("controllers/UserConnection.php");
 require_once("controllers/UserInputData.php");
-require_once("controllers/UserModification.php");
 
 require_once("elements/IresElement.php");
 require_once("elements/Discipline.php");

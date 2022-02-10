@@ -105,7 +105,7 @@ class Group extends IresElement {
                 $group->id_group,
                 $group->name,
                 $group->time_created,
-                get_user_by("id", $group->creator_id)
+                get_userdata($group->creator_id)
             );
         }, $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups ORDER BY name")));
     }
@@ -156,9 +156,9 @@ class Group extends IresElement {
 
     /**
      * Get all the users for who $user_id is responsible
-     * @return array|null all the id of the users
+     * @return WP_User[] all the id of the users
      */
-    public static function getSeeableUsers(WP_User $from) {
+    public static function getVisibleUsers(WP_User $from) {
         if (in_array("administrator", $from->roles)) {
             return get_users();
         }
@@ -217,7 +217,7 @@ class Group extends IresElement {
         $db = Database::get();
 
         return array_map(function ($u) {
-            return get_user_by("id", $u->user_id);
+            return get_userdata($u->user_id);
         }, $db->get_results(
             $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
                 $this->id
@@ -291,7 +291,7 @@ class Group extends IresElement {
         $db = Database::get();
 
         return array_map(function ($u) {
-            return get_user_by("id", $u->user_id);
+            return get_userdata($u->user_id);
         }, $db->get_results(
             $db->prepare("SELECT * FROM {$db->prefix}groups_users WHERE group_id = %d",
                 $this->id

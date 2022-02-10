@@ -38,15 +38,14 @@ class UserRegisterMenu extends IresMenu {
      */
     public function getContent() : void {
         $loggedUser = null;
-        $created = isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["email"]);
+        $created = isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["user_email"]);
 
         if ($created) {
-            $userFirstname = $_POST["first_name"] ?? "";
-            $userLastname = $_POST["last_name"] ?? "";
-            $userEmail = $_POST["email"] ?? "";
-
             try {
-                $connection = new UserConnection($userFirstname, $userLastname, $userEmail);
+                $connection = new UserConnection(
+                        $_POST["first_name"] ?? "",
+                    $_POST["last_name"] ?? "",
+                        $_POST["user_email"] ?? "");
 
                 UserInputData::checkSentData();
                 $loggedUser = $connection->register();
@@ -64,26 +63,30 @@ class UserRegisterMenu extends IresMenu {
             <?php }
         } ?>
         <form method='post' class='verifiy-form validate' novalidate='novalidate'>
-            <?php
+            <table class='form-table' role='presentation'>
+                <?php
+                foreach (UserData::all() as $data) {
+                    $formType = $data->getFormType();
+                    $dataId = $data->getId();
 
-            foreach (UserData::all() as $inputData) {
-                $inputFormType = $inputData->getFormType();
-                $inputId = $inputData->getId();
+                    if (!$data->isWordpressMeta() ||
+                        $dataId === "user_login" && $loggedUser === null) {
+                        continue;
+                    }
 
-                $shownInputs = ["nickname", "first_name", "last_name", "email"];
-                if(!$created){
-                    unset($shownInputs[0]);
-                }
-                if (!in_array($inputId, $shownInputs)) {
-                    continue;
-                } ?>
-                <table class='form-table' role='presentation'>
+                    $value = "";
+                    if(isset($_POST[$dataId])){
+                        $value = $_POST[$dataId];
+                    } else if($loggedUser !== null) {
+                        $value = $data->getValue($loggedUser);
+                    }
+                    ?>
                     <tr class="form-field form-required">
                         <th>
-                            <label for='<?php echo $inputId ?>'>
+                            <label for='<?php echo $dataId ?>'>
                                 <?php
-                                _e($inputData->getName());
-                                if ($inputData->isRequired()) {
+                                _e($data->getName());
+                                if ($data->isRequired()) {
                                     ?>
                                     <span class='description'><?php _e("(required)") ?></span>
                                     <?php
@@ -91,30 +94,24 @@ class UserRegisterMenu extends IresMenu {
                             </label>
                         </th>
                         <td>
+                            <input <?php echo Dataset::allFrom($data) ?>
+                                    class='form-control'
+                                    type='<?php echo $formType ?>'
+                                    id='<?php echo $dataId ?>'
+                                    name='<?php echo $dataId ?>'
+                                    value='<?php echo $value ?>'>
                             <?php
-                            if (in_array($inputData->getFormType(), [
-                                "text",
-                                "email"
-                            ])) { ?>
-                                <input <?php echo Dataset::allFrom($inputData) ?>
-                                        class='form-control'
-                                        type='<?php echo htmlspecialchars($inputFormType) ?>'
-                                        id='<?php echo htmlspecialchars($inputId) ?>'
-                                        name='<?php echo htmlspecialchars($inputId) ?>'
-                                        value='<?php echo($inputId === "nickname" && $loggedUser !== null ?
-                                            $loggedUser->user_login : ($_POST[$inputId] ?? "")) ?>'>
-                                <?php
-                                if (!empty($inputData->getDescription())) {
-                                    ?>
-                                    <p class="description"><?php _e($inputData->getDescription()) ?></p>
-                                <?php }
-                            } ?>
+                            if (!empty($data->getDescription())) { ?>
+                                <p class="description"><?php _e($data->getDescription()) ?></p>
+                            <?php } ?>
                         </td>
                     </tr>
-                </table>
-                <?php
-            } ?>
-            <button class="btn btn-outline-primary menu-submit" type="submit" id="createusersub" name="createuser" disabled>Créer un nouveau compte IRES</button>
+                    <?php
+                } ?>
+            </table>
+            <button class="btn btn-outline-primary menu-submit" type="submit" name="createuser" disabled>
+                Créer un nouveau compte IRES
+            </button>
         </form>
         <?php
     }

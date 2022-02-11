@@ -217,17 +217,10 @@ class GroupListMenu extends IresMenu {
                 </a>
             </th>
             <!-- Name of the user in charge of the group -->
-            <td class="">
-                <?php
-                $i = 0;
-                foreach ($responsables as $resp) {
-                    $i ++;
-                    echo $resp->first_name . " " . $resp->last_name;
-                    if (count($responsables) > 1 && $i < count($responsables)) {
-                        echo ", ";
-                    }
-                }
-                ?>
+            <td> <?php
+                echo implode(", ", array_map(function($u) {
+                    return $u->first_name . " " . $u->last_name;
+                }, $group->getResponsables()));  ?>
             </td>
             <!-- Date -->
             <td>

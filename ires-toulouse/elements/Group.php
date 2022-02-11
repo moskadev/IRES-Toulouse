@@ -12,6 +12,8 @@ use WP_User;
  */
 class Group extends IresElement {
 
+    public const NAME_LENGTH = 30;
+
     public const TYPE_RECHERCHE_ACTION = 0;
     public const TYPE_MANIFESTATION = 1;
     public const TYPE_AUTRE = 2;
@@ -30,44 +32,25 @@ class Group extends IresElement {
     private WP_User $creator;
 
     /**
-     * @param string $id
-     * @param string $name
-     * @param int $type
-     * @param string $creationTime
-     * @param WP_User $creator
-     *
-     * @throws \Exception
-     */
-    public function __construct(string $id, string $name, int $type, string $creationTime, WP_User $creator) {
-        parent::__construct($id, $name);
-        if(!self::isTypeValid($type)){
-            throw new \Exception("Type $type inexistant pour le groupe $name");
-        }
-        $this->type = $type;
-        $this->creationTime = $creationTime;
-        $this->creator = $creator;
-    }
-
-    /**
      * Looking if groups and groups_user table have been created and if they not, create then
      */
     public static function createTable() {
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        require_once ABSPATH . "wp-admin/includes/upgrade.php";
         $db = Database::get();
 
         $charset_collate = $db->get_charset_collate();
-        $table_name = $db->prefix . 'groups';
+        $table_name = $db->prefix . "groups";
         $sql_create_group = "CREATE TABLE $table_name (
                 id_group bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-                name char(30) NOT NULL,
-                type int(1) NOT NULL DEFAULT 2,
+                name char(" . self::NAME_LENGTH . ") NOT NULL,
+                type int(1) NOT NULL DEFAULT " . self::TYPE_AUTRE . ",
                 time_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 creator_id bigint(20) UNSIGNED NOT NULL,
                 FOREIGN KEY (creator_id) REFERENCES wp_users(ID),
                 PRIMARY KEY  (id_group) 
             ) $charset_collate;";
         maybe_create_table($table_name, $sql_create_group);
-        $table_name = $db->prefix . 'groups_users';
+        $table_name = $db->prefix . "groups_users";
 
         $sql_create_user_group = "CREATE TABLE $table_name (
                 ID bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -79,6 +62,11 @@ class Group extends IresElement {
                 PRIMARY KEY (ID)
             ) $charset_collate;";
         maybe_create_table($table_name, $sql_create_user_group);
+
+        // TEMPORAIRE pour l'ajout du type sans casser la table
+        if (!isset($db->get_row("SELECT * FROM {$db->prefix}groups")->type)) {
+            $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT " . self::TYPE_AUTRE);
+        }
     }
 
     /**
@@ -89,18 +77,13 @@ class Group extends IresElement {
      * @return bool true if the group is created, else false
      */
     public static function register(string $name, int $type = self::TYPE_AUTRE) : bool {
-        $db = Database::get();
-
-        if (self::isTypeValid($type) &&
+        if (self::isValid($name, $type) &&
             self::fromName($name) === null &&
             self::fromName(strtolower($name)) === null
         ) {
-            // TEMPORAIRE pour l'ajout du type sans casser la table
-            if(!isset($db->get_row("SELECT * FROM {$db->prefix}groups")->type)){
-                $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT 2");
-            }
-            $db->insert(
-                $db->prefix . "groups",
+            $db = Database::get();
+
+            $db->insert($db->prefix . "groups",
                 ["name" => $name, "type" => $type, "creator_id" => get_current_user_id()],
                 ["%s", "%d", "%d"]
             );
@@ -110,13 +93,17 @@ class Group extends IresElement {
     }
 
     /**
-     * Checks if the type that has been given exists for the group
+     * Checks if the name and type that have been given are correct if
+     * name >=
+     *
+     * @param string $name the group's name to check
      * @param int $type the type to check
      *
      * @return bool true if it exists
      */
-    public static function isTypeValid(int $type) : bool{
-        return in_array($type, array_keys(self::TYPE_NAMES));
+    public static function isValid(string $name, int $type){
+        return strlen($name) <= self::NAME_LENGTH &&
+            in_array($type, array_keys(self::TYPE_NAMES));
     }
 
     /**
@@ -134,6 +121,7 @@ class Group extends IresElement {
 
     /**
      * @return Group[] all the groups available
+     * @throws \Exception
      */
     public static function all() : array {
         $db = Database::get();
@@ -157,9 +145,9 @@ class Group extends IresElement {
      * @return bool true if group deleted or not
      */
     public static function delete(int $id) : bool {
-        $db = Database::get();
-
         if (self::exists($id)) {
+            $db = Database::get();
+
             $db->delete($db->prefix . 'groups', ['id_group' => $id], ['%s']);
             $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d",
                 $id)
@@ -244,25 +232,29 @@ class Group extends IresElement {
         if (count($request) === 0) {
             return [];
         }
+
         return array_map(function ($group) {
             return self::fromId($group->id_group);
         }, $request);
     }
 
     /**
-     * Get the users (if exist) in charge of the group given in parameter
-     * @return WP_User[] the user(s) in charge of the group
+     * @param string $id
+     * @param string $name
+     * @param int $type
+     * @param string $creationTime
+     * @param WP_User $creator
+     *
+     * @throws \Exception
      */
-    public function getResponsables() {
-        $db = Database::get();
-
-        return array_map(function ($u) {
-            return get_userdata($u->user_id);
-        }, $db->get_results(
-            $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
-                $this->id
-            ))
-        );
+    public function __construct(string $id, string $name, int $type, string $creationTime, WP_User $creator) {
+        if (!self::isValid($name, $type)) {
+            throw new \Exception("Le nom du groupe $name ou le type $type est invalide");
+        }
+        parent::__construct($id, $name);
+        $this->type = $type;
+        $this->creationTime = $creationTime;
+        $this->creator = $creator;
     }
 
     /**
@@ -287,6 +279,22 @@ class Group extends IresElement {
     }
 
     /**
+     * Get the users (if exist) in charge of the group given in parameter
+     * @return WP_User[] the user(s) in charge of the group
+     */
+    public function getResponsables() {
+        $db = Database::get();
+
+        return array_map(function ($u) {
+            return get_userdata($u->user_id);
+        }, $db->get_results(
+            $db->prepare("SELECT user_id FROM {$db->prefix}groups_users WHERE group_id = %d AND is_responsable = 1",
+                $this->id
+            ))
+        );
+    }
+
+    /**
      * Adds a manager if he is already in the group
      * Adds the user to the group as a manager if he is not already there
      *
@@ -295,21 +303,19 @@ class Group extends IresElement {
      * @return bool true if the responsable was added successfully
      */
     public function addResponsable(WP_User $user) : bool {
-        $db = Database::get();
         if (!$this->userExists($user)) {
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '1')",
-                $user->ID,
-                $this->id)
-            );
+            $this->addUser($user, true);
             $user->set_role("responsable");
-            return true;
         }
         if (!$this->isUserResponsable($user)) {
+            $db = Database::get();
+
             $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d",
                 $user->ID,
                 $this->id)
             );
             $user->set_role("responsable");
+
             return true;
         }
         return false;
@@ -361,19 +367,18 @@ class Group extends IresElement {
      * Ajoute l'utilisateur s'il n'est pas déjà présent et s'il existe
      *
      * @param WP_User $user
+     * @param bool $responsable
      *
      * @return bool
      */
-    public function addUser(WP_User $user) : bool {
+    public function addUser(WP_User $user, bool $responsable = false) : bool {
         if (!$this->userExists($user)) {
             $db = Database::get();
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, '0')",
-                $user->ID, $this->id
-            ));
-
+            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, " . $responsable ? "'1'" : "'0'" . ")",
+                $user->ID, $this->id)
+            );
             return true;
         }
-
         return false;
     }
 

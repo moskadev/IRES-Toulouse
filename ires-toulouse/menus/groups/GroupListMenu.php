@@ -127,10 +127,10 @@ class GroupListMenu extends IresMenu {
             if (count($groups) > 9) { ?>
                 <tfoot>
                 <tr>
-                    <td>Nom</td>
-                    <td>Responsable</td>
-                    <td>Date de création</td>
-                    <td></td>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Responsable(s)</th>
+                    <th scope="col">Date de création</th>
                 </tr>
                 </tfoot>
             <?php } // endif ?>
@@ -170,7 +170,7 @@ class GroupListMenu extends IresMenu {
          * Ajoute un groupe si possible
          */
         if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup']) && isset($_POST['typeAddGroup'])) {
-            $message = "Impossible de créer le groupe.";
+            $message = "Impossible de créer le groupe " . esc_attr($_POST['nameAddGroup']);
             $type_message = "error";
 
             Group::createTable();

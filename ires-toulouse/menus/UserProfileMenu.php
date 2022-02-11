@@ -173,7 +173,9 @@ class UserProfileMenu extends IresMenu {
                                                         return $u->first_name . " " . $u->last_name;
                                                     }, $group->getResponsables()); ?>
                                                     <tr>
-                                                        <td><?php echo $group->getName() ?></td>
+                                                        <td><a class="text-decoration-none"
+                                                               href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
+                                                                <?php echo $group->getName() ?></a></td>
                                                         <td><?php echo implode(", ", $respNames)?></td>
                                                         <td><?php echo $group->isUserResponsable($editingUser) ?
                                                                 "Oui" : "Non" ?></td>

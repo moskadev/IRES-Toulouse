@@ -180,7 +180,7 @@ class Group extends IresElement {
     /**
      * @return array|null containing all the groups where an user is responsable
      */
-    public static function allWhereUserResponsable(WP_User $user) {
+    public static function allWhereUserResponsable(WP_User $user) : ?array {
         $groups = [];
         foreach (self::getUserGroups($user) as $g) {
             if (in_array($user, $g->getResponsables())) {

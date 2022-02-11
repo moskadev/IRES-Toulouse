@@ -17,7 +17,6 @@ class UserListMenu extends IresMenu {
     }
 
     public function getContent() : void {
-        global $submenu;
-        var_dump($submenu['comptes_ires'][0][0]);
+
     }
 }

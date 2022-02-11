@@ -2,12 +2,17 @@ h1 {
     margin-bottom: 30px !important;
 }
 
-h2, .title-label {
-    margin-top: 40px !important;
+.title-label {
+    margin-top: 50px !important;
+    font-size: 1.7em !important;
 }
 
-.title-label {
-    font-size: 2em !important;
+.groups-data th, .groups-data td {
+    font-size: 1em !important;
+}
+
+h2 {
+    margin-top: 30px !important;
 }
 
 .disabled {

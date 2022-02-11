@@ -170,7 +170,6 @@ class GroupDetailsMenu extends IresMenu {
                                     echo "s";
                                 } ?> du groupe :</label>
                         </div>
-                    </div>
                         <div class="col-7">
                             <table class="table table-hover">
                                 <?php

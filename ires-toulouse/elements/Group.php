@@ -167,7 +167,7 @@ class Group extends IresElement {
             $users = array_merge($users, $group->getUsers());
         }
         $users = array_filter($users, function ($u) use ($from) {
-            return !in_array("administrator", $u->roles) ||
+            return !in_array("administrator", (array) $u->roles) ||
                 !in_array("responsable", $u->roles);
         });
         if (!in_array($from, $users)) {

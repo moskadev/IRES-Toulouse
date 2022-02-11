@@ -12,6 +12,18 @@ use WP_User;
  */
 class Group extends IresElement {
 
+    public const TYPE_RECHERCHE_ACTION = 0;
+    public const TYPE_MANIFESTATION = 1;
+    public const TYPE_AUTRE = 2;
+
+    public const TYPE_NAMES = [
+        self::TYPE_RECHERCHE_ACTION => "Recherche-action",
+        self::TYPE_MANIFESTATION => "Manifestation",
+        self::TYPE_AUTRE => "Autre"
+    ];
+
+    /** @var int */
+    private int $type;
     /** @var string */
     private string $creationTime;
     /** @var WP_User */
@@ -20,11 +32,18 @@ class Group extends IresElement {
     /**
      * @param string $id
      * @param string $name
+     * @param int $type
      * @param string $creationTime
      * @param WP_User $creator
+     *
+     * @throws \Exception
      */
-    public function __construct(string $id, string $name, string $creationTime, WP_User $creator) {
+    public function __construct(string $id, string $name, int $type, string $creationTime, WP_User $creator) {
         parent::__construct($id, $name);
+        if(!self::isTypeValid($type)){
+            throw new \Exception("Type $type inexistant pour le groupe $name");
+        }
+        $this->type = $type;
         $this->creationTime = $creationTime;
         $this->creator = $creator;
     }
@@ -41,6 +60,7 @@ class Group extends IresElement {
         $sql_create_group = "CREATE TABLE $table_name (
                 id_group bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                 name char(30) NOT NULL,
+                type int(1) NOT NULL DEFAULT 2,
                 time_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 creator_id bigint(20) UNSIGNED NOT NULL,
                 FOREIGN KEY (creator_id) REFERENCES wp_users(ID),
@@ -68,17 +88,35 @@ class Group extends IresElement {
      *
      * @return bool true if the group is created, else false
      */
-    public static function register(string $name) : bool {
+    public static function register(string $name, int $type = self::TYPE_AUTRE) : bool {
         $db = Database::get();
-        if (self::fromName($name) === null && self::fromName(strtolower($name)) === null) {
+
+        if (self::isTypeValid($type) &&
+            self::fromName($name) === null &&
+            self::fromName(strtolower($name)) === null
+        ) {
+            // TEMPORAIRE pour l'ajout du type sans casser la table
+            if(!isset($db->get_row("SELECT * FROM {$db->prefix}groups")->type)){
+                $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT 2");
+            }
             $db->insert(
-                $db->prefix . 'groups',
-                ['name' => $name, 'creator_id' => get_current_user_id()],
-                ['%s', '%d']
+                $db->prefix . "groups",
+                ["name" => $name, "type" => $type, "creator_id" => get_current_user_id()],
+                ["%s", "%d", "%d"]
             );
             return true;
         }
         return false;
+    }
+
+    /**
+     * Checks if the type that has been given exists for the group
+     * @param int $type the type to check
+     *
+     * @return bool true if it exists
+     */
+    public static function isTypeValid(int $type) : bool{
+        return in_array($type, array_keys(self::TYPE_NAMES));
     }
 
     /**
@@ -104,6 +142,7 @@ class Group extends IresElement {
             return new Group(
                 $group->id_group,
                 $group->name,
+                $group->type ?? self::TYPE_AUTRE,
                 $group->time_created,
                 get_userdata($group->creator_id)
             );
@@ -198,14 +237,15 @@ class Group extends IresElement {
      */
     public static function getUserGroups(WP_User $user) : array {
         $db = Database::get();
-        $request = $db->get_results($db->prepare("SELECT * FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON group_id = id_group WHERE user_id = %d",
+        $request = $db->get_results($db->prepare(
+            "SELECT * FROM {$db->prefix}groups JOIN {$db->prefix}groups_users ON group_id = id_group WHERE user_id = %d",
             $user->ID)
         );
         if (count($request) === 0) {
             return [];
         }
         return array_map(function ($group) {
-            return self::fromName($group->name);
+            return self::fromId($group->id_group);
         }, $request);
     }
 
@@ -223,6 +263,13 @@ class Group extends IresElement {
                 $this->id
             ))
         );
+    }
+
+    /**
+     * @return int the group's type
+     */
+    public function getType() : int {
+        return $this->type;
     }
 
     /**

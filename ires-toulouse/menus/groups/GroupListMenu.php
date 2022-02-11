@@ -38,8 +38,15 @@ class GroupListMenu extends IresMenu {
                             <label for="addGroup">Ajouter un groupe :</label>
                         </div>
                         <div class="col">
-                            <input type="text" id="addGroup" class="to-fill"
+                            <input type="text" id="addGroup" class="form-control h-100"
                                    name="nameAddGroup" placeholder="Nom du groupe">
+                        </div>
+                        <div class="col">
+                            <select class="form-control h-100" name="typeAddGroup"> <?php
+                                foreach (Group::TYPE_NAMES as $type => $name){?>
+                                    <option value="<?php echo $type?>"><?php echo $name?></option>
+                                <?php }
+                            ?></select>
                         </div>
                         <div class="col">
                             <input type="submit" name="addGroup" value="Ajouter"
@@ -65,9 +72,9 @@ class GroupListMenu extends IresMenu {
                 <thead>
                 <tr>
                     <th scope="col">Nom</th>
+                    <th scope="col">Type</th>
                     <th scope="col">Responsable(s)</th>
                     <th scope="col">Date de création</th>
-                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -90,9 +97,9 @@ class GroupListMenu extends IresMenu {
             <thead>
             <tr>
                 <th scope="col">Nom</th>
+                <th scope="col">Type</th>
                 <th scope="col">Responsable(s)</th>
                 <th scope="col">Date de création</th>
-                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
@@ -162,14 +169,15 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup'])) {
+        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup']) && isset($_POST['typeAddGroup'])) {
             $message = "Impossible de créer le groupe.";
             $type_message = "error";
 
             Group::createTable();
-            if (Group::register(esc_attr($_POST['nameAddGroup']))) {
+            if (Group::register(esc_attr($_POST['nameAddGroup']), intval(esc_attr($_POST['typeAddGroup'])))) {
                 $type_message = "updated";
-                $message = "Le groupe " . $_POST['nameAddGroup'] . " a été créé.";
+                $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
+                    ", dénommé " . $_POST['nameAddGroup'] . ", a été créé.";
             }
             ?>
             <form action="" method="post" id="message">
@@ -216,11 +224,13 @@ class GroupListMenu extends IresMenu {
                     <?php echo $group->getName() ?>
                 </a>
             </th>
-            <!-- Name of the user in charge of the group -->
+            <!-- Group's type -->
+            <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
+            <!-- Name of the users in charge of the group -->
             <td> <?php
                 echo implode(", ", array_map(function($u) {
                     return $u->first_name . " " . $u->last_name;
-                }, $group->getResponsables()));  ?>
+                }, $responsables));  ?>
             </td>
             <!-- Date -->
             <td>

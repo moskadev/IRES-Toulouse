@@ -162,6 +162,7 @@ class UserProfileMenu extends IresMenu {
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Nom du groupe</th>
+                                                    <th scope="col">Type du groupe</th>
                                                     <th scope="col">Responsables</th>
                                                     <th scope="col">Responsable de ce groupe</th>
                                                 </tr>
@@ -176,6 +177,7 @@ class UserProfileMenu extends IresMenu {
                                                         <td><a class="text-decoration-none"
                                                                href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
                                                                 <?php echo $group->getName() ?></a></td>
+                                                        <td><?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
                                                         <td><?php echo implode(", ", $respNames)?></td>
                                                         <td><?php echo $group->isUserResponsable($editingUser) ?
                                                                 "Oui" : "Non" ?></td>

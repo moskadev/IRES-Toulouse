@@ -163,6 +163,7 @@ class UserProfileMenu extends IresMenu {
                                                 <tr>
                                                     <th scope="col">Nom du groupe</th>
                                                     <th scope="col">Responsables</th>
+                                                    <th scope="col">Responsable de ce groupe</th>
                                                 </tr>
                                             </thead>
                                             <tbody> <?php
@@ -174,6 +175,8 @@ class UserProfileMenu extends IresMenu {
                                                     <tr>
                                                         <td><?php echo $group->getName() ?></td>
                                                         <td><?php echo implode(", ", $respNames)?></td>
+                                                        <td><?php echo $group->isUserResponsable($editingUser) ?
+                                                                "Oui" : "Non" ?></td>
                                                     </tr>
                                                 <?php }
                                             ?> </tbody>

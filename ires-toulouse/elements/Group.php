@@ -363,7 +363,7 @@ class Group extends IresElement {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
             $db = Database::get();
 
-            if (count(self::allWhereUserResponsable($user)) < 2) {
+            if (count(self::allWhereUserResponsable($user)) < 3) {
                 $user->set_role("subscriber");
             }
             $db->get_results(

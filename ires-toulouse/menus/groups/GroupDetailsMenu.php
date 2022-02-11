@@ -106,8 +106,8 @@ class GroupDetailsMenu extends IresMenu {
 
                 $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il est déjà responsable.";
                 $type_message = "error";
-                if (count($responsables) >= 2) {
-                    $message = "Erreur, il ne peut y avoir plus de 2 responsables.";
+                if (count($responsables) >= 3) {
+                    $message = "Erreur, il ne peut y avoir plus de 3 responsables.";
                     $type_message = "error";
                 } else if (!($newResponsable = get_user_by("login", $newResponsableLogin))) {
                     $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il n'existe pas.";
@@ -173,15 +173,12 @@ class GroupDetailsMenu extends IresMenu {
                         <div class="col-7">
                             <table class="table table-hover">
                                 <?php
-                                foreach ($responsables as $resp) { ?>
+                                foreach ($responsables as $resp) {
+                                    $fullName = $resp->first_name . " " .
+                                        $resp->last_name .
+                                        " (" . $resp->user_login . ")"; ?>
                                     <tr>
-                                        <td class="col-9">
-                                            <?php
-                                            $first_name = $resp->first_name;
-                                            $last_name = $resp->last_name;
-                                            echo $first_name . " " . $last_name;
-                                            ?>
-                                        </td>
+                                        <td class="col-9"><?php echo $fullName ?></td>
                                         <?php
                                         /**
                                          * Affichage des boutons modifier
@@ -193,7 +190,7 @@ class GroupDetailsMenu extends IresMenu {
                                                             value="<?php echo $resp->ID; ?>"
                                                             name="deleteResp"
                                                             class="btn btn-outline-danger btn-sm"
-                                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $first_name . " " . $last_name ?> ?');">
+                                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $fullName ?> ?');">
                                                         Supprimer
                                                     </button>
                                                 </form>
@@ -204,9 +201,9 @@ class GroupDetailsMenu extends IresMenu {
                                     <?php
                                 } // end foreach
                                 /**
-                                 * Affichage de l'ajout d'un nouveau responsable si le nb de responsable < 2
+                                 * Affichage de l'ajout d'un nouveau responsable si le nb de responsable < 3
                                  */
-                                if ((isset($_POST['modifResponsable']) && count($responsables) < 2) || count($responsables) === 0) { ?>
+                                if ((isset($_POST['modifResponsable']) && count($responsables) < 3) || count($responsables) === 0) { ?>
                                     <form action="" method="post">
                                         <tr>
                                             <td class="col-3">

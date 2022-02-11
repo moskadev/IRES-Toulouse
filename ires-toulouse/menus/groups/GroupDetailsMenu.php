@@ -81,25 +81,27 @@ class GroupDetailsMenu extends IresMenu {
                 if ($deletedResponsable !== false && $group->removeResponsable($deletedResponsable)) {
                     $message = $deletedResponsable->user_login . " a été retiré des responsables du groupe.";
                     $type_message = "updated";
+
+                    ?>
+                    <form action="" method="post" id="message">
+                        <input type="hidden" name="message"
+                               value="<?php echo $message ?>">
+                        <input type="hidden" name="type"
+                               value="<?php echo $type_message ?>">
+                    </form>
+
+                    <!-- Envoi du formulaire caché -->
+                    <script type="text/javascript">
+                        document.getElementById('message').submit(); // SUBMIT FORM
+                    </script>
+                    <?php
                 }
-                ?>
-
-                <form action="" method="post" id="message">
-                    <input type="hidden" name="message" value="<?php echo $message ?>">
-                    <input type="hidden" name="type" value="<?php echo $type_message ?>">
-                </form>
-
-                <!-- Envoi du formulaire caché -->
-                <script type="text/javascript">
-                    document.getElementById('message').submit(); // SUBMIT FORM
-                </script>
-                <?php
             }
 
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (isset ($_POST['submitResponsable'])) {
+            if (isset($_POST['submitResponsable']) && isset($_POST['nameResponsable'])) {
                 $newResponsableLogin = $_POST['nameResponsable'];
 
                 $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il est déjà responsable.";
@@ -119,13 +121,15 @@ class GroupDetailsMenu extends IresMenu {
                     <input type="hidden" name="message" value="<?php echo $message ?>">
                     <input type="hidden" name="type" value="<?php echo $type_message ?>">
                 </form>
-
-                <!-- Envoi du formulaire caché -->
-                <script type="text/javascript">
-                    document.getElementById('message').submit(); // SUBMIT FORM
-                </script>
                 <?php
-            }
+            } ?>
+
+            <!-- Envoi du formulaire caché -->
+            <script type="text/javascript">
+                document.getElementById('message').submit(); // SUBMIT FORM
+            </script>
+
+            <?php
 
             /*
              * Affichage d'un message
@@ -183,8 +187,8 @@ class GroupDetailsMenu extends IresMenu {
                                          * Affichage des boutons modifier
                                          */
                                         if (isset($_POST['modifResponsable'])) { ?>
-                                            <form action="" method="post">
-                                                <td class="col-3">
+                                            <td class="col-3">
+                                                <form action="" method="post">
                                                     <button type="submit"
                                                             value="<?php echo $resp->ID; ?>"
                                                             name="deleteResp"
@@ -192,8 +196,8 @@ class GroupDetailsMenu extends IresMenu {
                                                             onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $first_name . " " . $last_name ?> ?');">
                                                         Supprimer
                                                     </button>
-                                                </td>
-                                            </form>
+                                                </form>
+                                            </td>
                                             <?php
                                         } ?>
                                     </tr> <!-- Fin de ligne pour chaque responsable -->
@@ -203,21 +207,20 @@ class GroupDetailsMenu extends IresMenu {
                                  * Affichage de l'ajout d'un nouveau responsable si le nb de responsable < 2
                                  */
                                 if ((isset($_POST['modifResponsable']) && count($responsables) < 2) || count($responsables) === 0) { ?>
-                                    <tr>
-                                        <form action="" method="post">
+                                    <form action="" method="post">
+                                        <tr>
                                             <td class="col-3">
                                                 <input type="text" class="col-5"
-                                                       placeholder="Nouveau repsonsable"
+                                                       placeholder="Nouveau responsable"
                                                        name="nameResponsable"
-                                                       id="nameResponsable">
                                             </td>
                                             <td class="col-3">
                                                 <button class="btn btn-primary"
                                                         name="submitResponsable">Ajouter
                                                 </button>
                                             </td>
-                                        </form>
-                                    </tr>
+                                        </tr>
+                                    </form>
                                     <?php
                                 } ?>
                             </table>
@@ -225,7 +228,9 @@ class GroupDetailsMenu extends IresMenu {
                         <?php /**
                          * Affichage du bouton "Modifier" pour changer les responsables
                          */
-                        if (!isset($_POST['modifResponsable']) && current_user_can('administrator') && count($responsables) > 0) { ?>
+                        if (!isset($_POST['modifResponsable']) &&
+                            current_user_can('administrator') &&
+                            count($responsables) > 0) { ?>
                             <div class="col">
                                 <button type="submit" value="" name="modifResponsable"
                                         class="btn btn-outline-secondary btn-sm">Modifier
@@ -283,11 +288,13 @@ class GroupDetailsMenu extends IresMenu {
             <!-- Affichage de la liste des membres du groupe -->
             <table class="table table-striped table-hover">
                 <thead>
-                <th scope="row">Nom</th>
-                <th scope="row">Prénom</th>
-                <th scope="row">Identifiant</th>
-                <th scope="row"></th>
-                <th scope="row"></th>
+                <tr>
+                    <th scope="row">Nom</th>
+                    <th scope="row">Prénom</th>
+                    <th scope="row">Identifiant</th>
+                    <th scope="row"></th>
+                    <th scope="row"></th>
+                </tr>
                 </thead>
                 <tbody> <?php // Affichage de tous les utilisateurs du groupe
                 foreach ($members as $user) {

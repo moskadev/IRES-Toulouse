@@ -159,7 +159,7 @@ class Group extends IresElement {
      * @return WP_User[] all the id of the users
      */
     public static function getVisibleUsers(WP_User $from) {
-        if (in_array("administrator", $from->roles)) {
+        if (user_can($from, "administrator")) {
             return get_users();
         }
         $users = [];
@@ -167,8 +167,8 @@ class Group extends IresElement {
             $users = array_merge($users, $group->getUsers());
         }
         $users = array_filter($users, function ($u) use ($from) {
-            return !in_array("administrator", (array) $u->roles) ||
-                !in_array("responsable", $u->roles);
+            return !user_can($u, "administrator") ||
+                !user_can($u, "responsable");
         });
         if (!in_array($from, $users)) {
             $users[] = $from;

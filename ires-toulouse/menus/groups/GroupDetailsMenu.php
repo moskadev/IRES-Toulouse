@@ -316,7 +316,7 @@ class GroupDetailsMenu extends IresMenu {
                                     <?php
                                     if (current_user_can('administrator') ||
                                     (current_user_can('responsable') && $group->isUserResponsable(wp_get_current_user()))) { ?>
-                                    <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=profil_ires"
+                                    <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=mon_profil_ires"
                                           method="post">
                                         <input type="hidden" name="editingUserId"
                                                value="<?php echo $user->ID; ?>">

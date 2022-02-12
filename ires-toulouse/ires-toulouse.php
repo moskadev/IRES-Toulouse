@@ -68,3 +68,9 @@ add_action("admin_enqueue_scripts", function () {
     wp_enqueue_script("ires-script-fields", "/wp-content/plugins/ires-toulouse/js/fields.js", [], false, true);
 });
 
+function changeName() {
+    global $submenu;
+    $submenu['comptes_ires'][0][0] = "Tous les comptes IRES";
+}
+
+add_action("admin_menu", "changeName");

@@ -38,15 +38,8 @@ class GroupListMenu extends IresMenu {
                             <label for="addGroup">Ajouter un groupe :</label>
                         </div>
                         <div class="col">
-                            <input type="text" id="addGroup" class="form-control h-100"
+                            <input type="text" id="addGroup" class="to-fill"
                                    name="nameAddGroup" placeholder="Nom du groupe">
-                        </div>
-                        <div class="col">
-                            <select class="form-control h-100" name="typeAddGroup"> <?php
-                                foreach (Group::TYPE_NAMES as $type => $name){?>
-                                    <option value="<?php echo $type?>"><?php echo $name?></option>
-                                <?php }
-                            ?></select>
                         </div>
                         <div class="col">
                             <input type="submit" name="addGroup" value="Ajouter"
@@ -72,9 +65,9 @@ class GroupListMenu extends IresMenu {
                 <thead>
                 <tr>
                     <th scope="col">Nom</th>
-                    <th scope="col">Type</th>
                     <th scope="col">Responsable(s)</th>
                     <th scope="col">Date de création</th>
+                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -97,9 +90,9 @@ class GroupListMenu extends IresMenu {
             <thead>
             <tr>
                 <th scope="col">Nom</th>
-                <th scope="col">Type</th>
                 <th scope="col">Responsable(s)</th>
                 <th scope="col">Date de création</th>
+                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
@@ -127,10 +120,10 @@ class GroupListMenu extends IresMenu {
             if (count($groups) > 9) { ?>
                 <tfoot>
                 <tr>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Responsable(s)</th>
-                    <th scope="col">Date de création</th>
+                    <td>Nom</td>
+                    <td>Responsable</td>
+                    <td>Date de création</td>
+                    <td></td>
                 </tr>
                 </tfoot>
             <?php } // endif ?>
@@ -169,15 +162,14 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup']) && isset($_POST['typeAddGroup'])) {
-            $message = "Impossible de créer le groupe " . esc_attr($_POST['nameAddGroup']);
+        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup'])) {
+            $message = "Impossible de créer le groupe.";
             $type_message = "error";
 
             Group::createTable();
-            if (Group::register(esc_attr($_POST['nameAddGroup']), intval(esc_attr($_POST['typeAddGroup'])))) {
+            if (Group::register(esc_attr($_POST['nameAddGroup']))) {
                 $type_message = "updated";
-                $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
-                    ", dénommé " . $_POST['nameAddGroup'] . ", a été créé.";
+                $message = "Le groupe " . $_POST['nameAddGroup'] . " a été créé.";
             }
             ?>
             <form action="" method="post" id="message">
@@ -224,13 +216,18 @@ class GroupListMenu extends IresMenu {
                     <?php echo $group->getName() ?>
                 </a>
             </th>
-            <!-- Group's type -->
-            <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
-            <!-- Name of the users in charge of the group -->
-            <td> <?php
-                echo implode(", ", array_map(function($u) {
-                    return $u->first_name . " " . $u->last_name;
-                }, $responsables));  ?>
+            <!-- Name of the user in charge of the group -->
+            <td class="">
+                <?php
+                $i = 0;
+                foreach ($responsables as $resp) {
+                    $i ++;
+                    echo $resp->first_name . " " . $resp->last_name;
+                    if (count($responsables) > 1 && $i < count($responsables)) {
+                        echo ", ";
+                    }
+                }
+                ?>
             </td>
             <!-- Date -->
             <td>

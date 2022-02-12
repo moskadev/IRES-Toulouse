@@ -2,17 +2,12 @@ h1 {
     margin-bottom: 30px !important;
 }
 
+h2, .title-label {
+    margin-top: 40px !important;
+}
+
 .title-label {
-    margin-top: 50px !important;
-    font-size: 1.7em !important;
-}
-
-.groups-data th, .groups-data td {
-    font-size: 17px !important;
-}
-
-h2 {
-    margin-top: 30px !important;
+    font-size: 2em !important;
 }
 
 .disabled {
@@ -21,4 +16,8 @@ h2 {
 
 .verifiy-form select[multiple] {
     height: 200px !important;
+}
+
+.hide-info {
+    display: none;
 }

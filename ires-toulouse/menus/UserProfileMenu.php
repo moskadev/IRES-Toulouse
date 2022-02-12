@@ -147,7 +147,7 @@ class UserProfileMenu extends IresMenu {
                         <?php if (!$isLabel) { ?>
                             <td>
                                 <?php
-                                if ($formType === "text") { ?>
+                                if (in_array($formType, ["text", "email"])) { ?>
                                     <input <?php echo Dataset::allFrom($data) ?>
                                             class="form-control"
                                             type='<?php echo htmlspecialchars($formType) ?>'
@@ -155,39 +155,6 @@ class UserProfileMenu extends IresMenu {
                                             name='<?php echo $dataId ?>'
                                             value='<?php echo htmlspecialchars($data->getValue($editingUser)); ?>'>
                                     <?php
-                                } else if($formType === "table" && $dataId === "groupes"){
-                                    $groups = $data->getExtraData($editingUser);
-                                    if(count($groups) > 0){ ?>
-                                        <table class="table groups-data">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Nom du groupe</th>
-                                                    <th scope="col">Type du groupe</th>
-                                                    <th scope="col">Responsables</th>
-                                                    <th scope="col">Responsable de ce groupe</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody> <?php
-                                                /** @var Group $group */
-                                                foreach ($groups as $group){
-                                                    $respNames = array_map(function($u) {
-                                                        return $u->first_name . " " . $u->last_name;
-                                                    }, $group->getResponsables()); ?>
-                                                    <tr>
-                                                        <td><a class="text-decoration-none"
-                                                               href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
-                                                                <?php echo $group->getName() ?></a></td>
-                                                        <td><?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
-                                                        <td><?php echo implode(", ", $respNames)?></td>
-                                                        <td><?php echo $group->isUserResponsable($editingUser) ?
-                                                                "Oui" : "Non" ?></td>
-                                                    </tr>
-                                                <?php }
-                                            ?> </tbody>
-                                        </table> <?php
-                                    } else { ?>
-                                        <p>Vous n'appartenez à aucun groupe</p>
-                                    <?php }
                                 } else if ($formType === "radio") {
                                     $value = filter_var($data->getValue($editingUser),
                                         FILTER_VALIDATE_BOOLEAN); ?>

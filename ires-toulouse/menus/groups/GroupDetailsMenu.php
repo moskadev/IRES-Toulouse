@@ -81,33 +81,31 @@ class GroupDetailsMenu extends IresMenu {
                 if ($deletedResponsable !== false && $group->removeResponsable($deletedResponsable)) {
                     $message = $deletedResponsable->user_login . " a été retiré des responsables du groupe.";
                     $type_message = "updated";
-
-                    ?>
-                    <form action="" method="post" id="message">
-                        <input type="hidden" name="message"
-                               value="<?php echo $message ?>">
-                        <input type="hidden" name="type"
-                               value="<?php echo $type_message ?>">
-                    </form>
-
-                    <!-- Envoi du formulaire caché -->
-                    <script type="text/javascript">
-                        document.getElementById('message').submit(); // SUBMIT FORM
-                    </script>
-                    <?php
                 }
+                ?>
+
+                <form action="" method="post" id="message">
+                    <input type="hidden" name="message" value="<?php echo $message ?>">
+                    <input type="hidden" name="type" value="<?php echo $type_message ?>">
+                </form>
+
+                <!-- Envoi du formulaire caché -->
+                <script type="text/javascript">
+                    document.getElementById('message').submit(); // SUBMIT FORM
+                </script>
+                <?php
             }
 
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (isset($_POST['submitResponsable']) && isset($_POST['nameResponsable'])) {
+            if (isset ($_POST['submitResponsable'])) {
                 $newResponsableLogin = $_POST['nameResponsable'];
 
                 $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il est déjà responsable.";
                 $type_message = "error";
-                if (count($responsables) >= 3) {
-                    $message = "Erreur, il ne peut y avoir plus de 3 responsables.";
+                if (count($responsables) >= 2) {
+                    $message = "Erreur, il ne peut y avoir plus de 2 responsables.";
                     $type_message = "error";
                 } else if (!($newResponsable = get_user_by("login", $newResponsableLogin))) {
                     $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il n'existe pas.";
@@ -121,15 +119,13 @@ class GroupDetailsMenu extends IresMenu {
                     <input type="hidden" name="message" value="<?php echo $message ?>">
                     <input type="hidden" name="type" value="<?php echo $type_message ?>">
                 </form>
+
+                <!-- Envoi du formulaire caché -->
+                <script type="text/javascript">
+                    document.getElementById('message').submit(); // SUBMIT FORM
+                </script>
                 <?php
-            } ?>
-
-            <!-- Envoi du formulaire caché -->
-            <script type="text/javascript">
-                document.getElementById('message').submit(); // SUBMIT FORM
-            </script>
-
-            <?php
+            }
 
             /*
              * Affichage d'un message
@@ -173,51 +169,55 @@ class GroupDetailsMenu extends IresMenu {
                         <div class="col-7">
                             <table class="table table-hover">
                                 <?php
-                                foreach ($responsables as $resp) {
-                                    $fullName = $resp->first_name . " " .
-                                        $resp->last_name .
-                                        " (" . $resp->user_login . ")"; ?>
+                                foreach ($responsables as $resp) { ?>
                                     <tr>
-                                        <td class="col-9"><?php echo $fullName ?></td>
+                                        <td class="col-9">
+                                            <?php
+                                            $first_name = $resp->first_name;
+                                            $last_name = $resp->last_name;
+                                            echo $first_name . " " . $last_name;
+                                            ?>
+                                        </td>
                                         <?php
                                         /**
                                          * Affichage des boutons modifier
                                          */
                                         if (isset($_POST['modifResponsable'])) { ?>
-                                            <td class="col-3">
-                                                <form action="" method="post">
+                                            <form action="" method="post">
+                                                <td class="col-3">
                                                     <button type="submit"
                                                             value="<?php echo $resp->ID; ?>"
                                                             name="deleteResp"
                                                             class="btn btn-outline-danger btn-sm"
-                                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $fullName ?> ?');">
+                                                            onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $first_name . " " . $last_name ?> ?');">
                                                         Supprimer
                                                     </button>
-                                                </form>
-                                            </td>
+                                                </td>
+                                            </form>
                                             <?php
                                         } ?>
                                     </tr> <!-- Fin de ligne pour chaque responsable -->
                                     <?php
                                 } // end foreach
                                 /**
-                                 * Affichage de l'ajout d'un nouveau responsable si le nb de responsable < 3
+                                 * Affichage de l'ajout d'un nouveau responsable si le nb de responsable < 2
                                  */
-                                if ((isset($_POST['modifResponsable']) && count($responsables) < 3) || count($responsables) === 0) { ?>
-                                    <form action="" method="post">
-                                        <tr>
+                                if ((isset($_POST['modifResponsable']) && count($responsables) < 2) || count($responsables) === 0) { ?>
+                                    <tr>
+                                        <form action="" method="post">
                                             <td class="col-3">
                                                 <input type="text" class="col-5"
-                                                       placeholder="Nouveau responsable"
+                                                       placeholder="Nouveau repsonsable"
                                                        name="nameResponsable"
+                                                       id="nameResponsable">
                                             </td>
                                             <td class="col-3">
                                                 <button class="btn btn-primary"
                                                         name="submitResponsable">Ajouter
                                                 </button>
                                             </td>
-                                        </tr>
-                                    </form>
+                                        </form>
+                                    </tr>
                                     <?php
                                 } ?>
                             </table>
@@ -225,9 +225,7 @@ class GroupDetailsMenu extends IresMenu {
                         <?php /**
                          * Affichage du bouton "Modifier" pour changer les responsables
                          */
-                        if (!isset($_POST['modifResponsable']) &&
-                            current_user_can('administrator') &&
-                            count($responsables) > 0) { ?>
+                        if (!isset($_POST['modifResponsable']) && current_user_can('administrator') && count($responsables) > 0) { ?>
                             <div class="col">
                                 <button type="submit" value="" name="modifResponsable"
                                         class="btn btn-outline-secondary btn-sm">Modifier
@@ -285,13 +283,11 @@ class GroupDetailsMenu extends IresMenu {
             <!-- Affichage de la liste des membres du groupe -->
             <table class="table table-striped table-hover">
                 <thead>
-                <tr>
-                    <th scope="row">Nom</th>
-                    <th scope="row">Prénom</th>
-                    <th scope="row">Identifiant</th>
-                    <th scope="row"></th>
-                    <th scope="row"></th>
-                </tr>
+                <th scope="row">Nom</th>
+                <th scope="row">Prénom</th>
+                <th scope="row">Identifiant</th>
+                <th scope="row"></th>
+                <th scope="row"></th>
                 </thead>
                 <tbody> <?php // Affichage de tous les utilisateurs du groupe
                 foreach ($members as $user) {

@@ -91,7 +91,19 @@ class UserConnection extends Controller {
     public function countSameLogins() : int {
         return count(get_users([
             "search" => $this->getOriginalLogin() . "*",
-            "search_columns" => ["user_login"]])
+            "search_columns" => ["user_login"]
+        ])
         );
+    }
+
+    /**
+     * @param string $subject
+     * @param string $message
+     *
+     * @return bool true if success
+     */
+    public function sendEmail(string $subject, string $message) : bool {
+        //todo
+        return true;
     }
 }

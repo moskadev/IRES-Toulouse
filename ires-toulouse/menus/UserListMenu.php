@@ -3,6 +3,7 @@
 namespace menus;
 
 use irestoulouse\menus\IresMenu;
+use stdClass;
 
 class UserListMenu extends IresMenu {
     public function __construct() {
@@ -24,28 +25,41 @@ class UserListMenu extends IresMenu {
         }
 
         ?>
-        <table>
-            <tr>
-                <td>
-                    <form action="<?php echo get_site_url()."/wp-admin/admin.php?page=ajouter_un_compte"; ?>" method="post">
-                        <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
-                            <p class="search-box">
-                                <input class="button-secondary" type="submit" value="Ajouter un membre"/>
-                            </p>
-                        <?php   }?>
-                    </form>
-                </td>
-                <td>
-                    <form method="get">
-                        <p class="search-box">
-                            <input type="search" id="search">
-                            <input class="button-secondary" type="submit" value="Recher des comptes"/>
+        <div class="grid-container">
+            <div class="form-add-member">
+                <form action="<?php echo get_site_url()."/wp-admin/admin.php?page=ajouter_un_compte"; ?>" method="post">
+                    <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
+                        <p class="add-member">
+                            <input class="button-secondary" type="submit" value="Ajouter un membre"/>
                         </p>
-                    </form>
-                </td>
-            </tr>
-        </table>
+                    <?php   }?>
+                </form>
+            </div>
+            <div class="search">
+                <form action="" method="get">
+                    <p class="search-box">
+                        <input type="search" id="search" name="search">
+                        <input class="button-secondary" type="submit" value="Rechercher des comptes"/>
+                    </p>
+                </form>
+            </div>
+        </div>
 
+        <div class="popup-delete" id="popup-delete">
+            <div class="popup-header">
+                <div class="title">Suppression de : Nom Prénom</div>
+                <button data-close-button class="close-button">&times;</button>
+            </div>
+            <div class="popup-body">
+                Êtes-vous sur de vouloir supprimer ce compte ?
+                <form action="" method="post">
+
+                    <input class="button-primary" name="delete" type="submit" value="Confirmer"/>
+                    <input class="button-secondary" data-close-button type="button" value="Annuler"/>
+                </form>
+            </div>
+        </div>
+        <div id="overlay"></div>
         <table class="widefat">
             <thead>
                 <tr>
@@ -69,11 +83,8 @@ class UserListMenu extends IresMenu {
             <tbody>
             <?php
             $counter = 0;
-            $users = self::getAllMembers();
-            foreach ($users as $user) {
-                $user->first_name = get_user_meta($user->ID, 'first_name')[0];
-                $user->last_name = get_user_meta($user->ID, 'last_name')[0];
-            }
+
+            $users = self::getAllMembers($_GET['search'] ?? '');
 
             // Sorting of the users
             if (isset($_GET['orderby']) && $_GET['orderby'] === 'last_name') { // Sorting by last name
@@ -96,12 +107,19 @@ class UserListMenu extends IresMenu {
                         <?php echo $user->last_name; ?>
                         <br/>
                         <span id="hide-info">
-                            <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
-                                <a href="">Modifier</a>&emsp;
-                            <?php   } if (current_user_can('administrator')) { ?>
-                                <a href="" onclick="submitDeletion()" class="delete">Supprimer</a>&emsp;
-                            <?php   }?>
-                            <a href="">Voir</a>
+                            <form method="post">
+                                <input type="hidden" name="user_id" value="<?php echo $user->ID; ?>">
+                                <input type="hidden" name="user_login" value="<?php echo $user->user_login; ?>">
+                                <input type="hidden" name="user_email" value="<?php echo $user->user_email; ?>">
+                                <input type="hidden" name="first_name" value="<?php echo $user->first_name; ?>">
+                                <input type="hidden" name="last_name" value="<?php echo $user->last_name; ?>">
+                                <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
+                                    <a href="">Modifier</a>&emsp;
+                                <?php   } if (current_user_can('administrator')) { ?>
+                                    <button type="button" data-popup-target="#popup-delete" class="delete">Supprimer</button>&emsp;
+                                <?php   }?>
+                                <a href="">Voir</a>
+                            </form>
                         </span>
                     </td> <!-- Last name -->
                     <td class=""><?php echo $user->first_name; ?></td> <!-- First name -->
@@ -130,46 +148,49 @@ class UserListMenu extends IresMenu {
         <?php
     }
 
-
-    private function getAllMembers() {
+    /**
+     * @param string $search
+     * @return array
+     */
+    private function getAllMembers(string $search): array {
         global $wpdb;
-        $sql = "SELECT ID, user_login, user_email FROM {$wpdb->prefix}users";
-        return $wpdb->get_results($wpdb->prepare($sql));
+        $search = strtolower($search);
+        $sql = "SELECT ID, user_login, user_email FROM {$wpdb->prefix}users WHERE ID != 1";
+        $sql2 = "SELECT user_id, meta_value FROM {$wpdb->prefix}usermeta WHERE meta_key = 'first_name' AND user_id != 1";
+        $sql3 = "SELECT user_id, meta_value FROM {$wpdb->prefix}usermeta WHERE meta_key = 'last_name' AND user_id != 1";
+        $logins = $wpdb->get_results($wpdb->prepare($sql));
+        $first_name = $wpdb->get_results($wpdb->prepare($sql2));
+        $last_name = $wpdb->get_results($wpdb->prepare($sql3));
+
+        foreach ($logins as $login) {
+            foreach ($first_name as $a)
+                if ($login->ID === $a->user_id)
+                    $login->first_name = $a->meta_value;
+            foreach ($last_name as $b)
+                if ($login->ID === $b->user_id)
+                    $login->last_name = $b->meta_value;
+        }
+
+        $results = [];
+        foreach($logins as $login) {
+            if (str_contains(strtolower($login->first_name), $search) ||
+                str_contains(strtolower($login->last_name), $search) ||
+                str_contains(strtolower($login->user_login), $search) ||
+                str_contains(strtolower($login->user_email), $search)) {
+                $array = new stdClass();
+                $array->ID = $login->ID;
+                $array->first_name = $login->first_name;
+                $array->last_name = $login->last_name;
+                $array->user_login = $login->user_login;
+                $array->user_email = $login->user_email;
+                array_push($results, $array);
+            }
+        }
+        return $results;
     }
 
-    private function sens() {
+    private function sens(): string {
         return (isset($_GET['order']) && $_GET['order'] === "asc") ? "desc" : "asc";
     }
 }
 ?>
-<script type="text/javascript">
-    function submitDeletion() {
-        let form = document.getElementById('deleteMember');
-        if (confirm("Etes vous sur de vouloir supprimer ?")) {
-            form.submit();
-        }
-    }
-</script>
-<style>
-    #hide-info {
-        display: none;
-    }
-    #line {
-        height: 5vw;
-    }
-    #line:hover #hide-info {
-        display: inherit;
-    }
-    .name {
-        width: 25%;
-    }
-    .delete {
-        color: #d63638;
-    }
-    .delete:hover {
-        color: #8a2424;
-    }
-    align-right {
-        margin-left: 50px;
-    }
-</style>

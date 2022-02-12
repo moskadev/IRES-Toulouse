@@ -22,6 +22,7 @@ class GroupDetailsMenu extends IresMenu {
     public function getContent() : void {
         $group = Group::fromId($_GET["group"]);
         if ($group !== null) {
+            $message = $type_message = "";
             /*
              * Poste un message si un membre est ajouté
              */
@@ -36,21 +37,7 @@ class GroupDetailsMenu extends IresMenu {
                     $message = "L'utilisateur $newMemberLogin a été ajouté au groupe " . $group->getName() . ".";
                     $type_message = "updated";
                 }
-                ?>
-                <form action="" method="post" id="message">
-                    <input type="hidden" name="message" value="<?php echo $message ?>">
-                    <input type="hidden" name="type" value="<?php echo $type_message ?>">
-                </form>
-
-                <!-- Envoi du formulaire caché -->
-                <script type="text/javascript">
-                    document.getElementById('message').submit(); // SUBMIT FORM
-                </script>
-                <?php
             }
-
-            $members = $group->getUsers();
-            $responsables = $group->getResponsables();
 
             /*
              * Poste un message si un membre est retiré du groupe
@@ -60,17 +47,6 @@ class GroupDetailsMenu extends IresMenu {
 
                 $message = "L'utilisateur a été supprimé du groupe.";
                 $type_message = "updated";
-                ?>
-                <form action="" method="post" id="message">
-                    <input type="hidden" name="message" value="<?php echo $message ?>">
-                    <input type="hidden" name="type" value="<?php echo $type_message ?>">
-                </form>
-
-                <!-- Envoi du formulaire caché -->
-                <script type="text/javascript">
-                    document.getElementById('message').submit(); // SUBMIT FORM
-                </script>
-                <?php
             }
 
             /*
@@ -81,67 +57,35 @@ class GroupDetailsMenu extends IresMenu {
                 if ($deletedResponsable !== false && $group->removeResponsable($deletedResponsable)) {
                     $message = $deletedResponsable->user_login . " a été retiré des responsables du groupe.";
                     $type_message = "updated";
-
-                    ?>
-                    <form action="" method="post" id="message">
-                        <input type="hidden" name="message"
-                               value="<?php echo $message ?>">
-                        <input type="hidden" name="type"
-                               value="<?php echo $type_message ?>">
-                    </form>
-
-                    <!-- Envoi du formulaire caché -->
-                    <script type="text/javascript">
-                        document.getElementById('message').submit(); // SUBMIT FORM
-                    </script>
-                    <?php
                 }
             }
 
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (isset($_POST['submitResponsable']) && isset($_POST['nameResponsable'])) {
-                $newResponsableLogin = $_POST['nameResponsable'];
+            if (isset($_POST['submitResponsable'])) {
+                $newResponsableLogin = $_POST['submitResponsable'];
 
                 $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il est déjà responsable.";
                 $type_message = "error";
-                if (count($responsables) >= 3) {
+
+                if (count($group->getResponsables()) >= 3) {
                     $message = "Erreur, il ne peut y avoir plus de 3 responsables.";
                     $type_message = "error";
                 } else if (!($newResponsable = get_user_by("login", $newResponsableLogin))) {
                     $message = "Erreur, l'identifiant $newResponsableLogin n'a pas pu être ajouté car il n'existe pas.";
-                } else if ($group->addResponsable($newResponsable)) {
+                } else if ($d = $group->addResponsable($newResponsable)) {
                     $message = "L'identifiant $newResponsableLogin a été ajouté en tant que responsable du groupe {$group->getName()}.";
                     $type_message = "updated";
                 }
-                ?>
+            }
 
-                <form action="" method="post" id="message">
-                    <input type="hidden" name="message" value="<?php echo $message ?>">
-                    <input type="hidden" name="type" value="<?php echo $type_message ?>">
-                </form>
-                <?php
-            } ?>
-
-            <!-- Envoi du formulaire caché -->
-            <script type="text/javascript">
-                document.getElementById('message').submit(); // SUBMIT FORM
-            </script>
-
-            <?php
-
-            /*
-             * Affichage d'un message
-             */
-            if (isset($_POST['message']) && isset($_POST['type'])) { ?>
-                <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
-                <div id="message"
-                     class="<?php echo $_POST['type']; ?> notice is-dismissible">
-                    <p><strong><?php echo stripslashes($_POST['message']); ?></strong></p>
-                </div>
-                <?php
-            } ?>
+            if(!empty($message) && !empty($type_message)){ ?>
+                <div id="message" class="<?php echo $type_message ?> notice is-dismissible">
+                    <p><strong><?php echo $message ?></strong></p>
+                </div><?php
+            }
+            $responsables = $group->getResponsables();  ?>
 
             <!-- Bouton retour & titre de la page -->
             <div class="row">
@@ -209,12 +153,10 @@ class GroupDetailsMenu extends IresMenu {
                                             <td class="col-3">
                                                 <input type="text" class="col-5"
                                                        placeholder="Nouveau responsable"
-                                                       name="nameResponsable"
+                                                       name="submitResponsable"
                                             </td>
                                             <td class="col-3">
-                                                <button class="btn btn-primary"
-                                                        name="submitResponsable">Ajouter
-                                                </button>
+                                                <button class="btn btn-primary">Ajouter</button>
                                             </td>
                                         </tr>
                                     </form>
@@ -294,7 +236,7 @@ class GroupDetailsMenu extends IresMenu {
                 </tr>
                 </thead>
                 <tbody> <?php // Affichage de tous les utilisateurs du groupe
-                foreach ($members as $user) {
+                foreach ($group->getUsers() as $user) {
                     $first_name = $user->first_name;
                     $last_name = $user->last_name; ?>
                     <tr class="<?php if (get_current_user_id() === $user->ID) {

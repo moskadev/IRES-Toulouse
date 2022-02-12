@@ -53,6 +53,12 @@ class UserProfileMenu extends IresMenu {
     /** @var WP_User */
     private WP_User $lastRegisteredUser;
 
+    /** @var WP_User */
+    private WP_User $editingUser;
+
+    /** @var bool */
+    private bool $disableAll = true;
+
     /**
      * Constructing the menu and link to the admin page
      */
@@ -66,6 +72,7 @@ class UserProfileMenu extends IresMenu {
         $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
         $this->lastRegisteredUser = Identifier::getLastRegisteredUser($this->visibleUsers)
             ?? wp_get_current_user();
+        $this->disableAll = intval($_POST["confirm-modify"] ?? true);
     }
 
     /**
@@ -76,7 +83,7 @@ class UserProfileMenu extends IresMenu {
             current_user_can('administrator');
 
         if (count($this->visibleUsers) > 0) {
-            $editingUser = isset($_POST["editingUserId"]) ?
+            $this->editingUser = isset($_POST["editingUserId"]) ?
                 get_userdata($_POST["editingUserId"] ?? get_current_user_id()) :
                 $this->lastRegisteredUser;
 
@@ -85,28 +92,28 @@ class UserProfileMenu extends IresMenu {
              * If responsable, verify if he's responsible for the user
              * else chose itself
              */
-            if (!in_array($editingUser, $this->visibleUsers)) {
-                $editingUser = wp_get_current_user(); ?>
+            if (!in_array($this->editingUser, $this->visibleUsers)) {
+                $this->editingUser = wp_get_current_user(); ?>
                 <div id="message" class="error notice is-dismissible">
                     <p><strong>Vous n'avez pas la permission de modifier cet
                             utilisateur.</strong></p>
                 </div>
             <?php }
         } else {
-            $editingUser = wp_get_current_user();
+            $this->editingUser = wp_get_current_user();
         }
-        
+
         if (isset($_POST["action"]) && $_POST["action"] == "modifyuser") {
             try {
                 UserInputData::checkSentData();
                 foreach ($_POST as $dataId => $dataValue){
                     if(($data = UserData::fromId($dataId)) !== null){
-                        $data->updateValue($dataValue, $editingUser);
+                        $data->updateValue($dataValue, $this->editingUser);
                     }
                 }?>
                 <div id="message" class="updated notice is-dismissible">
                     <p><strong>Modification des informations de l'utilisateur
-                            <?php echo $editingUser->user_login ?> ont été bien
+                            <?php echo $this->editingUser->user_login ?> ont été bien
                             effectuées </strong></p>
                 </div> <?php
             } catch (Exception $e) { ?>
@@ -117,13 +124,16 @@ class UserProfileMenu extends IresMenu {
         }
 
         if ($isResp) {
-            $this->chooseUserForm($editingUser);
-        } ?>
+            $this->chooseUserForm();
+        }
+        $this->showModificationBtn(); ?>
 
         <form method='post' name='modify-user' id='modify-user'
               class='verifiy-form validate' novalidate='novalidate'>
-            <input name='editingUserId' type='hidden'
-                   value='<?php echo $editingUser->ID ?>'>
+            <?php
+            $this->saveEditedUser();
+            $this->saveConfirmModification();
+            ?>
             <input name='action' type='hidden' value='modifyuser'>
             <table class='form-table' role='presentation'><?php
                 foreach (UserData::all() as $data) {
@@ -153,10 +163,11 @@ class UserProfileMenu extends IresMenu {
                                             type='<?php echo htmlspecialchars($formType) ?>'
                                             id='<?php echo $dataId ?>'
                                             name='<?php echo $dataId ?>'
-                                            value='<?php echo htmlspecialchars($data->getValue($editingUser)); ?>'>
+                                            value='<?php echo htmlspecialchars($data->getValue($this->editingUser)); ?>'
+                                            <?php if ($this->disableAll) echo "disabled" ?>>
                                     <?php
                                 } else if($formType === "table" && $dataId === "groupes"){
-                                    $groups = $data->getExtraData($editingUser);
+                                    $groups = $data->getExtraData($this->editingUser);
                                     if(count($groups) > 0){ ?>
                                         <table class="table groups-data">
                                             <thead>
@@ -179,25 +190,26 @@ class UserProfileMenu extends IresMenu {
                                                                 <?php echo $group->getName() ?></a></td>
                                                         <td><?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
                                                         <td><?php echo implode(", ", $respNames)?></td>
-                                                        <td><?php echo $group->isUserResponsable($editingUser) ?
+                                                        <td><?php echo $group->isUserResponsable($this->editingUser) ?
                                                                 "Oui" : "Non" ?></td>
                                                     </tr>
                                                 <?php }
                                             ?> </tbody>
                                         </table> <?php
                                     } else { ?>
-                                        <p>Vous n'appartenez à aucun groupe</p>
+                                        <p>L'utilisateur n'appartient à aucun groupe</p>
                                     <?php }
                                 } else if ($formType === "radio") {
-                                    $value = filter_var($data->getValue($editingUser),
-                                        FILTER_VALIDATE_BOOLEAN); ?>
+                                    $value = filter_var($data->getValue($this->editingUser),
+                                        FILTER_VALIDATE_BOOL); ?>
                                     Oui <input <?php echo Dataset::allFrom($data) ?>
                                             class="form-control"
                                             type="radio"
                                             id='<?php echo $dataId ?>_oui'
                                             name='<?php echo $dataId ?>'
                                             value="true"
-                                            <?php if ($value == true)echo "checked" ?>>
+                                            <?php if ($this->disableAll) echo "disabled" ?>
+                                            <?php if ($value) echo "checked" ?>>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     Non <input <?php echo Dataset::allFrom($data) ?>
                                             class="form-control"
@@ -205,14 +217,16 @@ class UserProfileMenu extends IresMenu {
                                             id='<?php echo $dataId ?>_non'
                                             name='<?php echo $dataId ?>'
                                             value="false"
-                                            <?php if ($value == false) echo "checked" ?>>
+                                            <?php if ($this->disableAll) echo "disabled" ?>
+                                            <?php if (!$value) echo "checked" ?>>
                                     <?php
                                 } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
                                     <select <?php if ($formType === "checklist")
                                         echo "multiple" ?>
                                             name='<?php echo $dataId ?>[]'
                                             class="form-control"
-                                            id='<?php echo $dataId ?>'> <?php
+                                            id='<?php echo $dataId ?>'
+                                            <?php if ($this->disableAll) echo "disabled" ?>> <?php
                                         /**
                                          * Extra data are checked individually and put in the dropdown or checklist
                                          * Multiple items can be selected for checklist, so we check if the user
@@ -221,7 +235,7 @@ class UserProfileMenu extends IresMenu {
                                         foreach ($data->getExtraData() as $extraDatum) { ?>
                                             <!-- value of the option -->
                                             <option value='<?php echo $extraDatum ?>'
-                                                <?php if ($data->containsExtraData($extraDatum, $editingUser))
+                                                <?php if ($data->containsExtraData($extraDatum, $this->editingUser))
                                                     echo "selected" ?>>
                                                 <!-- check if the extra data has been selected by the user -->
                                                 <?php echo $extraDatum ?>
@@ -238,18 +252,46 @@ class UserProfileMenu extends IresMenu {
                     </tr>
                     <?php
                 } ?>
-            </table>
-            <button class="btn btn-outline-primary menu-submit" type="submit"
-                    name="profile-page" id="profile-page-sub" disabled>
-                Modifier les informations
-            </button>
+            </table><?php
+            if (!$this->disableAll) { ?>
+                <button class="btn btn-outline-primary menu-submit" type="submit"
+                        name="profile-page" disabled>
+                    Modifier les informations
+                </button>
+            <?php } ?>
         </form> <?php
     }
 
-    /**
-     * @param WP_User $editingUser
-     */
-    public function chooseUserForm(WP_User $editingUser) { ?>
+    public function saveEditedUser() : void{ ?>
+        <input name='editingUserId' type='hidden'
+               value='<?php echo $this->editingUser->ID ?>'> <?php
+    }
+
+    public function saveConfirmModification(){ ?>
+        <input name='confirm-button' type='hidden'
+               value='<?php echo $this->disableAll ?>'> <?php
+    }
+
+    public function showModificationBtn() : void {
+        var_dump($_POST, $this->disableAll);?>
+        <form method='post' name='confirm-modify-user' id='confirm-modify-user'
+              class='validate' novalidate='novalidate'>
+            <?php $this->saveEditedUser(); ?>
+            <table class='form-table' role='presentation'>
+                <tr>
+                    <td>
+                        <button class="btn btn-primary menu-submit w-100" type="submit"
+                                name="confirm-modify" value="<?php echo !$this->disableAll ?>">
+                            <?php echo $this->disableAll ? "Déverrouiller" : "Verrouiller" ?> les modifications de l'utilisateur
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    <?php }
+
+
+    public function chooseUserForm() : void { ?>
         <form method='post' name='to-modify-user' id='to-modify-user'
               class='validate' novalidate='novalidate'>
             <table class='form-table' role='presentation'>
@@ -260,10 +302,11 @@ class UserProfileMenu extends IresMenu {
                         </label>
                     </th>
                     <td>
-                        <select name="editingUserId"><?php
+                        <select name="editingUserId" class="confirm-item form-control"><?php
                             foreach ($this->visibleUsers as $user) { ?>
-                                <option value='<?php echo $user->ID ?>' <?php if ($user->ID === $editingUser->ID)
-                                    echo "selected" ?>>
+                                <option value='<?php echo $user->ID ?>'
+                                    <?php if ($user->ID === $this->editingUser->ID)
+                                        echo "selected" ?>>
                                     <?php echo $user->user_login ?>
                                 </option>
                             <?php } ?>
@@ -271,13 +314,6 @@ class UserProfileMenu extends IresMenu {
                     </td>
                 </tr>
             </table>
-            <button class="btn btn-success" type="submit" id="to-modify-user-btn">
-                Modifier cet utilisateur
-            </button>
-            <p class='description'>Veuillez valider si vous avez sélectionné
-                un nouveau
-                utilisateur <?php if ($editingUser->ID === $this->lastRegisteredUser->ID)
-                    echo "(le dernier utilisateur créé a été sélectionné par défaut)" ?></p>
         </form>
     <?php }
 }

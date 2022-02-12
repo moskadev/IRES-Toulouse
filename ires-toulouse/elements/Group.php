@@ -82,12 +82,9 @@ class Group extends IresElement {
             self::fromName(strtolower($name)) === null
         ) {
             $db = Database::get();
-
-            $db->insert($db->prefix . "groups",
-                ["name" => $name, "type" => $type, "creator_id" => get_current_user_id()],
-                ["%s", "%d", "%d"]
-            );
-            return true;
+            return $db->insert($db->prefix . "groups",
+                ["name" => $name, "type" => $type, "creator_id" => get_current_user_id()]
+            ) !== false;
         }
         return false;
     }
@@ -146,12 +143,13 @@ class Group extends IresElement {
      */
     public static function delete(int $id) : bool {
         if (self::exists($id)) {
+            foreach (Group::fromId($id)->getResponsables() as $r){
+                $r->set_role("subscriber");
+            }
             $db = Database::get();
 
-            $db->delete($db->prefix . 'groups', ['id_group' => $id], ['%s']);
-            $db->get_results($db->prepare("DELETE FROM {$db->prefix}groups_users WHERE group_id = %d",
-                $id)
-            );
+            $db->delete($db->prefix . "groups", ["id_group" => $id]);
+            $db->delete($db->prefix . "groups_users", ["group_id" => $id]);
             return true;
         }
         return false;
@@ -303,20 +301,15 @@ class Group extends IresElement {
      * @return bool true if the responsable was added successfully
      */
     public function addResponsable(WP_User $user) : bool {
-        if (!$this->userExists($user)) {
-            $this->addUser($user, true);
-            $user->set_role("responsable");
-        }
+        $this->addUser($user);
         if (!$this->isUserResponsable($user)) {
             $db = Database::get();
-
-            $db->get_results($db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '1' WHERE user_id = %d AND group_id = %d",
-                $user->ID,
-                $this->id)
-            );
             $user->set_role("responsable");
 
-            return true;
+            return $db->update($db->prefix . "groups_users",
+                ["is_responsable" => "1"],
+                ["user_id" => $user->ID, "group_id" => $this->id]
+            ) !== false;
         }
         return false;
     }
@@ -367,17 +360,15 @@ class Group extends IresElement {
      * Ajoute l'utilisateur s'il n'est pas déjà présent et s'il existe
      *
      * @param WP_User $user
-     * @param bool $responsable
      *
      * @return bool
      */
-    public function addUser(WP_User $user, bool $responsable = false) : bool {
+    public function addUser(WP_User $user) : bool {
         if (!$this->userExists($user)) {
             $db = Database::get();
-            $db->get_results($db->prepare("INSERT INTO {$db->prefix}groups_users (user_id, group_id, is_responsable) VALUES (%d, %d, " . $responsable ? "'1'" : "'0'" . ")",
-                $user->ID, $this->id)
-            );
-            return true;
+            return $db->insert($db->prefix . "groups_users",
+                ["user_id" => $user->ID, "group_id" => $this->id, "is_responsable" => "0"]
+            ) !== false;
         }
         return false;
     }
@@ -391,17 +382,12 @@ class Group extends IresElement {
      */
     public function removeUser(WP_User $user) : bool {
         if ($this->userExists($user)) {
-            if ($this->isUserResponsable($user)) {
-                $this->removeResponsable($user);
-            }
+            $this->removeResponsable($user);
+
             $db = Database::get();
-            $db->query(
-                $db->prepare("DELETE FROM {$db->prefix}groups_users WHERE user_id = %d AND group_id = %d",
-                    $user->ID,
-                    $this->id
-                )
-            );
-            return true;
+            return $db->delete($db->prefix . "groups_users",
+                ["user_id" => $user->ID, "group_id" => $this->id]
+            ) !== false;
         }
         return false;
     }
@@ -413,18 +399,13 @@ class Group extends IresElement {
      */
     public function removeResponsable(WP_User $user) : bool {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
-            $db = Database::get();
+            $user->set_role("subscriber");
 
-            if (count(self::allWhereUserResponsable($user)) < 3) {
-                $user->set_role("subscriber");
-            }
-            $db->get_results(
-                $db->prepare("UPDATE {$db->prefix}groups_users SET is_responsable = '0' WHERE user_id = %d AND group_id = %d",
-                    $user->ID,
-                    $this->id
-                )
-            );
-            return true;
+            $db = Database::get();
+            return $db->update($db->prefix . "groups_users",
+                ["is_responsable" => "0"],
+                ["user_id" => $user->ID, "group_id" => $this->id]
+            ) !== false;
         }
         return false;
     }

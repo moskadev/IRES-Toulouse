@@ -144,7 +144,7 @@ class Group extends IresElement {
     public static function delete(int $id) : bool {
         if (self::exists($id)) {
             foreach (Group::fromId($id)->getResponsables() as $r){
-                $r->set_role("subscriber");
+                $r->remove_role("responsable");
             }
             $db = Database::get();
 
@@ -304,7 +304,7 @@ class Group extends IresElement {
         $this->addUser($user);
         if (!$this->isUserResponsable($user)) {
             $db = Database::get();
-            $user->set_role("responsable");
+            $user->add_role("responsable");
 
             return $db->update($db->prefix . "groups_users",
                 ["is_responsable" => "1"],
@@ -399,7 +399,7 @@ class Group extends IresElement {
      */
     public function removeResponsable(WP_User $user) : bool {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
-            $user->set_role("subscriber");
+            $user->remove_role("responsable");
 
             $db = Database::get();
             return $db->update($db->prefix . "groups_users",

@@ -272,8 +272,7 @@ class UserProfileMenu extends IresMenu {
                value='<?php echo $this->disableAll ?>'> <?php
     }
 
-    public function showModificationBtn() : void {
-        var_dump($_POST, $this->disableAll);?>
+    public function showModificationBtn() : void { ?>
         <form method='post' name='confirm-modify-user' id='confirm-modify-user'
               class='validate' novalidate='novalidate'>
             <?php $this->saveEditedUser(); ?>

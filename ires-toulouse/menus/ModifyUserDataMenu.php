@@ -62,16 +62,30 @@ class ModifyUserDataMenu extends IresMenu {
      * Content of the page
      */
     public function getContent() : void {
-        $isAdmin = in_array("administrator",  wp_get_current_user()->roles); ?>
+        $this->search_bar();
+
+        $current_user = get_user_by('ID', get_current_user_id());
+        $isAdmin = current_user_can('administrator'); ?>
         <h1>Renseigner des informations supplémentaires</h1> <?php
         if(count(get_users()) > 1){
             /**
              * If admin, it gets the last created user or chosen user
-             * if not, it's just itself
+             * If responsable, verify if he's responsible for the user
+             * else chose itself
              */
-            $this->lastUserId = $isAdmin ?
-                ((int) ($_POST["users"] ?? Identifier::getLastRegisteredUser())) :
-                get_current_user_id();
+            if ($isAdmin || in_array($_POST['users'], self::getUsers($current_user->ID))) {
+                $this->lastUserId = (int) $_POST["users"];
+            } else {
+                $this->lastUserId = get_current_user_id();
+                if (isset($_POST['users']) && $_POST['users'] != "") {
+                    ?>
+                    <div id="message" class="error notice is-dismissible">
+                        <p><strong>Vous n'avez pas la permission de modifier cet utilisateur.</strong></p>
+                    </div>
+                    <?php
+                }
+            }
+
             if(isset($_POST["action"]) && $_POST["action"] == "modifyuser"){
                 try {
                     $this->verifyPostData();
@@ -124,7 +138,8 @@ class ModifyUserDataMenu extends IresMenu {
             ?>
 
             <form method='post' name='modify-user' id='modify-user' class='verifiy-form validate' novalidate='novalidate'>
-                <input name='action' type='hidden' value='modifyuser'> <?php
+                <input name='action' type='hidden' value='modifyuser'>
+                <input type="hidden" name="users" value="<?php echo $_POST['users']; ?>"> <?php
                 foreach(UserInputData::all() as $inputData){
                     $inputFormType = $inputData->getFormType();
                     $inputId = $inputData->getId();
@@ -268,5 +283,55 @@ class ModifyUserDataMenu extends IresMenu {
         if(is_wp_error($user)){
             throw new \Exception("ID $this->lastUserId : Problème lors de l'enregistrement d'une donnée");
         }
+    }
+
+
+    /**
+     * Get all the users for who $user_id is responsible
+     * @param int $user_id id of the responsible
+     * @return array|null all the id of the users
+     */
+    private function getUsers(int $user_id) {
+        global $wpdb;
+        $users = [];
+        $groups = [];
+        $results = $wpdb->get_results($wpdb->prepare(" SELECT id_group
+                                                            FROM {$wpdb->prefix}groups
+                                                            JOIN {$wpdb->prefix}groups_users 
+                                                            ON id_group = group_id 
+                                                                WHERE is_responsable = 1
+                                                                AND user_id = %d", $user_id),
+                                             ARRAY_A);
+        foreach ($results as $result) {
+            array_push($groups, $result['id_group']);
+        }
+
+        foreach ($groups as $group) {
+            // On récupère tous les utilisateur dans les groupes
+            $results = $wpdb->get_results($wpdb->prepare("SELECT * from {$wpdb->prefix}groups_users WHERE group_id = %d", $group), ARRAY_A);
+            foreach ($results as $result) {
+                if (!in_array($result['user_id'], $users)) {
+                    array_push($users, $result['user_id']);
+                }
+            }
+        }
+        return $users;
+    }
+
+    /**
+     * Initialise the scripts for ajax search bar
+     */
+    function search_bar() {
+        wp_enqueue_script('autocomplete-search', plugins_url('ires-toulouse/js/ScriptModifyUserDataMenu.js'),
+            ['jquery', 'jquery-ui-autocomplete'], null, true);
+        wp_localize_script('autocomplete-search', 'AutocompleteSearch', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'ajax_nonce' => wp_create_nonce('autocompleteSearchNonce')
+        ]);
+        $wp_scripts = wp_scripts();
+        wp_enqueue_style('jquery-ui-css',
+            '//ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-autocomplete']->ver . '/themes/smoothness/jquery-ui.css',
+            false, null, false
+        );
     }
 }

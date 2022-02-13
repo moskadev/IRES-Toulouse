@@ -23,12 +23,13 @@ class UserConnection extends Controller {
      * @throws FailedUserRegistrationException
      */
     public function __construct(string $firstName, string $lastName, string $email) {
-        if (empty($firstName) || empty($lastName) || empty($email)) {
-            throw new FailedUserRegistrationException($this->getOriginalLogin(), "Donnée incorrecte");
-        }
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
+
+        if (empty($firstName) || empty($lastName) || empty($email)) {
+            throw new FailedUserRegistrationException($this->getOriginalLogin(), "Donnée incorrecte");
+        }
     }
 
     /**

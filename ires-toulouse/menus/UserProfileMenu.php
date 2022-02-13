@@ -57,31 +57,26 @@ class UserProfileMenu extends IresMenu {
     private WP_User $editingUser;
 
     /** @var bool */
-    private bool $disableAll = true;
+    private bool $disableAll;
 
     /**
      * Constructing the menu and link to the admin page
      */
     public function __construct() {
+        $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
+        $this->lastRegisteredUser = Identifier::getLastRegisteredUser($this->visibleUsers)
+            ?? wp_get_current_user();
+        $this->disableAll = intval($_POST["confirm-modify"] ?? true);
+
         parent::__construct("Consulter les informations relatifs à votre profil IRES",
             "Mon profil IRES",
             0,
             "dashicons-id-alt",
             3
         );
-        $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
-        $this->lastRegisteredUser = Identifier::getLastRegisteredUser($this->visibleUsers)
-            ?? wp_get_current_user();
-        $this->disableAll = intval($_POST["confirm-modify"] ?? true);
     }
 
-    /**
-     * Content of the page
-     */
-    public function getContent() : void {
-        $isResp = current_user_can("responsable") ||
-            current_user_can('administrator');
-
+    public function analyzeSentData() : void {
         if (count($this->visibleUsers) > 0) {
             $this->editingUser = isset($_POST["editingUserId"]) ?
                 get_userdata($_POST["editingUserId"] ?? get_current_user_id()) :
@@ -122,8 +117,14 @@ class UserProfileMenu extends IresMenu {
                 </div>
             <?php }
         }
+    }
 
-        if ($isResp) {
+    /**
+     * Content of the page
+     */
+    public function getContent() : void {
+        if (current_user_can("responsable") ||
+            current_user_can('administrator')){
             $this->chooseUserForm();
         }
         $this->showModificationBtn(); ?>
@@ -262,17 +263,17 @@ class UserProfileMenu extends IresMenu {
         </form> <?php
     }
 
-    public function saveEditedUser() : void{ ?>
+    private function saveEditedUser() : void{ ?>
         <input name='editingUserId' type='hidden'
                value='<?php echo $this->editingUser->ID ?>'> <?php
     }
 
-    public function saveConfirmModification(){ ?>
+    private function saveConfirmModification(){ ?>
         <input name='confirm-button' type='hidden'
                value='<?php echo $this->disableAll ?>'> <?php
     }
 
-    public function showModificationBtn() : void { ?>
+    private function showModificationBtn() : void { ?>
         <form method='post' name='confirm-modify-user' id='confirm-modify-user'
               class='validate' novalidate='novalidate'>
             <?php $this->saveEditedUser(); ?>
@@ -290,7 +291,7 @@ class UserProfileMenu extends IresMenu {
     <?php }
 
 
-    public function chooseUserForm() : void { ?>
+    private function chooseUserForm() : void { ?>
         <form method='post' name='to-modify-user' id='to-modify-user'
               class='validate' novalidate='novalidate'>
             <table class='form-table' role='presentation'>

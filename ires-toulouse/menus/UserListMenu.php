@@ -16,6 +16,10 @@ class UserListMenu extends IresMenu {
         );
     }
 
+    public function analyzeSentData() : void {
+
+    }
+
     public function getContent() : void {
 
     }

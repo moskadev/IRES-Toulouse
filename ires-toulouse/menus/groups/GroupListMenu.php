@@ -17,20 +17,62 @@ class GroupListMenu extends IresMenu {
     }
 
     /**
+     * Show depending on the content that has been sent
+     * different error/warning/success messages
+     */
+    public function analyzeSentData() : void {
+        $message = $type_message = "";
+        /*
+         * Supprime un groupe
+         */
+        if (isset($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
+            $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
+            $type_message = "error";
+            if (Group::delete($deletedGroup->getId())) {
+                $message = "Le groupe " . $deletedGroup->getName() . " a été supprimé.";
+                $type_message = "updated";
+            }
+        }
+
+        /*
+         * Ajoute un groupe si possible
+         */
+        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup']) && isset($_POST['typeAddGroup'])) {
+            $message = "Impossible de créer le groupe " . esc_attr($_POST['nameAddGroup']);
+            $type_message = "error";
+
+            Group::createTable();
+            if (Group::register(esc_attr($_POST['nameAddGroup']), intval(esc_attr($_POST['typeAddGroup'])))) {
+                $type_message = "updated";
+                $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
+                    ", dénommé " . $_POST['nameAddGroup'] . ", a été créé.";
+            }
+        }
+
+        /*
+         * Affichage d'un message
+         */
+        if (!empty($message) && !empty($type_message)) { ?>
+            <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
+            <div id="message" class="<?php echo $type_message ?> notice is-dismissible">
+                <p><strong><?php echo $message; ?></strong></p>
+            </div>
+            <?php
+        }
+    }
+
+    /**
      * Contents of the "Create a group" menu
      * Allows to :
      *      - create a group of user if you are admin
      */
     function getContent() : void {
-        $this->showMessages();
-
         /*
          * Formulaire pour ajouter un groupe
          *  - Nom du groupe
          *  - Bouton ajouter
          */
-        if (current_user_can('administrator')) {
-            ?>
+        if (current_user_can('administrator')) { ?>
             <form action="" method="post">
                 <div class="container">
                     <div class="row">
@@ -45,8 +87,8 @@ class GroupListMenu extends IresMenu {
                             <select class="form-control h-100" name="typeAddGroup"> <?php
                                 foreach (Group::TYPE_NAMES as $type => $name){?>
                                     <option value="<?php echo $type?>"><?php echo $name?></option>
-                                <?php }
-                            ?></select>
+                                <?php } ?>
+                            </select>
                         </div>
                         <div class="col">
                             <input type="submit" name="addGroup" value="Ajouter"
@@ -54,10 +96,8 @@ class GroupListMenu extends IresMenu {
                         </div>
                     </div>
                 </div>
-            </form>
-
-            <?php
-        } // End if
+            </form> <?php
+        }
 
         /*
          * Affichage des groupes auquel l'utilisateur appartient
@@ -65,8 +105,7 @@ class GroupListMenu extends IresMenu {
          * Possibilité de l'afficher si il y a plus de 9 groupes créé afin d'alléger la page :
          * && count($groups) > 9
          */
-        if (count(Group::getUserGroups(wp_get_current_user())) > 0) {
-            ?>
+        if (count(Group::getUserGroups(wp_get_current_user())) > 0) { ?>
             <h2>Groupes dont vous appartenez : </h2>
             <table class="table table-striped table-hover">
                 <thead>
@@ -95,113 +134,48 @@ class GroupListMenu extends IresMenu {
         <h2>Groupes : </h2>
         <table class="table table-striped table-hover">
             <thead>
-            <tr>
-                <th scope="col">Nom</th>
-                <th scope="col">Type</th>
-                <th scope="col">Responsable(s)</th>
-                <th scope="col">Date de création</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
-            /*
-             * Affichage de tous les groupes
-             */
-            $groups = Group::all();
-            foreach ($groups as $group) {
-                self::printGroup($group);
-            } // end foreach ?>
-            </tbody>
-            <?php /*
-            * Affichage d'un message si aucun groupe n'existe
-            */
-            if (count($groups) === 0) { ?>
-                <tr>
-                    <td colspan="4"><?php _e("No existing group") ?></td>
-                </tr>
-            <?php } // endif
-
-            /*
-             * Affichage du bas de page si il y a plus de 9 groupes
-             */
-            if (count($groups) > 9) { ?>
-                <tfoot>
                 <tr>
                     <th scope="col">Nom</th>
                     <th scope="col">Type</th>
                     <th scope="col">Responsable(s)</th>
                     <th scope="col">Date de création</th>
                 </tr>
+            </thead>
+            <tbody>
+                <?php
+                /*
+                 * Affichage de tous les groupes
+                 */
+                $groups = Group::all();
+                foreach ($groups as $group) {
+                    self::printGroup($group);
+                }
+                /*
+                 * Affichage d'un message si aucun groupe n'existe
+                 */
+                if (count($groups) === 0) { ?>
+                    <tr>
+                        <td colspan="4"><?php _e("No existing group") ?></td>
+                    </tr> <?php
+                } ?>
+            </tbody>
+            <?php
+
+            /*
+             * Affichage du bas de page si il y a plus de 9 groupes
+             */
+            if (count($groups) > 9) { ?>
+                <tfoot>
+                    <tr>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Responsable(s)</th>
+                        <th scope="col">Date de création</th>
+                    </tr>
                 </tfoot>
-            <?php } // endif ?>
+            <?php }  ?>
         </table> <!-- Fin du tableau de l'affichage de tous les groupes -->
         <?php
-    } // end function getContent()
-
-    /**
-     * Show depending on the content that has been sent
-     * different error/warning/success messages
-     */
-    private function showMessages() {
-        /*
-         * Supprime un groupe
-         */
-        if (isset($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
-            $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
-            $type_message = "error";
-            if (Group::delete($deletedGroup->getId())) {
-                $message = "Le groupe " . $deletedGroup->getName() . " a été supprimé.";
-                $type_message = "updated";
-            }
-            ?>
-            <form action="" method="post" id="message">
-                <input type="hidden" name="message" value="<?php echo $message ?>">
-                <input type="hidden" name="type" value="<?php echo $type_message ?>">
-            </form>
-
-            <!-- Envoi du formulaire caché -->
-            <script type="text/javascript">
-                document.getElementById('message').submit(); // SUBMIT FORM
-            </script>
-            <?php
-        }
-
-        /*
-         * Ajoute un groupe si possible
-         */
-        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup']) && isset($_POST['typeAddGroup'])) {
-            $message = "Impossible de créer le groupe " . esc_attr($_POST['nameAddGroup']);
-            $type_message = "error";
-
-            Group::createTable();
-            if (Group::register(esc_attr($_POST['nameAddGroup']), intval(esc_attr($_POST['typeAddGroup'])))) {
-                $type_message = "updated";
-                $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
-                    ", dénommé " . $_POST['nameAddGroup'] . ", a été créé.";
-            }
-            ?>
-            <form action="" method="post" id="message">
-                <input type="hidden" name="message" value="<?php echo $message ?>">
-                <input type="hidden" name="type" value="<?php echo $type_message ?>">
-            </form>
-
-            <!-- Envoi du formulaire caché -->
-            <script type="text/javascript">
-                document.getElementById('message').submit(); // SUBMIT FORM
-            </script>
-            <?php
-        }
-
-        /*
-         * Affichage d'un message
-         */
-        if (isset($_POST['message']) && isset($_POST['type'])) { ?>
-            <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
-            <div id="message" class="<?php echo $_POST['type']; ?> notice is-dismissible">
-                <p><strong><?php echo stripslashes($_POST['message']); ?></strong></p>
-            </div>
-            <?php
-        }
     }
 
     /**

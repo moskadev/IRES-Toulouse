@@ -75,6 +75,7 @@ class Group extends IresElement {
      * @param string $name the group's name
      *
      * @return bool true if the group is created, else false
+     * @throws \Exception
      */
     public static function register(string $name, int $type = self::TYPE_AUTRE) : bool {
         if (self::isValid($name, $type) &&
@@ -98,7 +99,7 @@ class Group extends IresElement {
      *
      * @return bool true if it exists
      */
-    public static function isValid(string $name, int $type){
+    public static function isValid(string $name, int $type) : bool {
         return strlen($name) <= self::NAME_LENGTH &&
             in_array($type, array_keys(self::TYPE_NAMES));
     }
@@ -107,6 +108,7 @@ class Group extends IresElement {
      * @param string $groupName the group's name that we're looking for
      *
      * @return Group|null the group found by its name
+     * @throws \Exception
      */
     public static function fromName(string $groupName) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($groupName) {
@@ -140,11 +142,12 @@ class Group extends IresElement {
      * @param int $id the group's id
      *
      * @return bool true if group deleted or not
+     * @throws \Exception
      */
     public static function delete(int $id) : bool {
         if (self::exists($id)) {
-            foreach (Group::fromId($id)->getResponsables() as $r){
-                $r->remove_role("responsable");
+            foreach (($g = Group::fromId($id))->getResponsables() as $r){
+                $g->removeResponsable($r);
             }
             $db = Database::get();
 
@@ -163,19 +166,23 @@ class Group extends IresElement {
      * @return bool true if the group exist, otherwise return false
      */
     public static function exists(int $id) : bool {
-        return Group::fromId($id) !== null;
+        try {
+            return Group::fromId($id) !== null;
+        } catch (\Exception $e){
+            return false;
+        }
     }
 
     /**
-     * @param string $id the group's id that we're looking for
+     * @param int $id the group's id that we're looking for
      *
      * @return Group|null the group found by its id
+     * @throws \Exception
      */
-    public static function fromId(string $id) : ?Group {
+    public static function fromId(int $id) : ?Group {
         $group = array_filter(self::all(), function ($g) use ($id) {
             return $g->id === $id;
         });
-
         return $group[array_key_first($group)] ?? null;
     }
 
@@ -237,7 +244,7 @@ class Group extends IresElement {
     }
 
     /**
-     * @param string $id
+     * @param int $id
      * @param string $name
      * @param int $type
      * @param string $creationTime
@@ -245,7 +252,7 @@ class Group extends IresElement {
      *
      * @throws \Exception
      */
-    public function __construct(string $id, string $name, int $type, string $creationTime, WP_User $creator) {
+    public function __construct(int $id, string $name, int $type, string $creationTime, WP_User $creator) {
         if (!self::isValid($name, $type)) {
             throw new \Exception("Le nom du groupe $name ou le type $type est invalide");
         }
@@ -302,6 +309,10 @@ class Group extends IresElement {
      */
     public function addResponsable(WP_User $user) : bool {
         $this->addUser($user);
+        // à confirmer si l'utlisateur peut être responsable plus de 3 groupes
+        //if (count(self::allWhereUserResponsable($user)) > 3) {
+        //    return false;
+        //}
         if (!$this->isUserResponsable($user)) {
             $db = Database::get();
             $user->add_role("responsable");
@@ -399,13 +410,15 @@ class Group extends IresElement {
      */
     public function removeResponsable(WP_User $user) : bool {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
-            $user->remove_role("responsable");
-
             $db = Database::get();
-            return $db->update($db->prefix . "groups_users",
+            $request = $db->update($db->prefix . "groups_users",
                 ["is_responsable" => "0"],
                 ["user_id" => $user->ID, "group_id" => $this->id]
-            ) !== false;
+            );
+            if (count(self::allWhereUserResponsable($user)) === 0) {
+                $user->remove_role("responsable");
+            }
+            return $request !== false;
         }
         return false;
     }

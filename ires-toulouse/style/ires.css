@@ -24,6 +24,11 @@ h2, .title-label {
  *      Liste des utilisateurs
  * ================================
  */
+.button-delete {
+    border: none;
+    background: none;
+    color: #d63638;
+}
 #hide-info {
     display: none;
 }
@@ -65,6 +70,7 @@ p.add-member {
 .search {
     grid-area: right;
 }
+
 .popup-delete {
     position: fixed;
     top: 50%;

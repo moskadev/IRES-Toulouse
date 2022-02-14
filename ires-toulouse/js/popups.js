@@ -1,9 +1,13 @@
 const openPopupButtons = document.querySelectorAll('[data-popup-target]');
 const closePopupButtons = document.querySelectorAll('[data-close-button]');
 const overlay = document.getElementById('overlay');
+const popupTitle = document.getElementById('popup-title');
 
-const first_name = document.getElementsByName('first_name');
-
+function setUserId(user_id, first_name, last_name) {
+    console.log("random");
+    popupTitle.innerHTML = "Suppression de : " + first_name + " " + last_name
+    document.getElementById('userId').value = user_id
+}
 
 openPopupButtons.forEach(button => {
     button.addEventListener('click', () => {

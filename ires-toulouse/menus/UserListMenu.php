@@ -16,6 +16,16 @@ class UserListMenu extends IresMenu {
         );
     }
     public function getContent() : void {
+        /*
+         * Deleting the user after validation (with the confirmation popup)
+         */
+        if (current_user_can('administrator') && isset($_POST['delete']) && isset($_POST['user_id'])) {
+            wp_delete_user($_POST['user_id']);
+        }
+
+        /*
+         * Set the direction of the sorting indicator related to the sorting
+         */
         if (isset($_GET['order']) && isset($_GET['orderby'])) {
             if ($_GET['orderby'] === "first_name" && $_GET['order'] === "desc") {
                 echo "<style>#sorting-indicator-first_name { transform: rotate(180deg); }</style>";
@@ -24,7 +34,39 @@ class UserListMenu extends IresMenu {
             }
         }
 
+        $users = self::getAllMembers($_GET['search'] ?? '');
+
+        // Sorting of the users
+        if (isset($_GET['orderby']) && $_GET['orderby'] === 'last_name') { // Sorting by last name
+            isset($_GET['order']) && $_GET['order'] === 'asc' ?
+                usort($users, function($a, $b) {return strcmp($a->last_name, $b->last_name);}) :
+                usort($users, function($a, $b) {return strcmp($b->last_name, $a->last_name);});
+        }
+        if (isset($_GET['orderby']) && $_GET['orderby'] === 'first_name') { // Sorting by last name
+            isset($_GET['order']) && $_GET['order'] === 'asc' ?
+                usort($users, function($a, $b) {return strcmp($a->first_name, $b->first_name);}) :
+                usort($users, function($a, $b) {return strcmp($b->first_name, $a->first_name);});
+        }
+
         ?>
+        <!-- Confirmation popup for deletion of a user -->
+        <div class="popup-delete" id="popup-delete">
+            <div class="popup-header">
+                <div id="popup-title" class="title"></div>
+                <button data-close-button class="close-button">&times;</button>
+            </div>
+            <div class="popup-body">
+                Êtes-vous sur de vouloir supprimer ce compte ?
+                <form action="" method="post">
+                    <input type="hidden" id="userId" name="user_id" value="">
+                    <input class="button-primary" name="delete" type="submit" value="Confirmer"/>
+                    <input class="button-secondary" data-close-button type="button" value="Annuler"/>
+                </form>
+            </div>
+        </div>
+        <div id="overlay"></div>
+
+
         <div class="grid-container">
             <div class="form-add-member">
                 <form action="<?php echo get_site_url()."/wp-admin/admin.php?page=ajouter_un_compte"; ?>" method="post">
@@ -38,28 +80,14 @@ class UserListMenu extends IresMenu {
             <div class="search">
                 <form action="" method="get">
                     <p class="search-box">
-                        <input type="search" id="search" name="search">
+                        <input type="hidden" id="action" name="page" value="comptes_ires">
+                        <input type="text" id="search" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
                         <input class="button-secondary" type="submit" value="Rechercher des comptes"/>
+                        <input class="button-delete" type="submit"  onclick="document.getElementById('search').value = '';" value="Effacer"/>
                     </p>
                 </form>
             </div>
         </div>
-
-        <div class="popup-delete" id="popup-delete">
-            <div class="popup-header">
-                <div class="title">Suppression de : Nom Prénom</div>
-                <button data-close-button class="close-button">&times;</button>
-            </div>
-            <div class="popup-body">
-                Êtes-vous sur de vouloir supprimer ce compte ?
-                <form action="" method="post">
-
-                    <input class="button-primary" name="delete" type="submit" value="Confirmer"/>
-                    <input class="button-secondary" data-close-button type="button" value="Annuler"/>
-                </form>
-            </div>
-        </div>
-        <div id="overlay"></div>
         <table class="widefat">
             <thead>
                 <tr>
@@ -83,21 +111,6 @@ class UserListMenu extends IresMenu {
             <tbody>
             <?php
             $counter = 0;
-
-            $users = self::getAllMembers($_GET['search'] ?? '');
-
-            // Sorting of the users
-            if (isset($_GET['orderby']) && $_GET['orderby'] === 'last_name') { // Sorting by last name
-                isset($_GET['order']) && $_GET['order'] === 'asc' ?
-                    usort($users, function($a, $b) {return strcmp($a->last_name, $b->last_name);}) :
-                    usort($users, function($a, $b) {return strcmp($b->last_name, $a->last_name);});
-            }
-            if (isset($_GET['orderby']) && $_GET['orderby'] === 'first_name') { // Sorting by last name
-                isset($_GET['order']) && $_GET['order'] === 'asc' ?
-                    usort($users, function($a, $b) {return strcmp($a->first_name, $b->first_name);}) :
-                    usort($users, function($a, $b) {return strcmp($b->first_name, $a->first_name);});
-            }
-
             foreach ($users as $user) {
                 if ((int) $user->ID === 1)
                     continue;
@@ -108,15 +121,10 @@ class UserListMenu extends IresMenu {
                         <br/>
                         <span id="hide-info">
                             <form method="post">
-                                <input type="hidden" name="user_id" value="<?php echo $user->ID; ?>">
-                                <input type="hidden" name="user_login" value="<?php echo $user->user_login; ?>">
-                                <input type="hidden" name="user_email" value="<?php echo $user->user_email; ?>">
-                                <input type="hidden" name="first_name" value="<?php echo $user->first_name; ?>">
-                                <input type="hidden" name="last_name" value="<?php echo $user->last_name; ?>">
                                 <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
                                     <a href="">Modifier</a>&emsp;
                                 <?php   } if (current_user_can('administrator')) { ?>
-                                    <button type="button" data-popup-target="#popup-delete" class="delete">Supprimer</button>&emsp;
+                                    <button type="button" data-popup-target="#popup-delete" class="delete" onclick="setUserId(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp;
                                 <?php   }?>
                                 <a href="">Voir</a>
                             </form>
@@ -136,13 +144,13 @@ class UserListMenu extends IresMenu {
             ?>
             </tbody>
             <tfoot>
-            <tr>
-                <th class="row-title">Nom</th>
-                <th>Prénom</th>
-                <th>Email</th>
-                <th>Identifiant</th>
-                <th>Groupe</th>
-            </tr>
+                <tr>
+                    <th class="row-title">Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Identifiant</th>
+                    <th>Groupe</th>
+                </tr>
             </tfoot>
         </table>
         <?php

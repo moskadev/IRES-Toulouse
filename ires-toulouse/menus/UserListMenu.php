@@ -19,7 +19,7 @@ class UserListMenu extends IresMenu {
     {
         // TODO: Implement analyzeSentData() method.
     }
-    public function getContent() : void { ?> <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <?php
+    public function getContent() : void {
         /*
          * Deleting the user after validation (with the confirmation popup)
          */

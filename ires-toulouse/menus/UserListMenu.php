@@ -120,13 +120,14 @@ class UserListMenu extends IresMenu {
                         <?php echo $user->last_name; ?>
                         <br/>
                         <span id="hide-info">
-                            <form method="post">
+                            <form id="form-infos" method="post" action="<?php echo get_site_url(); ?>/wp-admin/admin.php?page=mon_profil_ires">
+                                <input type="hidden" name="editingUserId" value="<?php echo $user->ID ?>">
                                 <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
-                                    <a href="">Modifier</a>&emsp;
+                                    <input type="submit" class="button-link-ires" value="Modifier"/>&emsp;
                                 <?php   } if (current_user_can('administrator')) { ?>
                                     <button type="button" data-popup-target="#popup-delete" class="delete" onclick="setUserId(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp;
                                 <?php   }?>
-                                <a href="">Voir</a>
+                                <input type="submit" class="button-link-ires" value="Voir"/>&emsp;
                             </form>
                         </span>
                     </td> <!-- Last name -->

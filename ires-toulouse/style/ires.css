@@ -127,3 +127,8 @@ p.add-member {
     pointer-events: all;
     opacity: 1;
 }
+.button-link-ires {
+    border: none;
+    background: none;
+    color: #0d66c2;
+}

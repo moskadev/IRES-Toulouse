@@ -9,6 +9,7 @@ use irestoulouse\controllers\UserInputData;
 use irestoulouse\elements\Group;
 use irestoulouse\elements\input\UserData;
 use irestoulouse\utils\Dataset;
+use irestoulouse\utils\ExcelGenerator;
 use irestoulouse\utils\Identifier;
 use WP_User;
 
@@ -116,6 +117,17 @@ class UserProfileMenu extends IresMenu {
                     <p><strong>Erreur : <?php echo $e->getMessage() ?></strong></p>
                 </div>
             <?php }
+        }
+
+
+
+        if(isset($_POST["export-profile"])){
+            $excel = new ExcelGenerator("ires-profiles");
+            $excel->createRow(["cc", "ça va", "moi ouais"]);
+            $excel->createRow(["bla", "bla bla"]);
+
+            var_dump($excel);
+            $excel->generate();
         }
     }
 
@@ -258,6 +270,10 @@ class UserProfileMenu extends IresMenu {
                 <button class="btn btn-outline-primary menu-submit" type="submit"
                         name="profile-page" disabled>
                     Modifier les informations
+                </button>
+                <button class="btn btn-outline-primary" type="submit"
+                        name="export-profile">
+                    Exporter les informations
                 </button>
             <?php } ?>
         </form> <?php

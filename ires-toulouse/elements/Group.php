@@ -189,8 +189,9 @@ class Group extends IresElement {
     /**
      * Get all the users for who $user_id is responsible
      * @return WP_User[] all the id of the users
+     * @throws \Exception
      */
-    public static function getVisibleUsers(WP_User $from) {
+    public static function getVisibleUsers(WP_User $from) : array {
         if (user_can($from, "administrator")) {
             return get_users();
         }
@@ -211,6 +212,7 @@ class Group extends IresElement {
 
     /**
      * @return array|null containing all the groups where an user is responsable
+     * @throws \Exception
      */
     public static function allWhereUserResponsable(WP_User $user) : ?array {
         $groups = [];
@@ -227,6 +229,7 @@ class Group extends IresElement {
      * @param $user WP_User the user that we're looking for
      *
      * @return Group[] all the group(s) of this user
+     * @throws \Exception
      */
     public static function getUserGroups(WP_User $user) : array {
         $db = Database::get();

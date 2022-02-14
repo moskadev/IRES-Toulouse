@@ -112,8 +112,7 @@ class GroupDetailsMenu extends IresMenu {
                 </form>
             </div>
             <div class="col-auto">
-                <h1 class="wp-heading-inline"><b><?php echo $this->group->getName(); ?></b>
-                </h1>
+                <h3><b><?php echo $this->group->getName(); ?></b></h3>
             </div>
         </div>
         <hr>
@@ -203,12 +202,11 @@ class GroupDetailsMenu extends IresMenu {
         </form>
 
 
-        <h1 class="wp-heading-inline">Membres du groupe :</h1><br>
+        <h2>Membres du groupe :</h2><br>
 
         <!-- Affichage d'un bouton "Ajouter membre" si l'utilisateur est responsable ou administrateur -->
         <?php
-        if ((current_user_can('responsable') &&
-                $this->group->isUserResponsable(wp_get_current_user())) ||
+        if ($this->group->isUserResponsable(wp_get_current_user()) ||
             current_user_can('administrator')
         ) {
             if (isset($_POST['addMember'])) { ?>
@@ -270,7 +268,7 @@ class GroupDetailsMenu extends IresMenu {
                             <div class="col float-right">
                                 <?php
                                 if (current_user_can('administrator') ||
-                                (current_user_can('responsable') && $this->group->isUserResponsable(wp_get_current_user()))) { ?>
+                                    $this->group->isUserResponsable(wp_get_current_user())) { ?>
                                 <form action="<?php echo get_site_url() ?>/wp-admin/admin.php?page=mon_profil_ires"
                                       method="post">
                                     <input type="hidden" name="editingUserId"
@@ -285,7 +283,7 @@ class GroupDetailsMenu extends IresMenu {
                             <div class="col float-left">
                                 <?php
                                 if (get_current_user_id() === $user->ID
-                                    && !(current_user_can('responsable') && $this->group->isUserResponsable($user))
+                                    && !$this->group->isUserResponsable($user)
                                     || current_user_can('administrator')) {
                                     ?>
                                     <form action="" method="post">
@@ -301,7 +299,7 @@ class GroupDetailsMenu extends IresMenu {
                                     <?php
                                 }
                                 ?>
-                                <?php } // end if?>
+                                <?php } ?>
                             </div>
                         </div>
                     </td>

@@ -15,7 +15,11 @@ class UserListMenu extends IresMenu {
             3
         );
     }
-    public function getContent() : void {
+    public function analyzeSentData(): void
+    {
+        // TODO: Implement analyzeSentData() method.
+    }
+    public function getContent() : void { ?> <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <?php
         /*
          * Deleting the user after validation (with the confirmation popup)
          */
@@ -125,7 +129,7 @@ class UserListMenu extends IresMenu {
                                 <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
                                     <input type="submit" class="button-link-ires" value="Modifier"/>&emsp;
                                 <?php   } if (current_user_can('administrator')) { ?>
-                                    <button type="button" data-popup-target="#popup-delete" class="delete" onclick="setUserId(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp;
+                                    <button type="button" data-popup-target="#popup-delete" class="delete" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp;
                                 <?php   }?>
                                 <input type="submit" class="button-link-ires" value="Voir"/>&emsp;
                             </form>

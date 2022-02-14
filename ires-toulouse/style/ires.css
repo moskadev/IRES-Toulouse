@@ -2,17 +2,12 @@ h1 {
     margin-bottom: 30px !important;
 }
 
+h2, .title-label {
+    margin-top: 40px !important;
+}
+
 .title-label {
-    margin-top: 50px !important;
-    font-size: 1.7em !important;
-}
-
-.groups-data th, .groups-data td {
-    font-size: 17px !important;
-}
-
-h2 {
-    margin-top: 30px !important;
+    font-size: 2em !important;
 }
 
 .disabled {
@@ -21,4 +16,119 @@ h2 {
 
 .verifiy-form select[multiple] {
     height: 200px !important;
+}
+
+
+/**
+ * ================================
+ *      Liste des utilisateurs
+ * ================================
+ */
+.button-delete {
+    border: none;
+    background: none;
+    color: #d63638;
+}
+#hide-info {
+    display: none;
+}
+#line {
+    height: 5vw;
+}
+#line:hover #hide-info {
+    display: inherit;
+}
+.name {
+    width: 25%;
+}
+.delete {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    color: #d63638;
+}
+.delete:hover {
+    color: #8a2424;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-areas:
+            'header header header header header header'
+            'left center center center center right'
+            'footer footer footer footer footer footer';
+    grid-gap: 10px;
+}
+p.add-member {
+    float: left;
+    margin: 0;
+}
+.form-add-member {
+    grid-area: left;
+}
+.search {
+    grid-area: right;
+}
+
+.popup-delete {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: 200ms ease-in-out;
+    border: 1px solid black;
+    border-radius: 5px;
+    z-index: 10;
+    background-color: white;
+    width: 500px;
+    max-width: 80%;
+}
+
+.popup-delete.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+}
+.popup-header .title {
+    font-size: 1.125rem;
+}
+.popup-header .close-button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.popup-body {
+    padding: 10px 15px;
+
+}
+#overlay {
+    position: fixed;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: 200ms ease-in-out;
+    pointer-events: none;
+}
+#overlay.active {
+    pointer-events: all;
+    opacity: 1;
+}
+.button-link-ires {
+    border: none;
+    background: none;
+    color: #0d66c2;
 }

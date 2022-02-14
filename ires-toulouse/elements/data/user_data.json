@@ -38,7 +38,7 @@
   {
     "name": "E-mail",
     "parent": "info_perso",
-    "formType": "text",
+    "formType": "email",
     "required": true,
     "id": "user_email",
     "regex": "\\S+@\\S+\\.\\S+",
@@ -59,12 +59,27 @@
     "id": "activites_ires"
   },
   {
-    "name": "Groupes, manifestations et responsables",
-    "formType": "table",
-    "id": "groupes",
+    "name": "Groupe de recherche-action",
+    "formType": "text",
+    "id": "groupe_recherche_action",
     "parent": "activites_ires",
     "disabled": true,
     "extraData": "user_groups"
+  },
+  {
+    "name": "Responsable du groupe",
+    "id": "responsable_groupe",
+    "formType": "text",
+    "parent": "activites_ires",
+    "disabled": true,
+    "extraData": "user_groups_responsables"
+  },
+  {
+    "name": "Manifestation",
+    "formType": "text",
+    "id": "manifestation",
+    "disabled": true,
+    "parent": "activites_ires"
   },
   {
     "name": "Informations complémentaires",

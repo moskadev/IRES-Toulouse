@@ -41,9 +41,6 @@ abstract class IresMenu {
      * Initialize all menus
      */
     public static function init() : void {
-        global $menu;
-        global $submenu;
-
         $hasAboveRole = current_user_can('responsable') ||
             current_user_can('administrator');
 
@@ -55,14 +52,18 @@ abstract class IresMenu {
         );
         IresMenu::register("admin_menu", new GroupDetailsMenu(), true);
 
-        //TODO comprendre pourquoi cela ne fonctionne pas
-        if($hasAboveRole){
-            if(isset($submenu[$mainMenu->getId()])) {
-                $submenu[$mainMenu->getId()][0][0] = "Tous les comptes IRES";
+        add_action("admin_menu", function () use ($hasAboveRole, $mainMenu){
+            global $menu;
+            global $submenu;
+
+            if($hasAboveRole){
+                if(isset($submenu[$mainMenu->getId()])) {
+                    $submenu[$mainMenu->getId()][0][0] = "Tous les comptes IRES";
+                }
+            } else {
+                $menu[$mainMenu->getPosition()][0] = "Profil IRES";
             }
-        } else {
-            $menu[$mainMenu->getPosition() - 1][0] = "Profil IRES";
-        }
+        });
     }
 
     /**
@@ -154,7 +155,7 @@ abstract class IresMenu {
     }
 
     /**
-     * Generate content adapted to the Wordpress page
+     * Generate content adapted to the WordPress page
      * and adds the title of the menu
      */
     protected function generate() : void {

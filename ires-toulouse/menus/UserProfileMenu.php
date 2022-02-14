@@ -158,7 +158,7 @@ class UserProfileMenu extends IresMenu {
                         <?php if (!$isLabel) { ?>
                             <td>
                                 <?php
-                                if (in_array($formType, ["text", "email"])) { ?>
+                                if ($formType === "text") { ?>
                                     <input <?php echo Dataset::allFrom($data) ?>
                                             class="form-control"
                                             type='<?php echo htmlspecialchars($formType) ?>'
@@ -167,7 +167,6 @@ class UserProfileMenu extends IresMenu {
                                             value='<?php echo htmlspecialchars($data->getValue($this->editingUser)); ?>'
                                             <?php if ($this->disableAll) echo "disabled" ?>>
                                     <?php
-<<<<<<< HEAD
                                 } else if($formType === "table" && $dataId === "groupes"){
                                     $groups = $data->getExtraData($this->editingUser);
                                     if(count($groups) > 0){ ?>
@@ -201,8 +200,6 @@ class UserProfileMenu extends IresMenu {
                                     } else { ?>
                                         <p>L'utilisateur n'appartient à aucun groupe</p>
                                     <?php }
-=======
->>>>>>> ymay/40
                                 } else if ($formType === "radio") {
                                     $value = filter_var($data->getValue($this->editingUser),
                                         FILTER_VALIDATE_BOOL); ?>

@@ -15,11 +15,6 @@ class UserListMenu extends IresMenu {
             3
         );
     }
-
-    public function analyzeSentData() : void {
-
-    }
-
     public function getContent() : void {
         /*
          * Deleting the user after validation (with the confirmation popup)

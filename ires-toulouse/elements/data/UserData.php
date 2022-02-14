@@ -3,6 +3,7 @@
 namespace irestoulouse\elements\input;
 
 use Exception;
+use irestoulouse\elements\Group;
 use irestoulouse\elements\IresElement;
 use WP_User;
 
@@ -13,7 +14,7 @@ class UserData extends IresElement {
     public const VALUE_TYPE_STRING = 2;
     public const VALUE_TYPE_BOOL = 3;
 
-    public const DATAS = [
+    public const IDS = [
         "name",
         "formType",
         "id",
@@ -46,8 +47,8 @@ class UserData extends IresElement {
     private bool $required;
     /** @var string */
     private string $regex;
-    /** @var array */
-    private array $extraData;
+    /** @var mixed */
+    private $extraData;
     /** @var bool */
     private bool $disabled;
     /** @var bool */
@@ -80,22 +81,9 @@ class UserData extends IresElement {
         $this->uppercase = $uppercase ?? false;
         $this->required = $required ?? false;
         $this->regex = $regex ?? "";
-        $this->extraData = $this->convertExtraData($extraData);
+        $this->extraData = $extraData;
         $this->disabled = $disabled ?? false;
         $this->wordpressMeta = $wordpressMeta ?? false;
-    }
-
-    /**
-     * Extra data are given in string and can't be stored in the JSON file
-     * and have to be dynamically converted here
-     *
-     * @param $dataToConvert string|array desired data to convert
-     *
-     * @return array converted data
-     */
-    private function convertExtraData($dataToConvert) : array {
-        // TODO refaire les disciplines et appliquer les groupes
-        return is_string($dataToConvert) ? [] : ($dataToConvert ?? []);
     }
 
     /**
@@ -115,14 +103,14 @@ class UserData extends IresElement {
      * @return UserData[] all the user's necessary data
      */
     public static function all(bool $labelIncluded = true) : array {
-        $datas = [];
+        $userData = [];
         $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
         foreach ($jsonData as $d) {
             if ($labelIncluded || $d["formType"] !== "label") {
-                $datas[] = new UserData(...array_values(UserData::formatData($d)));
+                $userData[] = new UserData(...array_values(UserData::formatData($d)));
             }
         }
-        return $datas;
+        return $userData;
     }
 
     /**
@@ -151,7 +139,7 @@ class UserData extends IresElement {
      */
     private static function formatData(array $data) : array {
         $newData = [];
-        foreach (self::DATAS as $valid) {
+        foreach (self::IDS as $valid) {
             $newData[$valid] = null; // init a value to avoid exceptions
         }
         foreach ($data as $key => $d) {
@@ -203,7 +191,7 @@ class UserData extends IresElement {
 
     /**
      * Looking for the value to put in the input
-     * Special check for the Wordpress original meta
+     * Special check for the WordPress original meta
      *
      * @return string input's value
      */
@@ -228,10 +216,12 @@ class UserData extends IresElement {
         $value = implode(",", !is_array($value) ? [$value] : $value);
 
         /*
-         * We are still trying to save it, some Wordpress metadata appears
+         * We are still trying to save it, some WordPress metadata appears
          * in the new ones like first_name or last_name
          */
-        update_user_meta($user->ID, $this->id, $value);
+        if(!$this->isDisabled()) {
+            update_user_meta($user->ID, $this->id, $value);
+        }
 
         if($this->wordpressMeta) {
             $userId = wp_update_user(["ID" => $user->ID, $this->id => $value]);
@@ -314,10 +304,18 @@ class UserData extends IresElement {
     }
 
     /**
-     * @return array|null
+     * Extra data are given in string and can't be stored in the JSON file
+     * and have to be dynamically converted here
+     * @param $user WP_User|null
+     *
+     * @return array converted extra data
      */
-    public function getExtraData() : ?array {
-        return $this->extraData;
+    public function getExtraData(?WP_User $user = null) : array {
+        // TODO refaire les disciplines et appliquer les manifestations
+        if($this->extraData === "user_groups"){
+            return Group::getUserGroups($user);
+        }
+        return is_string($this->extraData) ? [] : ($this->extraData ?? []);
     }
 
     /**
@@ -339,7 +337,7 @@ class UserData extends IresElement {
      */
     public function toArray() : array {
         $array = parent::toArray();
-        foreach (self::DATAS as $d){
+        foreach (self::IDS as $d){
             $array[$d] = $this->$d;
         }
         return $array;

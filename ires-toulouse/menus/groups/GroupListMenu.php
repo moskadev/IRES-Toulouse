@@ -80,11 +80,10 @@ class GroupListMenu extends IresMenu {
                             <label for="addGroup">Ajouter un groupe :</label>
                         </div>
                         <div class="col">
-                            <input type="text" id="addGroup" class="to-fill"
+                            <input type="text" id="addGroup" class="form-control h-100"
                                    name="nameAddGroup" placeholder="Nom du groupe">
                         </div>
                         <div class="col">
-<<<<<<< HEAD
                             <select class="form-control h-100" name="typeAddGroup"> <?php
                                 foreach (Group::TYPE_NAMES as $type => $name){?>
                                     <option value="<?php echo $type?>"><?php echo $name?></option>
@@ -92,8 +91,6 @@ class GroupListMenu extends IresMenu {
                             </select>
                         </div>
                         <div class="col">
-=======
->>>>>>> ymay/40
                             <input type="submit" name="addGroup" value="Ajouter"
                                    class="btn btn-outline-primary">
                         </div>
@@ -114,9 +111,9 @@ class GroupListMenu extends IresMenu {
                 <thead>
                 <tr>
                     <th scope="col">Nom</th>
+                    <th scope="col">Type</th>
                     <th scope="col">Responsable(s)</th>
                     <th scope="col">Date de création</th>
-                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -137,45 +134,11 @@ class GroupListMenu extends IresMenu {
         <h2>Groupes : </h2>
         <table class="table table-striped table-hover">
             <thead>
-<<<<<<< HEAD
-=======
-            <tr>
-                <th scope="col">Nom</th>
-                <th scope="col">Responsable(s)</th>
-                <th scope="col">Date de création</th>
-                <th scope="col"></th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
-            /*
-             * Affichage de tous les groupes
-             */
-            $groups = Group::all();
-            foreach ($groups as $group) {
-                self::printGroup($group);
-            } // end foreach ?>
-            </tbody>
-            <?php /*
-            * Affichage d'un message si aucun groupe n'existe
-            */
-            if (count($groups) === 0) { ?>
                 <tr>
-                    <td colspan="4"><?php _e("No existing group") ?></td>
-                </tr>
-            <?php } // endif
-
-            /*
-             * Affichage du bas de page si il y a plus de 9 groupes
-             */
-            if (count($groups) > 9) { ?>
-                <tfoot>
->>>>>>> ymay/40
-                <tr>
-                    <td>Nom</td>
-                    <td>Responsable</td>
-                    <td>Date de création</td>
-                    <td></td>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Responsable(s)</th>
+                    <th scope="col">Date de création</th>
                 </tr>
             </thead>
             <tbody>
@@ -213,74 +176,6 @@ class GroupListMenu extends IresMenu {
             <?php }  ?>
         </table> <!-- Fin du tableau de l'affichage de tous les groupes -->
         <?php
-<<<<<<< HEAD
-=======
-    } // end function getContent()
-
-    /**
-     * Show depending on the content that has been sent
-     * different error/warning/success messages
-     */
-    private function showMessages() {
-        /*
-         * Supprime un groupe
-         */
-        if (isset($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
-            $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
-            $type_message = "error";
-            if (Group::delete($deletedGroup->getId())) {
-                $message = "Le groupe " . $deletedGroup->getName() . " a été supprimé.";
-                $type_message = "updated";
-            }
-            ?>
-            <form action="" method="post" id="message">
-                <input type="hidden" name="message" value="<?php echo $message ?>">
-                <input type="hidden" name="type" value="<?php echo $type_message ?>">
-            </form>
-
-            <!-- Envoi du formulaire caché -->
-            <script type="text/javascript">
-                document.getElementById('message').submit(); // SUBMIT FORM
-            </script>
-            <?php
-        }
-
-        /*
-         * Ajoute un groupe si possible
-         */
-        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup'])) {
-            $message = "Impossible de créer le groupe.";
-            $type_message = "error";
-
-            Group::createTable();
-            if (Group::register(esc_attr($_POST['nameAddGroup']))) {
-                $type_message = "updated";
-                $message = "Le groupe " . $_POST['nameAddGroup'] . " a été créé.";
-            }
-            ?>
-            <form action="" method="post" id="message">
-                <input type="hidden" name="message" value="<?php echo $message ?>">
-                <input type="hidden" name="type" value="<?php echo $type_message ?>">
-            </form>
-
-            <!-- Envoi du formulaire caché -->
-            <script type="text/javascript">
-                document.getElementById('message').submit(); // SUBMIT FORM
-            </script>
-            <?php
-        }
-
-        /*
-         * Affichage d'un message
-         */
-        if (isset($_POST['message']) && isset($_POST['type'])) { ?>
-            <!-- Affichage du message d'erreur ou de réussite en cas d'ajout d'un utilisateur au groupe -->
-            <div id="message" class="<?php echo $_POST['type']; ?> notice is-dismissible">
-                <p><strong><?php echo stripslashes($_POST['message']); ?></strong></p>
-            </div>
-            <?php
-        }
->>>>>>> ymay/40
     }
 
     /**
@@ -303,18 +198,13 @@ class GroupListMenu extends IresMenu {
                     <?php echo $group->getName() ?>
                 </a>
             </th>
-            <!-- Name of the user in charge of the group -->
-            <td class="">
-                <?php
-                $i = 0;
-                foreach ($responsables as $resp) {
-                    $i ++;
-                    echo $resp->first_name . " " . $resp->last_name;
-                    if (count($responsables) > 1 && $i < count($responsables)) {
-                        echo ", ";
-                    }
-                }
-                ?>
+            <!-- Group's type -->
+            <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
+            <!-- Name of the users in charge of the group -->
+            <td> <?php
+                echo implode(", ", array_map(function($u) {
+                    return $u->first_name . " " . $u->last_name;
+                }, $responsables));  ?>
             </td>
             <!-- Date -->
             <td>

@@ -202,7 +202,7 @@ class UserProfileMenu extends IresMenu {
                                     <?php }
                                 } else if ($formType === "radio") {
                                     $value = filter_var($data->getValue($this->editingUser),
-                                        FILTER_VALIDATE_BOOL); ?>
+                                        FILTER_VALIDATE_BOOLEAN); ?>
                                     Oui <input <?php echo Dataset::allFrom($data) ?>
                                             class="form-control"
                                             type="radio"

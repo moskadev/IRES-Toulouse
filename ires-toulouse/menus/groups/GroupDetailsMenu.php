@@ -267,7 +267,7 @@ class GroupDetailsMenu extends IresMenu {
                                 if (current_user_can('administrator') ||
                                     $this->group->isUserResponsable(wp_get_current_user())) { ?>
                                     <button type="submit" class="btn btn-outline-secondary btn-sm"
-                                            onclick="location.href = '/wp-admin/admin.php?page=page=mon_profil_ires&user_id=<?php echo $user->ID ?>&lock=0'">
+                                            onclick="location.href = '/wp-admin/admin.php?page=mon_profil_ires&user_id=<?php echo $user->ID ?>&lock=0'">
                                         Modifier
                                     </button>
                             </div>

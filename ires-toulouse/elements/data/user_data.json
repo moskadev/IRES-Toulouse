@@ -8,9 +8,10 @@
     "name": "Identifiant",
     "parent": "info_perso",
     "formType": "text",
-    "id": "nickname",
+    "id": "user_login",
     "disabled": true,
-    "description": "L'identifiant ne sera plus modifiable et sera attribué automatiquement"
+    "description": "L'identifiant n'est plus modifiable et est attribué automatiquement",
+    "wordpressMeta": true
   },
   {
     "name": "Nom",
@@ -20,7 +21,8 @@
     "uppercase": true,
     "required": true,
     "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
-    "description": "En majuscules uniquement, sans chiffres"
+    "description": "En majuscules uniquement, sans chiffres",
+    "wordpressMeta": true
   },
   {
     "name": "Prénom",
@@ -30,16 +32,18 @@
     "uppercase": true,
     "required": true,
     "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
-    "description": "En majuscules uniquement, sans chiffres"
+    "description": "En majuscules uniquement, sans chiffres",
+    "wordpressMeta": true
   },
   {
     "name": "E-mail",
     "parent": "info_perso",
-    "formType": "email",
+    "formType": "text",
     "required": true,
-    "id": "email",
-    "regex": "\\S+@\\S+\\.\\S+",
-    "description": "Si vous modifiez cela nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé."
+    "id": "user_email",
+    "regex": "(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))",
+    "description": "Nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé.",
+    "wordpressMeta": true
   },
   {
     "name": "Téléphone",
@@ -50,30 +54,67 @@
     "description": "+33 X XX XX XX XX, 0X XX XX XX XX, 0X.XX.XX.XX.XX..."
   },
   {
+    "name": "Activités à l'IRES de TOULOUSE",
+    "formType": "label",
+    "id": "activites_ires"
+  },
+  {
+    "name": "Groupes, manifestations et responsables",
+    "formType": "table",
+    "id": "groupes",
+    "parent": "activites_ires",
+    "disabled": true,
+    "extraData": "user_groups"
+  },
+  {
+    "name": "Informations complémentaires",
+    "formType": "label",
+    "id": "info_complementaires"
+  },
+  {
     "name": "Diplomes",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "checklist",
     "id": "diplomes",
-    "extraData": ["CAPES", "CAPET", "AGREGATION", "CRPE", "CAFFA", "CAPLP", "CAPPEI", "THÈSE"],
+    "extraData": [
+      "CAPES",
+      "CAPET",
+      "AGREGATION",
+      "CRPE",
+      "CAFFA",
+      "CAPLP",
+      "CAPPEI",
+      "THÈSE"
+    ],
     "description": "Enfoncez Ctrl (^) ou Cmd (⌘) sur Mac pour sélectionner de multiples choix"
   },
   {
     "name": "Situation professionnelle",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "dropdown",
     "id": "situation_pro",
-    "extraData": ["En activité", "Retraité"]
+    "extraData": [
+      "En activité",
+      "Retraité"
+    ]
   },
   {
     "name": "Type d'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "dropdown",
     "id": "type_etablissement",
-    "extraData": ["Primaire", "Collège", "Lycée", "Classes prépas", "Université", "Autre"]
+    "extraData": [
+      "Primaire",
+      "Collège",
+      "Lycée",
+      "Classes prépas",
+      "Université",
+      "Autre"
+    ]
   },
   {
     "name": "Nom de l'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "nom_etablissement",
     "uppercase": true,
@@ -82,7 +123,7 @@
   },
   {
     "name": "Ville de l'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "ville_etablissement",
     "uppercase": true,
@@ -91,7 +132,7 @@
   },
   {
     "name": "Code UAI/RNE de l'établissement scolaire",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "code_uai_rne",
     "uppercase": true,
@@ -100,7 +141,7 @@
   },
   {
     "name": "Nom du chef de l'établissement",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "formType": "text",
     "id": "nom_chef_etablissement",
     "uppercase": true,
@@ -110,7 +151,7 @@
   {
     "name": "Discipline enseignée",
     "formType": "dropdown",
-    "parent": "info_perso",
+    "parent": "info_complementaires",
     "id": "discipline_enseignee",
     "extraData": "disciplines"
   },
@@ -188,28 +229,5 @@
     "formType": "text",
     "id": "membre_association_autre",
     "parent": "assoc_societes_savantes"
-  },
-  {
-    "name": "Activités de l'IRES de TOULOUSE",
-    "formType": "label",
-    "id": "activites_ires"
-  },
-  {
-    "name": "Groupe de recherche-action",
-    "formType": "text",
-    "id": "groupe_recherche_action",
-    "parent": "activites_ires"
-  },
-  {
-    "name": "Responsable du groupe",
-    "id": "responsable_groupe",
-    "formType": "text",
-    "parent": "activites_ires"
-  },
-  {
-    "name": "Manifestation",
-    "formType": "text",
-    "id": "manifestation",
-    "parent": "activites_ires"
   }
 ]

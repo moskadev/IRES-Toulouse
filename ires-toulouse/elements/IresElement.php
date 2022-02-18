@@ -2,40 +2,21 @@
 
 namespace irestoulouse\elements;
 
-use irestoulouse\utils\Identifier;
-
 class IresElement {
 
     /** @var string */
     protected string $name;
 
-    /** @var string */
-    protected string $id;
+    /** @var mixed */
+    protected $id;
 
     /**
-     * Initialization of the name and generation of the
-     * discipline identifier
-     *
      * @param string $name
-     * @param string|null $id
+     * @param mixed $id
      */
-    public function __construct(string $name, ?string $id = null) {
+    public function __construct($id, string $name = "") {
         $this->name = $name;
-        $this->id = $id ?? Identifier::fromName($name);
-    }
-
-    /**
-     * @return string the name of the discipline
-     */
-    public function getName(): string {
-        return $this->name;
-    }
-
-    /**
-     * @return string the discipline identifier
-     */
-    public function getId(): string {
-        return $this->id;
+        $this->id = $id;
     }
 
     /**
@@ -46,6 +27,20 @@ class IresElement {
             "name" => $this->getName(),
             "id" => $this->getId()
         ];
+    }
+
+    /**
+     * @return string the element's name
+     */
+    public function getName() : string {
+        return $this->name;
+    }
+
+    /**
+     * @return mixed the element's identifier
+     */
+    public function getId() {
+        return $this->id;
     }
 
 }

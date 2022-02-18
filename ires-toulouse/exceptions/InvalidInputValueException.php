@@ -2,7 +2,9 @@
 
 namespace irestoulouse\exceptions;
 
-class InvalidInputValueException extends \Exception {
+use Exception;
+
+class InvalidInputValueException extends Exception {
 
     /**
      * @param string $inputName

@@ -139,7 +139,7 @@ class UserListMenu extends IresMenu {
                 <tr id="line">
                     <td class="name"><?php echo $user->last_name; ?><br/>
                         <form id="hide-info" method="post" action=""><?php
-                            if (current_user_can('responsable') || current_user_can('administrator')) { ?>
+                            if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
                                 <button type="submit" class="button-link-ires">
                                     <a href="/wp-admin/admin.php?page=mon_profil_ires&user_id=<?php echo $user->ID ?>&lock=0">Modifier</a>
                                 </button><?php

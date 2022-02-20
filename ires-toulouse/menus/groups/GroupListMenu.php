@@ -186,50 +186,42 @@ class GroupListMenu extends IresMenu {
      */
     private function printGroup(Group $group) {
         $user = wp_get_current_user();
-        $users = $group->getUsers();
-
-        $responsables = $group->getResponsables(); ?>
-        <tr class="<?php if (in_array($user, $users)) {
+        $respNames = array_map(function($u) {
+            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+        }, $group->getResponsables());
+        
+        ?>
+        <tr class="<?php if (in_array($user, $group->getUsers())) {
             echo "table-primary";
         } ?>">
             <!-- Name of the group -->
             <th scope="row" class="text-primary">
                 <a class="text-decoration-none"
-                   href="/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
+                   href="<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>">
                     <?php echo $group->getName() ?>
                 </a>
             </th>
             <!-- Group's type -->
             <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
             <!-- Name of the users in charge of the group -->
-            <td> <?php
-                echo implode(", ", array_map(function($u) {
-                    return $u->first_name . " " . $u->last_name;
-                }, $responsables));  ?>
-            </td>
+            <td> <?php echo implode(", ", $respNames) ?></td>
             <!-- Date -->
-            <td>
-                <?php echo $group->getCreationTime() ?>
-            </td>
+            <td><?php echo $group->getCreationTime() ?></td>
             <td>
                 <?php
                 if (current_user_can('administrator') || (current_user_can('responsable') && $group->isUserResponsable($user))) {
                     ?>
                     <form action="" method="post">
-                        <button type="button"
-                                id="modify"
-                                name="modify"
+                        <button type="button" id="modify" name="modify"
                                 value="<?php echo $group->getId() ?>"
                                 class="btn btn-outline-secondary btn-sm"
-                                onclick="location.href='/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>'">
+                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>'">
                             Modifier
                         </button>
                         <?php
                         if (current_user_can('administrator')) {
                             ?>
-                            <button type="submit"
-                                    id="delete"
-                                    name="delete"
+                            <button type="submit" id="delete" name="delete"
                                     value="<?php echo $group->getId() ?>"
                                     class="btn btn-outline-danger btn-sm"
                                     onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group->getName(); ?> ?');">

@@ -49,7 +49,7 @@ class UserRegisterMenu extends IresMenu {
                 $this->loggedUser = $connection->register();
 
                 $message = "L'utilisateur " . $this->loggedUser->user_login . "  a été bien enregistré, 
-                    <a href='/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->loggedUser->ID . "'>
+                    <a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->loggedUser->ID) . "'>
                         vous pouvez renseigner ses informations ici
                     </a>";
                 $type_message = "updated";

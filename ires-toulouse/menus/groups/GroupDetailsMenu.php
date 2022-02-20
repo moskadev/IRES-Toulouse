@@ -103,7 +103,7 @@ class GroupDetailsMenu extends IresMenu {
         <!-- Bouton retour & titre de la page -->
         <div class="row">
             <div class="col-auto">
-                <form action="/wp-admin/admin.php?page=groupes_ires"
+                <form action="<?php echo home_url("/wp-admin/admin.php?page=groupes_ires") ?>"
                       method="post">
                     <button type="submit" value="" name="back"
                             class="btn btn-outline-secondary rounded-circle"
@@ -267,7 +267,7 @@ class GroupDetailsMenu extends IresMenu {
                                 if (current_user_can('administrator') ||
                                     $this->group->isUserResponsable(wp_get_current_user())) { ?>
                                     <button type="submit" class="btn btn-outline-secondary btn-sm"
-                                            onclick="location.href = '/wp-admin/admin.php?page=mon_profil_ires&user_id=<?php echo $user->ID ?>&lock=0'">
+                                            onclick="location.href = '<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>'">
                                         Modifier
                                     </button>
                             </div>

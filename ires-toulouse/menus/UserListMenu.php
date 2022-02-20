@@ -86,7 +86,7 @@ class UserListMenu extends IresMenu {
 
         <div class="grid-container">
             <div class="form-add-member">
-                <form action="/wp-admin/admin.php?page=ajouter_un_compte">
+                <form action="<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>">
                     <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
                         <p class="add-member">
                             <input class="button-secondary" type="submit" value="Ajouter un membre"/>
@@ -109,13 +109,13 @@ class UserListMenu extends IresMenu {
             <thead>
                 <tr>
                     <th class="manage-column column-username column-primary sortable <?php echo self::sens(); ?>">
-                        <a href="/wp-admin/admin.php?page=comptes_ires&orderby=last_name&order=<?php echo self::sens(); ?>"><!-- order = asc ou desc-->
+                        <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=last_name&order=" . self::sens()) ?>"><!-- order = asc ou desc-->
                             <span>Nom</span>
                             <span id="sorting-indicator-last_name" class="sorting-indicator"></span>
                         </a>
                     </th>
                     <th class="manage-column column-username column-primary sortable <?php echo self::sens(); ?>">
-                        <a href="/wp-admin/admin.php?page=comptes_ires&orderby=first_name&order=<?php echo self::sens(); ?>"><!-- order = asc ou desc-->
+                        <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=first_name&order=" . self::sens()) ?>"><!-- order = asc ou desc-->
                             <span>Prénom</span>
                             <span id="sorting-indicator-first_name" class="sorting-indicator"></span>
                         </a>
@@ -133,22 +133,22 @@ class UserListMenu extends IresMenu {
                     continue;
                 }
                 $groupNames = array_map(function ($g){
-                    return "<a href='/wp-admin/admin.php?page=details_du_groupe&group=" .
-                        $g->getId() . "'>" . $g->getName() . "</a>";
+                    return "<a href='" . home_url("/wp-admin/admin.php?page=details_du_groupe&group=" .
+                        $g->getId()) . "'>" . $g->getName() . "</a>";
                 }, Group::getUserGroups($user)); ?>
                 <tr id="line">
                     <td class="name"><?php echo $user->last_name; ?><br/>
                         <form id="hide-info" method="post" action=""><?php
                             if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
                                 <button type="submit" class="button-link-ires">
-                                    <a href="/wp-admin/admin.php?page=mon_profil_ires&user_id=<?php echo $user->ID ?>&lock=0">Modifier</a>
+                                    <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>">Modifier</a>
                                 </button><?php
                             }
                             if (current_user_can('administrator') && !user_can($user, "administrator")) { ?>
                                 <button type="button" data-popup-target="#popup-delete" class="delete" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp; <?php
                             }?>
                             <button type="submit" class="button-link-ires">
-                                <a href="/wp-admin/admin.php?page=mon_profil_ires&user_id=<?php echo $user->ID ?>&lock=1">Voir</a>
+                                <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>">Voir</a>
                             </button>
                         </form>
                     </td> <!-- Last name -->

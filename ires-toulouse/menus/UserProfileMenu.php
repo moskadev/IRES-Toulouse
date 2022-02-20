@@ -177,11 +177,11 @@ class UserProfileMenu extends IresMenu {
                                             /** @var Group $group */
                                             foreach ($groups as $group){
                                                 $respNames = array_map(function($u) {
-                                                    return "<a href='/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $u->ID . "&lock=1'>" . $u->first_name . " " . $u->last_name . "</a>";
+                                                    return "<a href='" . home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
                                                 }, $group->getResponsables()); ?>
                                                 <tr>
                                                     <td><a class="text-decoration-none"
-                                                           href="/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
+                                                           href="<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>">
                                                             <?php echo $group->getName() ?></a></td>
                                                     <td><?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
                                                     <td><?php echo implode(", ", $respNames)?></td>
@@ -260,7 +260,8 @@ class UserProfileMenu extends IresMenu {
         <table class="form-table">
             <tr>
                 <td>
-                    <button class="btn btn-primary w-100" onclick='location.href="/wp-admin/admin.php?page=<?php echo $this->getId() ?>&user_id=<?php echo $this->editingUser->ID ?>&lock=<?php echo !$this->locked ?>"'>
+                    <button class="btn btn-primary w-100"
+                            onclick='location.href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $this->editingUser->ID . "&lock=" . !$this->locked) ?>"'>
                         <span class='dashicons <?php echo $this->locked ? "dashicons-lock'></span>Déverrouiller" : "dashicons-unlock'></span>Verrouiller" ?> les modifications de l'utilisateur
                     </button>
                 </td>
@@ -279,7 +280,7 @@ class UserProfileMenu extends IresMenu {
             <div class="dropdown-content"><?php
                 foreach ($this->visibleUsers as $user) { ?>
                     <a class="<?php if($user->ID === $this->editingUser->ID) echo "dropdown-selected" ?>"
-                       href="/wp-admin/admin.php?page=<?php echo $this->getId() ?>&user_id=<?php echo $user->ID ?>">
+                       href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $user->ID) ?>">
                         <?php echo $user->user_login ?>
                     </a>
                 <?php } ?>

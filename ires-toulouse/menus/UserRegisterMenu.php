@@ -74,7 +74,7 @@ class UserRegisterMenu extends IresMenu {
      *      - Add the user to the database
      */
     public function getContent() : void {?>
-        <form method='post' class='verifiy-form validate' novalidate='novalidate'>
+        <form method='post' class='verifiy-form'>
             <table class='form-table' role='presentation'>
                 <?php
                 foreach (UserData::all() as $data) {
@@ -107,7 +107,6 @@ class UserRegisterMenu extends IresMenu {
                         </th>
                         <td>
                             <input <?php echo Dataset::allFrom($data) ?>
-                                    class='form-control'
                                     type='<?php echo $formType ?>'
                                     id='<?php echo $dataId ?>'
                                     name='<?php echo $dataId ?>'
@@ -121,7 +120,7 @@ class UserRegisterMenu extends IresMenu {
                     <?php
                 } ?>
             </table>
-            <button class="btn btn-outline-primary w-100 menu-submit" type="submit"
+            <button class="button-primary menu-submit" type="submit"
                     name="createuser" disabled>
                 Créer un nouveau compte IRES
             </button>

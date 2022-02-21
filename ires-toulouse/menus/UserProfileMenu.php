@@ -130,7 +130,7 @@ class UserProfileMenu extends IresMenu {
 
         <form method='post' name='modify' class='verifiy-form'>
             <input name='action' type='hidden' value='modify'>
-            <table class='data-table form-table' role='presentation'><?php
+            <table class='form-table' role='presentation'><?php
                 foreach (UserData::all() as $data) {
                     $formType = $data->getFormType();
                     $dataId = $data->getId();
@@ -154,7 +154,6 @@ class UserProfileMenu extends IresMenu {
                                 <?php
                                 if ($formType === "text") { ?>
                                     <input <?php echo Dataset::allFrom($data) ?>
-                                            class="form-control"
                                             type='<?php echo htmlspecialchars($formType) ?>'
                                             id='<?php echo $dataId ?>'
                                             name='<?php echo $dataId ?>'
@@ -164,13 +163,13 @@ class UserProfileMenu extends IresMenu {
                                 } else if($formType === "table" && $dataId === "groupes"){
                                     $groups = $data->getExtraData($this->editingUser);
                                     if(count($groups) > 0){ ?>
-                                        <table class="table groups-data table-striped">
+                                        <table class="widefat groups-data striped">
                                             <thead>
                                             <tr>
-                                                <th scope="col">Nom du groupe</th>
-                                                <th scope="col">Type du groupe</th>
-                                                <th scope="col">Responsables</th>
-                                                <th scope="col">Responsable de ce groupe</th>
+                                                <th class="row-title">Nom du groupe</th>
+                                                <th class="row-title">Type du groupe</th>
+                                                <th class="row-title">Responsables</th>
+                                                <th class="row-title">Responsable de ce groupe</th>
                                             </tr>
                                             </thead>
                                             <tbody> <?php
@@ -198,7 +197,6 @@ class UserProfileMenu extends IresMenu {
                                     $value = filter_var($data->getValue($this->editingUser),
                                         FILTER_VALIDATE_BOOLEAN); ?>
                                     Oui <input <?php echo Dataset::allFrom($data) ?>
-                                            class="form-control"
                                             type="radio"
                                             id='<?php echo $dataId ?>_oui'
                                             name='<?php echo $dataId ?>'
@@ -207,7 +205,6 @@ class UserProfileMenu extends IresMenu {
                                         <?php if ($value) echo "checked" ?>>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     Non <input <?php echo Dataset::allFrom($data) ?>
-                                            class="form-control"
                                             type="radio"
                                             id='<?php echo $dataId ?>_non'
                                             name='<?php echo $dataId ?>'
@@ -217,7 +214,6 @@ class UserProfileMenu extends IresMenu {
                                     <?php
                                 } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
                                     <select <?php if ($formType === "checklist") echo "multiple" ?>
-                                            class="form-control"
                                             name='<?php echo $dataId ?>[]'
                                             id='<?php echo $dataId ?>'
                                         <?php if ($this->locked) echo "disabled" ?>> <?php
@@ -248,7 +244,7 @@ class UserProfileMenu extends IresMenu {
                 } ?>
             </table><?php
             if (!$this->locked) { ?>
-                <button class="btn btn-outline-primary w-100 menu-submit" type="submit"
+                <button class="button-primary menu-submit" type="submit"
                         name="profile-page" disabled>
                     Modifier les informations
                 </button>
@@ -257,10 +253,10 @@ class UserProfileMenu extends IresMenu {
     }
 
     private function showModificationBtn() : void { ?>
-        <table class="form-table">
+        <table class="data-table">
             <tr>
                 <td>
-                    <button class="btn btn-primary w-100"
+                    <button class="button-primary button-large"
                             onclick='location.href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $this->editingUser->ID . "&lock=" . !$this->locked) ?>"'>
                         <span class='dashicons <?php echo $this->locked ? "dashicons-lock'></span>Déverrouiller" : "dashicons-unlock'></span>Verrouiller" ?> les modifications de l'utilisateur
                     </button>

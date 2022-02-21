@@ -18,6 +18,8 @@ class Group extends IresElement {
     public const TYPE_MANIFESTATION = 1;
     public const TYPE_AUTRE = 2;
 
+    public const MAX_RESPONSABLES = 3;
+
     public const TYPE_NAMES = [
         self::TYPE_RECHERCHE_ACTION => "Recherche-action",
         self::TYPE_MANIFESTATION => "Manifestation",
@@ -322,11 +324,11 @@ class Group extends IresElement {
      */
     public function addResponsable(WP_User $user) : bool {
         $this->addUser($user);
-        // à confirmer si l'utlisateur peut être responsable plus de 3 groupes
-        //if (count(self::allWhereUserResponsable($user)) > 3) {
+        // à confirmer si l'utlisateur peut être responsable dans plus de 3 groupes
+        //if (count(self::allWhereUserResponsable($user)) > self::MAX_RESPONSABLES) {
         //    return false;
         //}
-        if (!$this->isUserResponsable($user)) {
+        if (!$this->isUserResponsable($user) && count($this->getResponsables()) < self::MAX_RESPONSABLES) {
             $db = Database::get();
             $user->add_role("responsable");
 
@@ -392,12 +394,9 @@ class Group extends IresElement {
         if (!$this->userExists($user)) {
             $db = Database::get();
 
-            return $db->insert($db->prefix . "groups_users",
-                    [
-                        "user_id" => $user->ID,
-                        "group_id" => $this->id,
-                        "is_responsable" => "0"
-                    ]) !== false;
+            return $db->insert($db->prefix . "groups_users", [
+                "user_id" => $user->ID, "group_id" => $this->id, "is_responsable" => "0"
+                ]) !== false;
         }
 
         return false;

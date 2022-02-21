@@ -57,13 +57,14 @@ forms.forEach(function (form) {
     function changeSubmitState(btn) {
         if (btn !== null) {
             btn.disabled = !areCorrectlyFilled();
-            if (areCorrectlyFilled()) {
-                btn.classList.remove("btn-outline-primary");
-                btn.classList.add("btn-primary");
-            } else {
-                btn.classList.add("btn-outline-primary");
-                btn.classList.remove("btn-primary");
-            }
+            // bootstrap
+            //if (areCorrectlyFilled()) {
+            //    btn.classList.remove("btn-outline-primary");
+            //    btn.classList.add("btn-primary");
+            //} else {
+            //    btn.classList.add("btn-outline-primary");
+            //    btn.classList.remove("btn-primary");
+            //}
         }
     }
 

@@ -5,7 +5,6 @@ namespace menus;
 use irestoulouse\controllers\UserConnection;
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
-use stdClass;
 
 class UserListMenu extends IresMenu {
 
@@ -27,9 +26,9 @@ class UserListMenu extends IresMenu {
          * Deleting the user after validation (with the confirmation popup)
          */
         $message = $type_message = "";
-        if (current_user_can('administrator') && isset($_POST['delete']) && $_POST['user_id']) {
+        if (current_user_can('administrator') && isset($_POST['delete'])) {
             try {
-                $deletedUser = get_userdata($_POST['user_id']);
+                $deletedUser = get_userdata($_POST['delete']);
                 if($deletedUser !== false) {
                     $fullName = "{$deletedUser->last_name} {$deletedUser->first_name} ({$deletedUser->user_login})";
 
@@ -67,45 +66,38 @@ class UserListMenu extends IresMenu {
 
     public function getContent() : void {?>
         <!-- Confirmation popup for deletion of a user -->
-        <div class="popup-delete" id="popup-delete">
-            <div class="popup-header">
-                <div id="popup-title" class="title"></div>
-                <button data-close-button class="close-button">&times;</button>
-            </div>
-            <div class="popup-body">
-                Êtes-vous sur de vouloir supprimer ce compte ?
-                <form action="" method="post">
-                    <input type="hidden" id="userId" name="user_id" value="">
-                    <input class="button-primary" name="delete" type="submit" value="Confirmer"/>
-                    <input class="button-secondary" data-close-button type="button" value="Annuler"/>
-                </form>
-            </div>
-        </div>
-        <div id="overlay"></div>
-
-
-        <div class="grid-container">
-            <div class="form-add-member">
-                <form action="<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>">
-                    <?php   if (current_user_can('responsable') || current_user_can('administrator')) { ?>
-                        <p class="add-member">
-                            <input class="button-secondary" type="submit" value="Ajouter un membre"/>
-                        </p>
-                    <?php   }?>
-                </form>
-            </div>
-            <div class="search">
-                <form action="" method="get">
-                    <p class="search-box">
-                        <input type="hidden" id="action" name="page" value="comptes_ires">
-                        <input type="text" id="search" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
-                        <input class="button-secondary" type="submit" value="Rechercher des comptes"/>
-                        <input class="button-delete" type="submit"  onclick="document.getElementById('search').value = '';" value="Effacer"/>
-                    </p>
-                </form>
+        <div class="popup">
+            <div class="popup-element">
+                <div class="popup-header">
+                    <p class="title popup-title"></p>
+                    <button data-close-button class="close-button">&times;</button>
+                </div>
+                <div class="popup-body">
+                    <p>Êtes-vous sûr de vouloir supprimer ce compte ?</p>
+                    <form action="" method="post">
+                        <input type="hidden" id="userId" name="delete" value="">
+                        <button class="confirm-delete button-primary button-delete" type="submit">Confirmer</button>
+                        <button class="button-secondary" type="button" data-close-button>Annuler</button>
+                    </form>
+                </div>
             </div>
         </div>
-        <table class="widefat striped">
+
+
+        <div class="action-list-bar">
+            <form action="<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>"><?php
+                if (current_user_can('responsable') || current_user_can('administrator')) { ?>
+                    <input class="button-secondary" type="submit" value="Ajouter un membre"/><?php
+                }?>
+            </form>
+            <form action="" method="get">
+                <input type="hidden" id="action" name="page" value="comptes_ires">
+                <input type="text" id="search" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
+                <input class="button-secondary" type="submit" value="Rechercher des comptes"/>
+                <input class="button-secondary button-secondary-delete" type="submit"  onclick="document.getElementById('search').value = '';" value="Effacer"/>
+            </form>
+        </div>
+        <table class="widefat striped users-list">
             <thead>
                 <tr>
                     <th class="manage-column column-username column-primary sortable <?php echo self::sens(); ?>">
@@ -128,7 +120,7 @@ class UserListMenu extends IresMenu {
             <tbody>
             <?php
             $counter = 0;
-            foreach ($this->users  as $user) {
+            foreach ($this->users as $user) {
                 if($user->ID === get_current_user_id()){
                     continue;
                 }
@@ -136,16 +128,16 @@ class UserListMenu extends IresMenu {
                     return "<a href='" . home_url("/wp-admin/admin.php?page=details_du_groupe&group=" .
                         $g->getId()) . "'>" . $g->getName() . "</a>";
                 }, Group::getUserGroups($user)); ?>
-                <tr id="line">
+                <tr>
                     <td class="name"><?php echo $user->last_name; ?><br/>
-                        <form id="hide-info" method="post" action=""><?php
+                        <form class="hide-actions" method="post" action=""><?php
                             if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
                                 <button type="submit" class="button-link-ires">
                                     <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>">Modifier</a>
                                 </button><?php
                             }
                             if (current_user_can('administrator') && !user_can($user, "administrator")) { ?>
-                                <button type="button" data-popup-target="#popup-delete" class="delete" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp; <?php
+                                <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp; <?php
                             }?>
                             <button type="submit" class="button-link-ires">
                                 <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>">Voir</a>
@@ -165,14 +157,16 @@ class UserListMenu extends IresMenu {
             }
             ?>
             </tbody>
-            <tfoot>
-                <tr>
-                    <th class="row-title">Nom</th>
-                    <th>Prénom</th>
-                    <th>Email</th>
-                    <th>Identifiant</th>
-                    <th>Groupe</th>
-                </tr>
+            <tfoot> <?php
+                if(count($this->users) > 9){ ?>
+                    <tr>
+                        <th class="row-title">Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Identifiant</th>
+                        <th>Groupe</th>
+                    </tr><?php
+                } ?>
             </tfoot>
         </table>
         <?php

@@ -284,3 +284,69 @@ tr:hover .hide-actions {
     background-color: #ddd;
     color: black !important;
 }
+
+/*
+ * Switches
+ */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #c3c4c7;
+    transition: 400ms;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 400ms;
+}
+
+.switch-radio[disabled] + .slider {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.switch-radio[value=true] + .slider {
+    background-color: #135e96;
+}
+
+.switch-radio:focus + .slider {
+    box-shadow: 0 0 1px #135e96;
+}
+
+.switch-radio[value=true] + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

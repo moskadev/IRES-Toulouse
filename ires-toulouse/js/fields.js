@@ -133,7 +133,24 @@ forms.forEach(function (form) {
     }
 });
 
+changeSwitchState();
 submitFormOnItemSelect();
+
+/**
+ * Change the state of the switch on click
+ */
+function changeSwitchState() {
+    document.querySelectorAll(".switch").forEach(switchBtn => {
+        switchBtn.addEventListener("click", e => {
+            const switchRadio = switchBtn.firstElementChild;
+
+            console.log(switchRadio.disabled)
+            if(e.target === switchRadio && !switchRadio.disabled) {
+                switchRadio.value = !switchRadio.value || switchRadio.value === "true" ? "false" : "true";
+            }
+        });
+    });
+}
 
 /**
  * Submit the select input's form when a new item has been

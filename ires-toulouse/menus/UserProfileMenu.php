@@ -193,25 +193,15 @@ class UserProfileMenu extends IresMenu {
                                     } else { ?>
                                         <p>L'utilisateur n'appartient à aucun groupe</p>
                                     <?php }
-                                } else if ($formType === "radio") {
-                                    $value = filter_var($data->getValue($this->editingUser),
-                                        FILTER_VALIDATE_BOOLEAN); ?>
-                                    Oui <input <?php echo Dataset::allFrom($data) ?>
-                                            type="radio"
-                                            id='<?php echo $dataId ?>_oui'
-                                            name='<?php echo $dataId ?>'
-                                            value="true"
-                                        <?php if ($this->locked) echo "disabled" ?>
-                                        <?php if ($value) echo "checked" ?>>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    Non <input <?php echo Dataset::allFrom($data) ?>
-                                            type="radio"
-                                            id='<?php echo $dataId ?>_non'
-                                            name='<?php echo $dataId ?>'
-                                            value="false"
-                                        <?php if ($this->locked) echo "disabled" ?>
-                                        <?php if (!$value) echo "checked" ?>>
-                                    <?php
+                                } else if ($formType === "radio") { ?>
+                                    <label class="switch">
+                                        <input class="switch-radio"
+                                               type="radio"
+                                               name="<?php echo $dataId ?>"
+                                               value="<?php echo $data->getValue($this->editingUser) ?>"
+                                            <?php if ($this->locked) echo "disabled" ?>>
+                                        <div class="slider round"></div>
+                                    </label> <?php
                                 } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
                                     <select <?php if ($formType === "checklist") echo "multiple" ?>
                                             name='<?php echo $dataId ?>[]'

@@ -1,19 +1,23 @@
+let hideContent = true;
+executeCustomDropdownEvents();
+
 /**
  * Custom dropdowns
  */
-let hideContent = true;
-document.onclick = function(){
-    if(hideContent)
-        document.querySelectorAll(".dropdown-content").forEach(drop => drop.style.display = "none")
-    hideContent = true;
-};
+function executeCustomDropdownEvents() {
+    document.onclick = function(){
+        if(hideContent)
+            document.querySelectorAll(".dropdown-content").forEach(drop => drop.style.display = "none")
+        hideContent = true;
+    };
 
-document.querySelectorAll(".dropdown-btn").forEach(btn => {
-    btn.onclick = () => {
-        hideContent = false;
-        btn.nextElementSibling.style.display = "block";
-    }
-});
+    document.querySelectorAll(".dropdown-btn").forEach(btn => {
+        btn.onclick = () => {
+            hideContent = false;
+            btn.nextElementSibling.style.display = "block";
+        }
+    });
+}
 
 
 /**

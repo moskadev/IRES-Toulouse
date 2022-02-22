@@ -8,8 +8,6 @@ use irestoulouse\controllers\UserInputData;
 use irestoulouse\elements\input\UserData;
 use irestoulouse\utils\Dataset;
 
-use WP_User;
-
 /**
  * Creation of the plugin page
  * This page will allow you to add a user by a manager
@@ -19,9 +17,6 @@ use WP_User;
  *      - Last name
  */
 class UserRegisterMenu extends IresMenu {
-
-    /** @var WP_User|null */
-    private ?WP_User $loggedUser = null;
 
     public function __construct() {
         parent::__construct(
@@ -33,22 +28,30 @@ class UserRegisterMenu extends IresMenu {
         );
     }
 
-    public function analyzeSentData() : void {
-        if (!empty($_POST["first_name"]) &&
-            !empty($_POST["last_name"]) &&
-            !empty($_POST["user_email"])
-        ) {
+    /**
+     * Contents of the "Add a user" menu
+     * Allows to :
+     *      - Display a form to add a user (E-mail, First name, Last name)
+     *      - Create the user's login in the format:
+     *          first letter of the first name concatenated with the last name all in lower case
+     *      - Add the user to the database
+     */
+    public function getContent() : void {
+        $loggedUser = null;
+        $created = isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["user_email"]);
+
+        if ($created) {
             try {
                 $connection = new UserConnection(
-                    $_POST["first_name"],
-                    $_POST["last_name"],
-                    $_POST["user_email"]);
+                        $_POST["first_name"] ?? "",
+                    $_POST["last_name"] ?? "",
+                        $_POST["user_email"] ?? "");
 
                 UserInputData::checkSentData();
-                $this->loggedUser = $connection->register(); ?>
-
+                $loggedUser = $connection->register();
+                ?>
                 <div id="message" class="updated notice is-dismissible">
-                    <p><strong>L'utilisateur <?php echo $this->loggedUser->user_login ?> a
+                    <p><strong>L'utilisateur <?php echo $loggedUser->user_login ?> a
                             été bien enregistré, <a href='admin.php?page=mon_profil_ires'>
                                 vous pouvez renseigner ses informations ici</a></strong>
                     </p>
@@ -58,18 +61,7 @@ class UserRegisterMenu extends IresMenu {
                     <p><strong><?php echo $e->getMessage() ?></strong></p>
                 </div>
             <?php }
-        }
-    }
-
-    /**
-     * Contents of the "Add a user" menu
-     * Allows to :
-     *      - Display a form to add a user (E-mail, First name, Last name)
-     *      - Create the user's login in the format:
-     *          first letter of the first name concatenated with the last name all in lower case
-     *      - Add the user to the database
-     */
-    public function getContent() : void {?>
+        } ?>
         <form method='post' class='verifiy-form validate' novalidate='novalidate'>
             <table class='form-table' role='presentation'>
                 <?php
@@ -78,15 +70,15 @@ class UserRegisterMenu extends IresMenu {
                     $dataId = $data->getId();
 
                     if (!$data->isWordpressMeta() ||
-                        $dataId === "user_login" && $this->loggedUser === null) {
+                        $dataId === "user_login" && $loggedUser === null) {
                         continue;
                     }
 
                     $value = "";
                     if(isset($_POST[$dataId])){
                         $value = $_POST[$dataId];
-                    } else if($this->loggedUser !== null) {
-                        $value = $data->getValue($this->loggedUser);
+                    } else if($loggedUser !== null) {
+                        $value = $data->getValue($loggedUser);
                     }
                     ?>
                     <tr class="form-field form-required">
@@ -117,8 +109,7 @@ class UserRegisterMenu extends IresMenu {
                     <?php
                 } ?>
             </table>
-            <button class="btn btn-outline-primary menu-submit" type="submit"
-                    name="createuser" disabled>
+            <button class="btn btn-outline-primary menu-submit" type="submit" name="createuser" disabled>
                 Créer un nouveau compte IRES
             </button>
         </form>

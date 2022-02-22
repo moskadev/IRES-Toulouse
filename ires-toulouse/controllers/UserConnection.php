@@ -23,13 +23,12 @@ class UserConnection extends Controller {
      * @throws FailedUserRegistrationException
      */
     public function __construct(string $firstName, string $lastName, string $email) {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->email = $email;
-
         if (empty($firstName) || empty($lastName) || empty($email)) {
             throw new FailedUserRegistrationException($this->getOriginalLogin(), "Donnée incorrecte");
         }
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->email = $email;
     }
 
     /**
@@ -92,7 +91,19 @@ class UserConnection extends Controller {
     public function countSameLogins() : int {
         return count(get_users([
             "search" => $this->getOriginalLogin() . "*",
-            "search_columns" => ["user_login"]])
+            "search_columns" => ["user_login"]
+        ])
         );
+    }
+
+    /**
+     * @param string $subject
+     * @param string $message
+     *
+     * @return bool true if success
+     */
+    public function sendEmail(string $subject, string $message) : bool {
+        //todo
+        return true;
     }
 }

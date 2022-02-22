@@ -67,3 +67,4 @@ add_action("admin_enqueue_scripts", function () {
     wp_enqueue_style("ires-style", "/wp-content/plugins/ires-toulouse/style/ires.css");
     wp_enqueue_script("ires-script-fields", "/wp-content/plugins/ires-toulouse/js/fields.js", [], false, true);
 });
+

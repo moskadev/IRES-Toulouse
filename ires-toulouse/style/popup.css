@@ -1,0 +1,15 @@
+.overlay {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    background-color: rgba(0,0,0,0.5);
+    width: 100%;
+    display: none;
+}
+.popup {
+    margin: 20% auto;
+    width: 70%;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 15px 20px 0  rgba(0,0,0,0.5);
+}

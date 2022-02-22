@@ -8,8 +8,8 @@ use irestoulouse\menus\IresMenu;
 
 class UserListMenu extends IresMenu {
 
-    /** @var array */
-    private array $users;
+    /** @var \WP_User[] */
+    private array $searchedMembers;
 
     public function __construct() {
         parent::__construct(
@@ -49,19 +49,17 @@ class UserListMenu extends IresMenu {
                 <p><strong><?php echo $message ?></strong></p>
             </div> <?php
         }
-        $this->users = self::getAllMembers($_GET['search'] ?? '');
-
-        // Sorting of the users
-        if (isset($_GET['orderby']) && $_GET['orderby'] === 'last_name') { // Sorting by last name
-            isset($_GET['order']) && $_GET['order'] === 'asc' ?
-                usort($this->users, function($a, $b) {return strcmp($a->last_name, $b->last_name);}) :
-                usort($this->users, function($a, $b) {return strcmp($b->last_name, $a->last_name);});
-        }
-        if (isset($_GET['orderby']) && $_GET['orderby'] === 'first_name') { // Sorting by last name
-            isset($_GET['order']) && $_GET['order'] === 'asc' ?
-                usort($this->users, function($a, $b) {return strcmp($a->first_name, $b->first_name);}) :
-                usort($this->users, function($a, $b) {return strcmp($b->first_name, $a->first_name);});
-        }
+        /**
+         * Sorting the users
+         */
+        $search = $_GET["search"] ?? "";
+        $orderBy = $_GET["orderby"] ?? "";
+        $this->searchedMembers = get_users([
+            "search" => "*$search*",
+            "orderby" => wp_get_current_user()->$orderBy !== null ? $orderBy : "",
+            "order" => $this->getOrder(),
+            "search_columns" => ["user_login", "first_name", "last_name", "user_email"]
+        ]);
     }
 
     public function getContent() : void {?>
@@ -95,22 +93,27 @@ class UserListMenu extends IresMenu {
                 }?>
             </div>
             <form action="" method="get">
-                <input type="text" id="search" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
-                <input class="button-secondary" type="submit" value="Rechercher des comptes"/>
-                <input class="button-secondary button-secondary-delete" type="submit"  onclick="document.getElementById('search').value = ''" value="Effacer"/>
+                <input type="hidden" name="page" value="<?php echo $this->getId() ?>"/>
+                <input type="text" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
+                <button class="button-secondary" type="submit">Rechercher des comptes</button>
+                <button class="button-secondary button-secondary-delete"
+                        type="submit"
+                        onclick="document.querySelector('input[name=search]').value = ''">
+                    Effacer
+                </button>
             </form>
         </div>
         <table class="widefat striped users-list">
             <thead>
                 <tr>
-                    <th class="manage-column column-username column-primary sortable <?php echo self::sens(); ?>">
-                        <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=last_name&order=" . self::sens()) ?>"><!-- order = asc ou desc-->
+                    <th class="manage-column column-username column-primary sortable <?php echo $this->getOrder() ?>">
+                        <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=last_name&order=" . $this->getOrder(true)) ?>"><!-- order = asc ou desc-->
                             <span>Nom</span>
                             <span id="sorting-indicator-last_name" class="sorting-indicator"></span>
                         </a>
                     </th>
-                    <th class="manage-column column-username column-primary sortable <?php echo self::sens(); ?>">
-                        <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=first_name&order=" . self::sens()) ?>"><!-- order = asc ou desc-->
+                    <th class="manage-column column-username column-primary sortable <?php echo $this->getOrder() ?>">
+                        <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=first_name&order=" . $this->getOrder(true)) ?>"><!-- order = asc ou desc-->
                             <span>Prénom</span>
                             <span id="sorting-indicator-first_name" class="sorting-indicator"></span>
                         </a>
@@ -121,7 +124,7 @@ class UserListMenu extends IresMenu {
                 </tr>
             </thead>
             <tbody> <?php
-            foreach ($this->users as $user) {
+            foreach ($this->searchedMembers as $user) {
                 if($user->ID === get_current_user_id()){
                     continue;
                 }
@@ -135,11 +138,11 @@ class UserListMenu extends IresMenu {
                             if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
                                 <button type="submit" class="button-link-ires">
                                     <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>">Modifier</a>
-                                </button><?php
+                                </button>|<?php
                             }
                             if (current_user_can('administrator') && !user_can($user, "administrator")) { ?>
-                                <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>&emsp; <?php
-                            }?>
+                                <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button><?php
+                            }?>|
                             <button type="submit" class="button-link-ires">
                                 <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>">Voir</a>
                             </button>
@@ -158,7 +161,7 @@ class UserListMenu extends IresMenu {
             ?>
             </tbody>
             <tfoot> <?php
-                if(count($this->users) > 9){ ?>
+                if(count($this->searchedMembers) > 9){ ?>
                     <tr>
                         <th class="row-title">Nom</th>
                         <th>Prénom</th>
@@ -173,45 +176,12 @@ class UserListMenu extends IresMenu {
     }
 
     /**
-     * @param string $search
-     * @return array
+     * @param bool $reverse
+     *
+     * @return string
      */
-    private function getAllMembers(string $search): array {
-        global $wpdb;
-        $search = strtolower($search);
-        $sql = "SELECT ID, user_login, user_email FROM {$wpdb->prefix}users WHERE ID != 1";
-        $sql2 = "SELECT user_id, meta_value FROM {$wpdb->prefix}usermeta WHERE meta_key = 'first_name' AND user_id != 1";
-        $sql3 = "SELECT user_id, meta_value FROM {$wpdb->prefix}usermeta WHERE meta_key = 'last_name' AND user_id != 1";
-        $logins = $wpdb->get_results($wpdb->prepare($sql));
-        $first_name = $wpdb->get_results($wpdb->prepare($sql2));
-        $last_name = $wpdb->get_results($wpdb->prepare($sql3));
-
-        foreach ($logins as $login) {
-            foreach ($first_name as $a)
-                if ($login->ID === $a->user_id)
-                    $login->first_name = $a->meta_value;
-            foreach ($last_name as $b)
-                if ($login->ID === $b->user_id)
-                    $login->last_name = $b->meta_value;
-        }
-
-        $results = [];
-        foreach($logins as $login) {
-            if (str_contains(strtolower($login->first_name), $search) ||
-                str_contains(strtolower($login->last_name), $search) ||
-                str_contains(strtolower($login->user_login), $search) ||
-                str_contains(strtolower($login->user_email), $search)) {
-
-                if(($u = get_userdata($login->ID)) !== false){
-                    $results[] = $u;
-                }
-            }
-        }
-        return $results;
-    }
-
-    private function sens(): string {
-        return (isset($_GET['order']) && $_GET['order'] === "asc") ? "desc" : "asc";
+    private function getOrder(bool $reverse = false) : string{
+        $order = $_GET["order"] ?? "asc";
+        return !$reverse ? $order : ($order === "asc" ? "desc" : "asc");
     }
 }
-?>

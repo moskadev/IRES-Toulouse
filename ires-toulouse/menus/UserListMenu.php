@@ -85,16 +85,19 @@ class UserListMenu extends IresMenu {
 
 
         <div class="action-list-bar">
-            <form action="<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>"><?php
+            <div><?php
                 if (current_user_can('responsable') || current_user_can('administrator')) { ?>
-                    <input class="button-secondary" type="submit" value="Ajouter un membre"/><?php
+                    <button class="button-secondary"
+                            type="submit"
+                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>'">
+                        Ajouter un membre
+                    </button><?php
                 }?>
-            </form>
+            </div>
             <form action="" method="get">
-                <input type="hidden" id="action" name="page" value="comptes_ires">
                 <input type="text" id="search" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
                 <input class="button-secondary" type="submit" value="Rechercher des comptes"/>
-                <input class="button-secondary button-secondary-delete" type="submit"  onclick="document.getElementById('search').value = '';" value="Effacer"/>
+                <input class="button-secondary button-secondary-delete" type="submit"  onclick="document.getElementById('search').value = ''" value="Effacer"/>
             </form>
         </div>
         <table class="widefat striped users-list">
@@ -117,9 +120,7 @@ class UserListMenu extends IresMenu {
                     <th>Groupe</th>
                 </tr>
             </thead>
-            <tbody>
-            <?php
-            $counter = 0;
+            <tbody> <?php
             foreach ($this->users as $user) {
                 if($user->ID === get_current_user_id()){
                     continue;
@@ -153,7 +154,6 @@ class UserListMenu extends IresMenu {
                     <input type="hidden" value="<?php echo $user->ID; ?>">
                 </form>
                 <?php
-                $counter++;
             }
             ?>
             </tbody>

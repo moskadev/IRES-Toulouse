@@ -168,12 +168,11 @@ class GroupDetailsMenu extends IresMenu {
                     foreach ($this->group->getResponsables() as $resp) {
                         $first_name = $resp->first_name;
                         $last_name = $resp->last_name; ?>
-                        <tr class="is-row-hover <?php if($resp->ID === get_current_user_id()) echo "row-hover" ?>"
-                            onclick="location.href='/wp-admin/admin.php?page=mon_profil_ires&user_id=<?php echo $resp->ID; ?>&lock=1'">
+                        <tr class="<?php if($resp->ID === get_current_user_id()) echo "row-hover" ?>">
                             <td><?php echo $first_name ?></td>
                             <td><?php echo $last_name ?></td>
                             <td><?php echo $resp->user_login ?></td>
-                            <td>
+                            <td class="hide-actions">
                                 <form action="" method="post">
                                     <button type="button" class="button-secondary"
                                             onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID . "&lock=1") ?>'">
@@ -239,11 +238,11 @@ class GroupDetailsMenu extends IresMenu {
                 foreach ($this->group->getUsers() as $user) {
                     $first_name = $user->first_name;
                     $last_name = $user->last_name; ?>
-                    <tr class="is-row-hover <?php if($user->ID === get_current_user_id()) echo "row-hover" ?>">
+                    <tr class="<?php if($user->ID === get_current_user_id()) echo "row-hover" ?>">
                         <td><?php echo $first_name; ?></td>
                         <td><?php echo $last_name; ?></td>
                         <td><?php echo $user->user_login; ?></td>
-                        <td>
+                        <td class="hide-actions">
                             <form action="" method="post">
                                 <button type="button" class="button-secondary"
                                         onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>'">

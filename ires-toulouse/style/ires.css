@@ -130,16 +130,11 @@ input {
  * Users list
  */
 .hide-actions {
-    transition: opacity 200ms;
     opacity: 0;
 }
 
 tr:hover .hide-actions {
     opacity: 1;
-}
-
-.users-list tbody tr {
-    height: 5vw;
 }
 
 .name {

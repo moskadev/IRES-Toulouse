@@ -144,21 +144,19 @@ class GroupListMenu extends IresMenu {
             </thead>
             <tbody>
                 <?php
-                /*
-                 * Affichage de tous les groupes
-                 */
                 $groups = Group::all();
-                foreach ($groups as $group) {
-                    self::printGroup($group);
-                }
                 /*
                  * Affichage d'un message si aucun groupe n'existe
                  */
                 if (count($groups) === 0) { ?>
                     <tr>
-                        <td colspan="4"><?php _e("No existing group") ?></td>
+                        <td colspan="4">Aucun groupe n'existe</td>
                     </tr> <?php
-                } ?>
+                } else {
+                    foreach ($groups as $group) {
+                        self::printGroup($group);
+                    }
+                }?>
             </tbody>
             <?php
 
@@ -206,7 +204,7 @@ class GroupListMenu extends IresMenu {
             <td> <?php echo implode(", ", $respNames) ?></td>
             <!-- Date -->
             <td><?php echo $group->getCreationTime() ?></td>
-            <td>
+            <td class="hide-actions">
                 <?php
                 if (current_user_can('administrator') || $group->isUserResponsable($currentUser)) {?>
                     <form method="post">

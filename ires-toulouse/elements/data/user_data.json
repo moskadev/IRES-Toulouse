@@ -1,0 +1,233 @@
+[
+  {
+    "name": "Informations personnelles",
+    "formType": "label",
+    "id": "info_perso"
+  },
+  {
+    "name": "Identifiant",
+    "parent": "info_perso",
+    "formType": "text",
+    "id": "user_login",
+    "disabled": true,
+    "description": "L'identifiant n'est plus modifiable et est attribué automatiquement",
+    "wordpressMeta": true
+  },
+  {
+    "name": "Nom",
+    "id": "last_name",
+    "parent": "info_perso",
+    "formType": "text",
+    "uppercase": true,
+    "required": true,
+    "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
+    "description": "En majuscules uniquement, sans chiffres",
+    "wordpressMeta": true
+  },
+  {
+    "name": "Prénom",
+    "id": "first_name",
+    "parent": "info_perso",
+    "formType": "text",
+    "uppercase": true,
+    "required": true,
+    "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
+    "description": "En majuscules uniquement, sans chiffres",
+    "wordpressMeta": true
+  },
+  {
+    "name": "E-mail",
+    "parent": "info_perso",
+    "formType": "text",
+    "required": true,
+    "id": "user_email",
+    "regex": "\\S+@\\S+\\.\\S+",
+    "description": "Nous vous enverrons un e-mail de confirmation à votre nouvelle adresse. La nouvelle adresse ne sera pas active tant que vous n’aurez pas confirmé.",
+    "wordpressMeta": true
+  },
+  {
+    "name": "Téléphone",
+    "parent": "info_perso",
+    "formType": "text",
+    "id": "telephone",
+    "regex": "(?:(?:\\+|00)33|0)\\s*[1-9](?:[\\s.-]*\\d{2}){4}",
+    "description": "+33 X XX XX XX XX, 0X XX XX XX XX, 0X.XX.XX.XX.XX..."
+  },
+  {
+    "name": "Activités à l'IRES de TOULOUSE",
+    "formType": "label",
+    "id": "activites_ires"
+  },
+  {
+    "name": "Groupes, manifestations et responsables",
+    "formType": "table",
+    "id": "groupes",
+    "parent": "activites_ires",
+    "disabled": true,
+    "extraData": "user_groups"
+  },
+  {
+    "name": "Informations complémentaires",
+    "formType": "label",
+    "id": "info_complementaires"
+  },
+  {
+    "name": "Diplomes",
+    "parent": "info_complementaires",
+    "formType": "checklist",
+    "id": "diplomes",
+    "extraData": [
+      "CAPES",
+      "CAPET",
+      "AGREGATION",
+      "CRPE",
+      "CAFFA",
+      "CAPLP",
+      "CAPPEI",
+      "THÈSE"
+    ],
+    "description": "Enfoncez Ctrl (^) ou Cmd (⌘) sur Mac pour sélectionner de multiples choix"
+  },
+  {
+    "name": "Situation professionnelle",
+    "parent": "info_complementaires",
+    "formType": "dropdown",
+    "id": "situation_pro",
+    "extraData": [
+      "En activité",
+      "Retraité"
+    ]
+  },
+  {
+    "name": "Type d'établissement",
+    "parent": "info_complementaires",
+    "formType": "dropdown",
+    "id": "type_etablissement",
+    "extraData": [
+      "Primaire",
+      "Collège",
+      "Lycée",
+      "Classes prépas",
+      "Université",
+      "Autre"
+    ]
+  },
+  {
+    "name": "Nom de l'établissement",
+    "parent": "info_complementaires",
+    "formType": "text",
+    "id": "nom_etablissement",
+    "uppercase": true,
+    "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
+    "description": "En majuscules uniquement, sans chiffres"
+  },
+  {
+    "name": "Ville de l'établissement",
+    "parent": "info_complementaires",
+    "formType": "text",
+    "id": "ville_etablissement",
+    "uppercase": true,
+    "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
+    "description": "En majuscules uniquement, sans chiffres"
+  },
+  {
+    "name": "Code UAI/RNE de l'établissement scolaire",
+    "parent": "info_complementaires",
+    "formType": "text",
+    "id": "code_uai_rne",
+    "uppercase": true,
+    "regex": "\\d{7}[A-Z]",
+    "description": "Consititué de 7 chiffres et une lettre : 0000000X"
+  },
+  {
+    "name": "Nom du chef de l'établissement",
+    "parent": "info_complementaires",
+    "formType": "text",
+    "id": "nom_chef_etablissement",
+    "uppercase": true,
+    "regex": "[A-ZÀ-ÿ]*\\s*(\\s*-?[A-ZÀ-ÿ]*)*",
+    "description": "En majuscules uniquement, sans chiffres"
+  },
+  {
+    "name": "Discipline enseignée",
+    "formType": "dropdown",
+    "parent": "info_complementaires",
+    "id": "discipline_enseignee",
+    "extraData": "disciplines"
+  },
+  {
+    "name": "Formations",
+    "formType": "label",
+    "id": "formations"
+  },
+  {
+    "name": "Animateur formation PAF (année en cours)",
+    "parent": "formations",
+    "id": "animateur_formation",
+    "formType": "radio"
+  },
+  {
+    "name": "Si animateur, titre de la formation",
+    "parent": "animateur_formation",
+    "id": "si_animateur_titre_de_la_formation",
+    "formType": "text"
+  },
+  {
+    "name": "Participation à un labo de maths",
+    "id": "participation_labo_maths",
+    "parent": "formations",
+    "formType": "radio"
+  },
+  {
+    "name": "Membre de l'INSPE",
+    "id": "membre_inspe",
+    "parent": "formations",
+    "formType": "radio"
+  },
+  {
+    "name": "Interventions à l'INSPE",
+    "id": "interventions_inspe",
+    "parent": "formations",
+    "formType": "radio"
+  },
+  {
+    "name": "CII IREM",
+    "formType": "label",
+    "id": "cii_irem"
+  },
+  {
+    "name": "Membre CII",
+    "parent": "cii_irem",
+    "id": "membre_cii",
+    "formType": "radio"
+  },
+  {
+    "name": "Nom de la CII",
+    "parent": "cii_irem",
+    "id": "nom_cii",
+    "formType": "text"
+  },
+  {
+    "name": "Associations ou sociétés savantes",
+    "formType": "label",
+    "id": "assoc_societes_savantes"
+  },
+  {
+    "name": "Membre association professeurs",
+    "id": "membre_association_prof",
+    "formType": "text",
+    "parent": "assoc_societes_savantes"
+  },
+  {
+    "name": "Membre société savante",
+    "id": "membre_societe_savante",
+    "formType": "text",
+    "parent": "assoc_societes_savantes"
+  },
+  {
+    "name": "Membre association (autre)",
+    "formType": "text",
+    "id": "membre_association_autre",
+    "parent": "assoc_societes_savantes"
+  }
+]

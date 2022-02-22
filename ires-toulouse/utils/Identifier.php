@@ -2,6 +2,8 @@
 
 namespace irestoulouse\utils;
 
+use WP_User;
+
 class Identifier {
 
     /**
@@ -13,27 +15,32 @@ class Identifier {
      * underscores are kept and the rest is deleted.
      *
      * @param string $string String to convert
+     *
      * @return string the generated id
      */
     public static function fromName(string $string) : string {
         return preg_replace(["/\s+/", "/\W+/"], ["_", ""],
             iconv("UTF-8", "ASCII//TRANSLIT//IGNORE",
-                strtolower($string)));
+                strtolower($string)
+            )
+        );
     }
 
     /**
-     * @return int
+     * @param array $users
+     *
+     * @return WP_User|null
      */
-    public static function getLastRegisteredUser() : int{
-        $max = -1;
-        foreach (get_users() as $user){
-            if($user->ID > $max){
-                $max = $user->ID;
+    public static function getLastRegisteredUser(array $users = []) : ?WP_User {
+        if($users === []){
+            $users = get_users();
+        }
+        $maxId = get_current_user_id();
+        foreach ($users as $user){
+            if($user instanceof WP_User) {
+                $maxId = $user->ID > $maxId ? $user->ID : $maxId;
             }
         }
-        if($max === -1){
-            $max = get_current_user_id();
-        }
-        return $max;
+        return ($user = get_userdata($maxId)) === false ? null : $user;
     }
 }

@@ -4,9 +4,13 @@ namespace irestoulouse\menus;
 
 include_once("IresMenu.php");
 
-use irestoulouse\elements\input\UserInputData;
+use Exception;
+use irestoulouse\controllers\UserInputData;
+use irestoulouse\elements\Group;
+use irestoulouse\elements\input\UserData;
 use irestoulouse\utils\Dataset;
 use irestoulouse\utils\Identifier;
+use WP_User;
 
 /**
  * Creation of the plugin page
@@ -41,26 +45,33 @@ use irestoulouse\utils\Identifier;
  *      - MEMBER of a learned society (Société Mathématique de France, Société Française de Physique, ...)
  *      - ASSOCIATION MEMBER (OTHER)
  */
-class ModifyUserDataMenu extends IresMenu {
+class UserProfileMenu extends IresMenu {
 
-    /** @var int */
-    private int $lastUserId;
+    /** @var WP_User[] */
+    private array $visibleUsers;
+
+    /** @var WP_User */
+    private WP_User $lastRegisteredUser;
 
     /**
      * Constructing the menu and link to the admin page
      */
     public function __construct() {
-        parent::__construct("Modifier les informations supplémentaires", // Page title when the menu is selected
-            "Renseigner des informations", // Name of the menu
-            0, // Menu access security level
-            "dashicons-id-alt", // Menu icon
-            3 // Page position in the list
+        parent::__construct("Consulter les informations relatifs à votre profil IRES",
+            "Mon profil IRES",
+            0,
+            "dashicons-id-alt",
+            3
         );
+        $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
+        $this->lastRegisteredUser = Identifier::getLastRegisteredUser($this->visibleUsers)
+            ?? wp_get_current_user();
     }
 
     /**
      * Content of the page
      */
-    public function getContent() : void {
+    public function getContent() : void
+    {
     }
 }

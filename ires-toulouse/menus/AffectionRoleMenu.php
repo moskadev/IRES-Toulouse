@@ -28,21 +28,28 @@ class AffectionRoleMenu extends IresMenu {
      *      - change a permission of an user if you are admin
      */
     public function getContent() : void {
+	    $groups = self::getGroups(); // Get all the groups available
+
     	// Check that the form has been sent
         $user = null;
-        if(isset($_POST['username'])) {
-            $user_login = $_POST['username'];
-            $type_message="error";
+	    if(isset($_POST['username'])) {
+		    $user_login = $_POST['username'];
+		    $type_message="error";
 
-            // Check if the login name submit exist
-            if ( username_exists( $user_login ) !== false ) {
-                $choice = $_POST['choosen_role'];
-                $name_role = $choice !== 'subscriber' ? 'responsable' : 'membre';
-                $message="$user_login est maintenant $name_role.";
+		    // Check if the login name submit exist
+		    if ( username_exists( $user_login ) !== false ) {
+			    $choice = $_POST['choosen_role'];
+			    $name_role = $choice !== 'subscriber' ? 'responsable' : 'membre';
+			    $message="$user_login est maintenant $name_role.";
 
-                $user = get_userdatabylogin( $user_login );
+			    $user = get_userdatabylogin( $user_login );
 
-                // The role for the user haven't been changed because he already had the role choose
+                // Add a group to the user selected if a group is selected
+			    if (isset($_POST['group-selection']) && $_POST['group-selection'] != "") {
+                    $this->addUserGroup($user->ID, $_POST['group-selection']);
+			    }
+
+			    // The role for the user haven't been changed because he already had the role choose
                 if (!in_array( $choice, $user->roles)) {
                     $user->set_role($choice);
                     $type_message = "updated";
@@ -52,12 +59,13 @@ class AffectionRoleMenu extends IresMenu {
                 }
             } else {
                 $message = "Rien n'a été effectué, $user_login n'est pas un identifiant valide.";
-            } ?>
+            }?>
             <div id="message" class="<?php echo "$type_message";?> notice is-dismissible">
                 <p><strong><?php echo "$message"; ?></strong></p>
             </div>
     		<?php
-    	}?>
+    	}
+        ?>
         <h1>Modifier le rôle d'un utilisateur</h1> <?php
         if(count(get_users()) > 1){?>
             <form method="post" name="modify-role" id="modify-role" class="validate" novalidate="novalidate">
@@ -113,8 +121,17 @@ class AffectionRoleMenu extends IresMenu {
                         <th><label for="group"><?php _e('Groupe'); ?></label></th>
                         <td>
                             <select name="group-selection">
-                                <option>Groupe 1</option>
-                                <option selected>Groupe 2</option>
+                                <?php
+                                if (sizeof($groups) === 0) {
+                                    echo "<option value=\"\">Aucun groupe existant</option>";
+                                } else {
+                                    ?> <option value="" selected>Aucun</option> <?php
+                                    foreach ($groups as $group) {
+                                        ?> <option value ="<?php echo $group['id_group']; ?>"><?php echo $group['name'];; ?></option>
+                                        <?php
+                                    } // end foreach
+                                } // end if
+                                ?>
                             </select>
                         </td>
                     </tr>
@@ -128,5 +145,29 @@ class AffectionRoleMenu extends IresMenu {
                 <p><strong>Aucun utilisateur ne peut être modifié</strong></p>
             </div>
         <?php }
+    }
+
+	/**
+	 * @return array|object|null all the groups available
+	 */
+	private function getGroups() {
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups ORDER BY name"),
+			ARRAY_A);
+	}
+
+	/**
+	 * @param $id the id of the searched group
+	 *
+	 * @return array|object|null an array with the information of the group, else null
+	 */
+    private function getGroup($id) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}groups WHERE id_group = %d", $id), ARRAY_A);
+    }
+
+    private function addUserGroup($user_id, $group_id) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("INSERT INTO {$wpdb->prefix}groups_users VALUES (%d, %d)", $user_id, $group_id));
     }
 }

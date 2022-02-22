@@ -25,7 +25,19 @@ forms.forEach(function (form) {
         }
         changeSubmitState(buttonSubmit);
     });
-    formInputs.forEach(input => checkCorrectlyFilled(input));
+    form.addEventListener("click", (event) => {
+        if (event.target.dataset?.formtype === "radio") {
+            changeSwitchState(event.target);
+            updateChildrenFieldDisplay(event.target);
+        }
+    });
+    formInputs.forEach(input => {
+        if (input.dataset?.formtype === "radio") {
+            updateChildrenFieldDisplay(input);
+        }
+        checkCorrectlyFilled(input);
+    });
+
 
     /**
      * Dynamically update the value in the input from
@@ -102,7 +114,7 @@ forms.forEach(function (form) {
                  */
                 filled = !input.value || !regex || regex.test(input.value);
             }
-            if(!input.dataset.disabled) {
+            if (!input.dataset.disabled) {
                 if (filled) {
                     input.classList.add("is-valid");
                     input.classList.remove("is-invalid");
@@ -131,26 +143,60 @@ forms.forEach(function (form) {
         });
         return filled;
     }
-});
 
-changeSwitchState();
-submitFormOnItemSelect();
+    /**
+     *
+     * @param parentRadio
+     */
+    function updateChildrenFieldDisplay(parentRadio) {
+        const children = form.querySelectorAll("input[data-parent=" + parentRadio.name + "]");
+        children.forEach(child => {
+            if (!parentRadio.value || parentRadio.value === "false") {
+                child.value = child.dataset?.formtype === "radio" ? "false" : "";
+            }
+            /*
+             * We are searching in the form if there's a row corresponding to
+             * where is stored our child.
+             * We will hide it if the parent switch is equal to false or
+             * show it if true
+             */
+            getParents(child).reverse().forEach(row => {
+                if (row.tagName === "TR") {
+                    if (!parentRadio.value || parentRadio.value === "false") {
+                        row.style.display = "none";
+                    } else {
+                        row.style.removeProperty("display");
+                    }
+                }
+            });
+        })
+    }
 
-/**
- * Change the state of the switch on click
- */
-function changeSwitchState() {
-    document.querySelectorAll(".switch").forEach(switchBtn => {
-        switchBtn.addEventListener("click", e => {
+    /**
+     *
+     * @param target
+     */
+    function changeSwitchState(target) {
+        let switchBtn = null;
+        if (!target.classList.contains("switch")) {
+            getParents(target).reverse().forEach(el => {
+                if (!switchBtn && el.classList?.contains("switch")) {
+                    switchBtn = el;
+                }
+            });
+        } else {
+            switchBtn = target;
+        }
+        if (switchBtn) {
             const switchRadio = switchBtn.firstElementChild;
-
-            console.log(switchRadio.disabled)
-            if(e.target === switchRadio && !switchRadio.disabled) {
+            if (target === switchRadio && !switchRadio.disabled) {
                 switchRadio.value = !switchRadio.value || switchRadio.value === "true" ? "false" : "true";
             }
-        });
-    });
-}
+        }
+    }
+});
+
+submitFormOnItemSelect();
 
 /**
  * Submit the select input's form when a new item has been

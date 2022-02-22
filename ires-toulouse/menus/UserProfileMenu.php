@@ -196,6 +196,7 @@ class UserProfileMenu extends IresMenu {
                                 } else if ($formType === "radio") { ?>
                                     <label class="switch">
                                         <input class="switch-radio"
+                                               <?php echo Dataset::allFrom($data) ?>
                                                type="radio"
                                                name="<?php echo $dataId ?>"
                                                value="<?php echo $data->getValue($this->editingUser) ?>"
@@ -203,7 +204,8 @@ class UserProfileMenu extends IresMenu {
                                         <div class="slider round"></div>
                                     </label> <?php
                                 } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
-                                    <select <?php if ($formType === "checklist") echo "multiple" ?>
+                                    <select <?php echo Dataset::allFrom($data);
+                                            if ($formType === "checklist") echo "multiple" ?>
                                             name='<?php echo $dataId ?>[]'
                                             id='<?php echo $dataId ?>'
                                         <?php if ($this->locked) echo "disabled" ?>> <?php

@@ -90,7 +90,8 @@ class GroupListMenu extends IresMenu {
                     </div>
                 <?php } else {?>
                     <button type="submit" name="submitGroup"
-                            class="button-primary menu-submit">
+                            class="button-primary menu-submit button-large">
+                        <span class="dashicons dashicons-groups"></span>
                         Ajouter un nouveau groupe
                     </button>
                 <?php }

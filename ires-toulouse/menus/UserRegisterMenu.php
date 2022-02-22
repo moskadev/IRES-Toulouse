@@ -120,8 +120,9 @@ class UserRegisterMenu extends IresMenu {
                     <?php
                 } ?>
             </table>
-            <button class="button-primary menu-submit" type="submit"
+            <button class="button-primary menu-submit button-large" type="submit"
                     name="createuser" disabled>
+                <span class="dashicons dashicons-insert"></span>
                 Créer un nouveau compte IRES
             </button>
         </form>

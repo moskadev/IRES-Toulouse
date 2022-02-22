@@ -146,7 +146,8 @@ class GroupDetailsMenu extends IresMenu {
                 <?php
                 } else { ?>
                     <button type="submit" name="modifResponsable"
-                            class="button-primary menu-submit">
+                            class="button-primary menu-submit button-large">
+                        <span class="dashicons dashicons-businesswoman"></span>
                         Ajouter un nouveau responsable
                     </button>
                 <?php } ?>
@@ -215,7 +216,8 @@ class GroupDetailsMenu extends IresMenu {
                     </div>
                 <?php } else { ?>
                     <button type="submit" name="addMember"
-                            class="button-primary menu-submit">
+                            class="button-primary menu-submit button-large">
+                        <span class="dashicons dashicons-admin-users"></span>
                         Ajouter un nouveau membre
                     </button>
                 <?php } ?>

@@ -244,8 +244,9 @@ class UserProfileMenu extends IresMenu {
                 } ?>
             </table><?php
             if (!$this->locked) { ?>
-                <button class="button-primary menu-submit" type="submit"
+                <button class="button-primary menu-submit button-large" type="submit"
                         name="profile-page" disabled>
+                    <span class="dashicons dashicons-id"></span>
                     Modifier les informations
                 </button>
             <?php } ?>

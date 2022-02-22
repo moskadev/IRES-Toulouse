@@ -27,12 +27,12 @@ input {
     height: 50px;
 }
 
-.input-register-2 {
-    grid-template-columns: 1fr 10%;
+.input-register-3 {
+    grid-template-columns: 1fr 10% 10%;
 }
 
-.input-register-3 {
-    grid-template-columns: 1fr 30% 10%;
+.input-register-4 {
+    grid-template-columns: 1fr 30% 10% 10%;
 }
 
 :not([disabled]).is-valid {
@@ -159,7 +159,6 @@ tr:hover .hide-actions {
     transform: translate(-50%, -50%) scale(0);
     transition: transform 200ms ease-in-out;
 
-    z-index: 100;
     background-color: white;
     width: 500px;
     max-width: 80%;
@@ -215,6 +214,7 @@ tr:hover .hide-actions {
     width: 100vw;
     height: 100vh;
 
+    z-index: 100;
     opacity: 0;
     transition: opacity 200ms ease-in-out;
     pointer-events: none;

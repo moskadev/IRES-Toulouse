@@ -26,7 +26,7 @@ class GroupListMenu extends IresMenu {
         /*
          * Supprime un groupe
          */
-        if (isset($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
+        if (!empty($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
             $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
             $type_message = "error";
             if (Group::delete($deletedGroup->getId())) {
@@ -38,7 +38,7 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (!empty($_POST['addGroup']) && isset($_POST['typeAddGroup'])) {
+        if (!empty($_POST['addGroup']) && !empty($_POST['typeAddGroup'])) {
             $message = "Impossible de créer le groupe " . esc_attr($_POST['addGroup']);
             $type_message = "error";
             try {
@@ -79,7 +79,7 @@ class GroupListMenu extends IresMenu {
         if (current_user_can('administrator')) { ?>
             <form action="" method="post"> <?php
                 if(isset($_POST["submitGroup"])){?>
-                    <div class="input-register-container input-register-3">
+                    <div class="input-register-container input-register-4">
                         <input type="text" name="addGroup" placeholder="Nom du groupe">
                         <select name="typeAddGroup"> <?php
                             foreach (Group::TYPE_NAMES as $type => $name){?>
@@ -87,6 +87,7 @@ class GroupListMenu extends IresMenu {
                             <?php } ?>
                         </select>
                         <button class="button-primary" type="submit">Ajouter</button>
+                        <button class="button-secondary" type="submit">Annuler</button>
                     </div>
                 <?php } else {?>
                     <button type="submit" name="submitGroup"

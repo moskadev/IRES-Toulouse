@@ -34,7 +34,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est ajouté
              */
-            if (isset($_POST['submitMember'])) {
+            if (!empty($_POST['submitMember'])) {
                 $newMemberLogin = $_POST['submitMember'];
 
                 $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il est déjà présent dans le groupe.";
@@ -50,7 +50,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est retiré du groupe
              */
-            if (isset($_POST['removeMember'])) {
+            if (!empty($_POST['removeMember'])) {
                 $message = "Une erreur s'est produite lors de la suppression d'un membre.";
                 $type_message = "error";
                 try {
@@ -66,7 +66,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un responsable est supprimé
              */
-            if (isset($_POST['deleteResp'])) {
+            if (!empty($_POST['deleteResp'])) {
                 $message = "Une erreur s'est produite lors de la suppression d'un responsable.";
                 $type_message = "error";
                 try {
@@ -83,7 +83,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (isset($_POST['submitResponsable'])) {
+            if (!empty($_POST['submitResponsable'])) {
                 $newResponsableLogin = $_POST['submitResponsable'];
                 $newResponsable = get_user_by("login", $newResponsableLogin);
 
@@ -138,10 +138,11 @@ class GroupDetailsMenu extends IresMenu {
                 $this->group->isUserResponsable(wp_get_current_user()))) { ?>
             <form action="" method="post"> <?php
                 if (isset($_POST["modifResponsable"])) { ?>
-                    <div class="input-register-container input-register-2">
+                    <div class="input-register-container input-register-3">
                         <input type="text" placeholder="Identifiant du responsable à ajouter"
                                name="submitResponsable">
                         <button class="button-primary" type="submit">Ajouter</button>
+                        <button class="button-secondary" type="submit">Annuler</button>
                     </div>
                 <?php
                 } else { ?>
@@ -209,10 +210,11 @@ class GroupDetailsMenu extends IresMenu {
             current_user_can('administrator')) { ?>
             <form action="" method="post"> <?php
                 if (isset($_POST["addMember"])) { ?>
-                    <div class="input-register-container input-register-2">
+                    <div class="input-register-container input-register-3">
                         <input type="text" placeholder="Identifiant du membre à ajouter"
                                name="submitMember">
                         <button class="button-primary" type="submit">Ajouter</button>
+                        <button class="button-secondary" type="submit">Annuler</button>
                     </div>
                 <?php } else { ?>
                     <button type="submit" name="addMember"

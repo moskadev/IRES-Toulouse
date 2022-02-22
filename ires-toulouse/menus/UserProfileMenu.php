@@ -249,7 +249,7 @@ class UserProfileMenu extends IresMenu {
         <table class="data-table">
             <tr>
                 <td>
-                    <button class="button-primary button-large"
+                    <button class="<?php echo $this->locked ? "button-primary" : "button-secondary" ?> button-large"
                             onclick='location.href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $this->editingUser->ID . "&lock=" . !$this->locked) ?>"'>
                         <span class='dashicons <?php echo $this->locked ? "dashicons-lock'></span>Déverrouiller" : "dashicons-unlock'></span>Verrouiller" ?> les modifications de l'utilisateur
                     </button>

@@ -43,7 +43,8 @@ class ExcelGenerator {
                 return $data->getValue($user);
             }, UserData::all(false)));
         }
-        print $this->container;
+
+        echo $this->container;
         ob_end_flush();
 
         exit;

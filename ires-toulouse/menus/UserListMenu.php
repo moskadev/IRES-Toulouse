@@ -91,6 +91,7 @@ class UserListMenu extends IresMenu {
                             onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>'">
                         Ajouter un membre
                     </button>
+                    <!-- TODO directeur role -->
                     <form action="" method="post" style="display: inline-block">
                         <button class="button-secondary"
                             type="submit" name="download_csv">
@@ -154,11 +155,10 @@ class UserListMenu extends IresMenu {
                                 <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>">Voir</a>
                             </button>|
 
+                            <!-- TODO directeur role -->
                             <form action="" method="post" style="display: inline-block">
-                                <button class="button-secondary"
-                                        type="submit" name="download_csv">
-                                    Tout exporter
-                                </button>
+                                <input type="hidden" class="download_csv" name="download_csv" value="<?php echo $user->ID ?>"/>
+                                <button class="button-link-ires" type="submit">Exporter</button>
                             </form>
                         </form>
                     </td> <!-- Last name -->

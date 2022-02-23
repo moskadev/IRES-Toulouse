@@ -242,6 +242,8 @@ class UserProfileMenu extends IresMenu {
                         <span class="dashicons dashicons-id"></span>
                         Modifier les informations
                     </button>
+
+                    <!-- TODO directeur role -->
                     <form action="" method="post" style="display: inline-block">
                         <input type="hidden" class="download_csv" name="download_csv" value="<?php echo $this->editingUser->ID ?>"/>
                         <button class="button-secondary button-large" type="submit">

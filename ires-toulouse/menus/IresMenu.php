@@ -50,8 +50,7 @@ abstract class IresMenu {
                 [new UserRegisterMenu(), new GroupListMenu(), new UserProfileMenu()] :
                 [new UserRegisterMenu(), new UserListMenu(), new GroupListMenu()]
         );
-        //IresMenu::register("admin_menu", new CSVExport(), false);
-        //IresMenu::register("admin_menu", new CSVExport(), true);
+        IresMenu::register("admin_menu", new GroupDetailsMenu(), true);
 
         add_action("admin_menu", function () use ($hasAboveRole, $mainMenu){
             global $menu;
@@ -84,7 +83,7 @@ abstract class IresMenu {
                     $browseMenu->getLvlAccess(),
                     $browseMenu->getId(),
                     function () use ($browseMenu) {
-                        $browseMenu->generateContent();
+                        $browseMenu->generate();
                     },
                 );
             });
@@ -106,7 +105,7 @@ abstract class IresMenu {
                     $menu->getLvlAccess(),
                     $menu->getId(),
                     function () use ($menu) {
-                        $menu->generateContent();
+                        $menu->generate();
                     },
                     $menu->getIconUrl(),
                     $menu->getPosition()
@@ -119,7 +118,7 @@ abstract class IresMenu {
                     $menu->getLvlAccess(),
                     $menu->getId(),
                     function () use ($menu) {
-                        $menu->generateContent();
+                        $menu->generate();
                     },
                     $menu->getPosition()
                 );
@@ -159,12 +158,18 @@ abstract class IresMenu {
      * Generate content adapted to the WordPress page
      * and adds the title of the menu
      */
-    protected function generateContent() : void {
+    protected function generate() : void {
+        $this->analyzeSentData();
         echo "<div class='wrap'>";
             echo "<h1 class='wp-heading-inline'>" . $this->pageTitle . "</h1>";
             $this->getContent();
         echo "</div>";
     }
+
+    /**
+     * Analyze the POST/GET data
+     */
+    public abstract function analyzeSentData() : void;
 
     /**
      * Content of the page

@@ -9,12 +9,12 @@ forms.forEach(function (form) {
             element.disabled = true;
         }
     });
-    changeSubmitState();
+    changeSubmitState(buttonSubmit);
 
     // add the input event to the form inputs
     form.addEventListener("input", function (event) {
         if (!String(event.target.type).includes("select")) {
-            // uppercase caracters if necessary
+            // uppercase characters if necessary
             event.target.value = uppercase(event.target);
 
             // if a regex is present for the input
@@ -23,7 +23,7 @@ forms.forEach(function (form) {
             }
             checkCorrectlyFilled(event.target);
         }
-        changeSubmitState();
+        changeSubmitState(buttonSubmit);
     });
     formInputs.forEach(input => checkCorrectlyFilled(input));
 
@@ -50,14 +50,20 @@ forms.forEach(function (form) {
             element.value;
     }
 
-    function changeSubmitState() {
-        buttonSubmit.disabled = !areCorrectlyFilled();
-        if(areCorrectlyFilled()){
-            buttonSubmit.classList.remove("btn-outline-primary");
-            buttonSubmit.classList.add("btn-primary");
-        } else {
-            buttonSubmit.classList.add("btn-outline-primary");
-            buttonSubmit.classList.remove("btn-primary");
+    /**
+     *
+     * @param btn
+     */
+    function changeSubmitState(btn) {
+        if (btn !== null) {
+            btn.disabled = !areCorrectlyFilled();
+            if (areCorrectlyFilled()) {
+                btn.classList.remove("btn-outline-primary");
+                btn.classList.add("btn-primary");
+            } else {
+                btn.classList.add("btn-outline-primary");
+                btn.classList.remove("btn-primary");
+            }
         }
     }
 
@@ -95,7 +101,7 @@ forms.forEach(function (form) {
                  */
                 filled = !input.value || !regex || regex.test(input.value);
             }
-            if(filled){
+            if (filled) {
                 input.classList.add("is-valid");
                 input.classList.remove("is-invalid");
             } else {
@@ -116,10 +122,43 @@ forms.forEach(function (form) {
     function areCorrectlyFilled() {
         let filled = true;
         formInputs.some(input => {
-            if(filled){
+            if (filled) {
                 filled = checkCorrectlyFilled(input);
             }
         });
         return filled;
     }
 });
+
+submitFormOnItemSelect();
+
+/**
+ * Submit the select input's form when a new item has been
+ * selected by the user
+ */
+function submitFormOnItemSelect() {
+    document.querySelectorAll(".confirm-item").forEach(el =>
+        el.addEventListener("change", () => {
+            getParents(el).reverse().forEach(parent => {
+                if (parent.tagName === "FORM") {
+                    parent.submit();
+                }
+            });
+        })
+    );
+}
+
+/**
+ * Return all the element given's parents
+ *
+ * @param element current element
+ * @returns {Element[]} all element's parents
+ */
+function getParents(element) {
+    let parents = [];
+    while (element) {
+        parents.unshift(element);
+        element = element.parentNode;
+    }
+    return parents;
+}

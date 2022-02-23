@@ -7,17 +7,14 @@ class IresElement {
     /** @var string */
     protected string $name;
 
-    /** @var string */
-    protected string $id;
+    /** @var mixed */
+    protected $id;
 
     /**
-     * Initialization of the name and generation of the
-     * discipline identifier
-     *
      * @param string $name
-     * @param string|null $id
+     * @param mixed $id
      */
-    public function __construct(string $id, string $name = "") {
+    public function __construct($id, string $name = "") {
         $this->name = $name;
         $this->id = $id;
     }
@@ -33,16 +30,16 @@ class IresElement {
     }
 
     /**
-     * @return string the name of the discipline
+     * @return string the element's name
      */
     public function getName() : string {
         return $this->name;
     }
 
     /**
-     * @return string the discipline identifier
+     * @return mixed the element's identifier
      */
-    public function getId() : string {
+    public function getId() {
         return $this->id;
     }
 

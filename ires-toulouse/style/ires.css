@@ -127,8 +127,15 @@ input {
     background: none;
     border: none;
     color: #d30e0e !important;
+    cursor: pointer;
 }
 
+.button-link-ires {
+    border: none;
+    background: none;
+    color: #0d66c2;
+    cursor: pointer;
+}
 
 /*
  * Users list
@@ -227,12 +234,6 @@ tr:hover .hide-actions {
 .popup.active {
     opacity: 1;
     pointer-events: auto;
-}
-
-.button-link-ires {
-    border: none;
-    background: none;
-    color: #0d66c2;
 }
 
 /*

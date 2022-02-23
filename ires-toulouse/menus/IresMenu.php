@@ -47,11 +47,20 @@ abstract class IresMenu {
 
         add_action("admin_init", function () {
             if(isset($_POST['download_csv'])) {
-                (new ExcelGenerator("ires_utilisateurs"))->generate(
-                    is_numeric($_POST["download_csv"]) ?
-                        [get_userdata($_POST["download_csv"])] :
-                        get_users()
-                );
+                $excelName = "ires_";
+                $users = get_users();
+                if(is_numeric($_POST["download_csv"])){
+                    if(($u = get_userdata($_POST["download_csv"])) !== false){
+                        $excelName .= $u->user_login;
+                        $users = [get_userdata($_POST["download_csv"])];
+                    } else {
+                        $excelName .= "utilisateurs";
+                    }
+                } else {
+                    $excelName .= "utilisateurs";
+                }
+
+                (new ExcelGenerator($excelName))->generate($users);
             }
         });
         $mainMenu = $hasAboveRole ? new UserListMenu() : new UserProfileMenu();

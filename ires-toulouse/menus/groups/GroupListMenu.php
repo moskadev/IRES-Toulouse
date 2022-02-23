@@ -22,10 +22,11 @@ class GroupListMenu extends IresMenu {
      */
     public function analyzeSentData() : void {
         $message = $type_message = "";
+
         /*
          * Supprime un groupe
          */
-        if (isset($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
+        if (!empty($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
             $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
             $type_message = "error";
             if (Group::delete($deletedGroup->getId())) {
@@ -37,15 +38,18 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (isset($_POST['addGroup']) && isset($_POST['nameAddGroup']) && isset($_POST['typeAddGroup'])) {
-            $message = "Impossible de créer le groupe " . esc_attr($_POST['nameAddGroup']);
+        if (!empty($_POST['addGroup']) && !empty($_POST['typeAddGroup'])) {
+            $message = "Impossible de créer le groupe " . esc_attr($_POST['addGroup']);
             $type_message = "error";
-
-            Group::createTable();
-            if (Group::register(esc_attr($_POST['nameAddGroup']), intval(esc_attr($_POST['typeAddGroup'])))) {
-                $type_message = "updated";
-                $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
-                    ", dénommé " . $_POST['nameAddGroup'] . ", a été créé.";
+            try {
+                Group::createTable();
+                if(Group::register(esc_attr($_POST['addGroup']), intval(esc_attr($_POST['typeAddGroup'])))){
+                    $type_message = "updated";
+                    $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
+                        ", dénommé " . $_POST['addGroup'] . ", a été créé.";
+                }
+            } catch (\Exception $e){
+                // do nothing, the error message is already set
             }
         }
 
@@ -73,29 +77,26 @@ class GroupListMenu extends IresMenu {
          *  - Bouton ajouter
          */
         if (current_user_can('administrator')) { ?>
-            <form action="" method="post">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-2">
-                            <label for="addGroup">Ajouter un groupe :</label>
-                        </div>
-                        <div class="col">
-                            <input type="text" id="addGroup" class="form-control h-100"
-                                   name="nameAddGroup" placeholder="Nom du groupe">
-                        </div>
-                        <div class="col">
-                            <select class="form-control h-100" name="typeAddGroup"> <?php
-                                foreach (Group::TYPE_NAMES as $type => $name){?>
-                                    <option value="<?php echo $type?>"><?php echo $name?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <input type="submit" name="addGroup" value="Ajouter"
-                                   class="btn btn-outline-primary">
-                        </div>
+            <form action="" method="post"> <?php
+                if(isset($_POST["submitGroup"])){?>
+                    <div class="input-register-container input-register-4">
+                        <input type="text" name="addGroup" placeholder="Nom du groupe">
+                        <select name="typeAddGroup"> <?php
+                            foreach (Group::TYPE_NAMES as $type => $name){?>
+                                <option value="<?php echo $type?>"><?php echo $name?></option>
+                            <?php } ?>
+                        </select>
+                        <button class="button-primary" type="submit">Ajouter</button>
+                        <button class="button-secondary" type="submit">Annuler</button>
                     </div>
-                </div>
+                <?php } else {?>
+                    <button type="submit" name="submitGroup"
+                            class="button-primary menu-submit button-large">
+                        <span class="dashicons dashicons-groups"></span>
+                        Ajouter un nouveau groupe
+                    </button>
+                <?php }
+                ?>
             </form> <?php
         }
 
@@ -106,14 +107,15 @@ class GroupListMenu extends IresMenu {
          * && count($groups) > 9
          */
         if (count(Group::getUserGroups(wp_get_current_user())) > 0) { ?>
-            <h2>Groupes dont vous appartenez : </h2>
-            <table class="table table-striped table-hover">
+            <h2 class="title-label">Vos groupes : </h2>
+            <table class="widefat data-table striped">
                 <thead>
                 <tr>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Responsable(s)</th>
-                    <th scope="col">Date de création</th>
+                    <th class="row-title">Nom</th>
+                    <th class="row-title">Type</th>
+                    <th class="row-title" style="width: 300px;">Responsable(s)</th>
+                    <th class="row-title">Date de création</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -122,7 +124,7 @@ class GroupListMenu extends IresMenu {
                  * Affichage de chaque ligne
                  */
                 foreach (Group::getUserGroups(wp_get_current_user()) as $group) {
-                    self::printGroup($group);
+                    $this->printGroup($group);
                 }
                 ?>
                 </tbody>
@@ -131,33 +133,32 @@ class GroupListMenu extends IresMenu {
         }
         ?>
 
-        <h2>Groupes : </h2>
-        <table class="table table-striped table-hover">
+        <h2 class="title-label">Groupes : </h2>
+        <table class="widefat data-table striped">
             <thead>
-                <tr>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Responsable(s)</th>
-                    <th scope="col">Date de création</th>
-                </tr>
+            <tr>
+                <th class="row-title">Nom</th>
+                <th class="row-title">Type</th>
+                <th class="row-title" style="width: 300px;">Responsable(s)</th>
+                <th class="row-title">Date de création</th>
+                <th></th>
+            </tr>
             </thead>
             <tbody>
                 <?php
-                /*
-                 * Affichage de tous les groupes
-                 */
                 $groups = Group::all();
-                foreach ($groups as $group) {
-                    self::printGroup($group);
-                }
                 /*
                  * Affichage d'un message si aucun groupe n'existe
                  */
                 if (count($groups) === 0) { ?>
                     <tr>
-                        <td colspan="4"><?php _e("No existing group") ?></td>
+                        <td colspan="4">Aucun groupe n'existe</td>
                     </tr> <?php
-                } ?>
+                } else {
+                    foreach ($groups as $group) {
+                        self::printGroup($group);
+                    }
+                }?>
             </tbody>
             <?php
 
@@ -167,10 +168,11 @@ class GroupListMenu extends IresMenu {
             if (count($groups) > 9) { ?>
                 <tfoot>
                     <tr>
-                        <th scope="col">Nom</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Responsable(s)</th>
-                        <th scope="col">Date de création</th>
+                        <th class="row-title">Nom</th>
+                        <th class="row-title">Type</th>
+                        <th class="row-title">Responsable(s)</th>
+                        <th class="row-title">Date de création</th>
+                        <th></th>
                     </tr>
                 </tfoot>
             <?php }  ?>
@@ -184,61 +186,43 @@ class GroupListMenu extends IresMenu {
      * @param $group Group the group to print
      */
     private function printGroup(Group $group) {
-        $user = wp_get_current_user();
-        $users = $group->getUsers();
+        $currentUser = wp_get_current_user();
+        $respNames = array_map(function($u) {
+            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+        }, $group->getResponsables());
 
-        $responsables = $group->getResponsables(); ?>
-        <tr class="<?php if (in_array($user, $users)) {
-            echo "table-primary";
-        } ?>">
+        ?>
+        <tr class="<?php if ($group->userExists($currentUser)) echo "row-hover" ?>">
             <!-- Name of the group -->
-            <th scope="row" class="text-primary">
+            <th>
                 <a class="text-decoration-none"
-                   href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
+                   href="<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>">
                     <?php echo $group->getName() ?>
                 </a>
             </th>
             <!-- Group's type -->
             <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
             <!-- Name of the users in charge of the group -->
-            <td> <?php
-                echo implode(", ", array_map(function($u) {
-                    return $u->first_name . " " . $u->last_name;
-                }, $responsables));  ?>
-            </td>
+            <td> <?php echo implode(", ", $respNames) ?></td>
             <!-- Date -->
-            <td>
-                <?php echo $group->getCreationTime() ?>
-            </td>
-            <td>
+            <td><?php echo $group->getCreationTime() ?></td>
+            <td class="hide-actions">
                 <?php
-                if (current_user_can('administrator') || (current_user_can('responsable') && $group->isUserResponsable($user))) {
-                    ?>
-                    <form action="" method="post">
-                        <button type="button"
-                                id="modify"
-                                name="modify"
-                                value="<?php echo $group->getId() ?>"
-                                class="btn btn-outline-secondary btn-sm"
-                                onclick="location.href='<?php echo get_site_url() ?>/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>'">
+                if (current_user_can('administrator') || $group->isUserResponsable($currentUser)) {?>
+                    <form method="post">
+                        <button type="button" id="modify" name="modify" value="<?php echo $group->getId() ?>"
+                                class="button-secondary"
+                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>'">
                             Modifier
-                        </button>
-                        <?php
-                        if (current_user_can('administrator')) {
-                            ?>
-                            <button type="submit"
-                                    id="delete"
-                                    name="delete"
-                                    value="<?php echo $group->getId() ?>"
-                                    class="btn btn-outline-danger btn-sm"
-                                    onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group->getName(); ?> ?');">
-                                <?php echo __('Delete') ?>
-                            </button>
-                            <?php
-                        }
-                        ?>
-                    </form>
-                    <?php
+                        </button> <?php
+                        if (current_user_can('administrator')) {?>
+                            <button type="submit" id="delete" name="delete" value="<?php echo $group->getId() ?>"
+                                class="button-secondary button-secondary-delete"
+                                onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group->getName() ?> ?');">
+                                Supprimer
+                            </button><?php
+                        } ?>
+                    </form><?php
                 }
                 ?>
             </td>

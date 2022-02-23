@@ -167,7 +167,7 @@ class UserData extends IresElement {
             case self::VALUE_TYPE_FLOAT:
                 return "0.0";
             case self::VALUE_TYPE_BOOL:
-                return "false";
+                return "non";
             default:
                 return "";
         }
@@ -245,6 +245,18 @@ class UserData extends IresElement {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param WP_User $user the user where the meta will be deleted
+     *
+     * @return bool true if the meta has been deleted
+     */
+    public function delete(WP_User $user) : bool{
+        if($this->wordpressMeta){
+            return true;
+        }
+        return delete_user_meta($user->ID, $this->id);
     }
 
     /**

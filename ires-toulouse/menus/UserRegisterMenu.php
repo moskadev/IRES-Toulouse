@@ -34,6 +34,7 @@ class UserRegisterMenu extends IresMenu {
     }
 
     public function analyzeSentData() : void {
+        $message = $type_message = "";
         if (!empty($_POST["first_name"]) &&
             !empty($_POST["last_name"]) &&
             !empty($_POST["user_email"])
@@ -45,19 +46,22 @@ class UserRegisterMenu extends IresMenu {
                     $_POST["user_email"]);
 
                 UserInputData::checkSentData();
-                $this->loggedUser = $connection->register(); ?>
+                $this->loggedUser = $connection->register();
 
-                <div id="message" class="updated notice is-dismissible">
-                    <p><strong>L'utilisateur <?php echo $this->loggedUser->user_login ?> a
-                            été bien enregistré, <a href='admin.php?page=mon_profil_ires'>
-                                vous pouvez renseigner ses informations ici</a></strong>
-                    </p>
-                </div> <?php
-            } catch (Exception $e) { ?>
-                <div id="message" class="error notice is-dismissible">
-                    <p><strong><?php echo $e->getMessage() ?></strong></p>
-                </div>
-            <?php }
+                $message = "L'utilisateur " . $this->loggedUser->user_login . "  a été bien enregistré, 
+                    <a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->loggedUser->ID) . "'>
+                        vous pouvez renseigner ses informations ici
+                    </a>";
+                $type_message = "updated";
+            } catch (Exception $e) {
+                $message = $e->getMessage();
+                $type_message = "error";
+            }
+        }
+        if (!empty($message) && !empty($type_message)) { ?>
+            <div id="message" class="<?php echo $type_message ?> notice is-dismissible">
+                <p><strong><?php echo $message ?></strong></p>
+            </div><?php
         }
     }
 
@@ -70,7 +74,7 @@ class UserRegisterMenu extends IresMenu {
      *      - Add the user to the database
      */
     public function getContent() : void {?>
-        <form method='post' class='verifiy-form validate' novalidate='novalidate'>
+        <form method='post' class='verifiy-form'>
             <table class='form-table' role='presentation'>
                 <?php
                 foreach (UserData::all() as $data) {
@@ -103,7 +107,6 @@ class UserRegisterMenu extends IresMenu {
                         </th>
                         <td>
                             <input <?php echo Dataset::allFrom($data) ?>
-                                    class='form-control'
                                     type='<?php echo $formType ?>'
                                     id='<?php echo $dataId ?>'
                                     name='<?php echo $dataId ?>'
@@ -117,8 +120,9 @@ class UserRegisterMenu extends IresMenu {
                     <?php
                 } ?>
             </table>
-            <button class="btn btn-outline-primary menu-submit" type="submit"
+            <button class="button-primary menu-submit button-large" type="submit"
                     name="createuser" disabled>
+                <span class="dashicons dashicons-insert"></span>
                 Créer un nouveau compte IRES
             </button>
         </form>

@@ -4,38 +4,16 @@ namespace menus;
 
 use irestoulouse\controllers\UserConnection;
 use irestoulouse\elements\Group;
-use irestoulouse\elements\input\UserData;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\utils\ExcelGenerator;
 
 add_action("admin_init", function () {
     if(isset($_POST['download_csv'])) {
-        ob_start();
-
-        $domain = $_SERVER['SERVER_NAME'];
-        $filename = 'users-' . $domain . '-' . time() . '.csv';
-
-        $users = is_numeric($_POST["download_csv"]) ? [get_userdata($_POST["download_csv"])] : get_users();
-
-        $fh = @fopen( 'php://output', 'w' );
-        fprintf( $fh, chr(0xEF) . chr(0xBB) . chr(0xBF) );
-        header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-        header( 'Content-Description: File Transfer' );
-        header( 'Content-type: text/csv' );
-        header( "Content-Disposition: attachment; filename={$filename}" );
-        header( 'Expires: 0' );
-        header( 'Pragma: public' );
-
-        fputcsv( $fh, array_map(function ($data) {
-            return $data->getName();
-        }, UserData::all(false)));
-        foreach ($users as $user){
-            fputcsv( $fh, array_map(function ($data) use ($user) {
-                return $data->getValue($user);
-            }, UserData::all(false)) );
-        }
-        ob_end_flush();
-
-        exit;
+        (new ExcelGenerator("ires_utilisateurs.csv"))->generate(
+                is_numeric($_POST["download_csv"]) ?
+                    [get_userdata($_POST["download_csv"])] :
+                    get_users()
+        );
     }
 });
 

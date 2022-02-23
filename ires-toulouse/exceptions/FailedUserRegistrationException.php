@@ -7,10 +7,12 @@ use Exception;
 class FailedUserRegistrationException extends Exception {
 
     /**
-     * @param string $login
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $reason
      */
-    public function __construct(string $login, string $reason) {
-        parent::__construct("L'utilisateur $login n'a pas pu être enregistré : $reason");
+    public function __construct(string $firstName, string $lastName, string $reason) {
+        parent::__construct("L'utilisateur $firstName $lastName n'a pas pu être enregistré : $reason");
     }
 
 }

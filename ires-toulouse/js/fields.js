@@ -25,7 +25,19 @@ forms.forEach(function (form) {
         }
         changeSubmitState(buttonSubmit);
     });
-    formInputs.forEach(input => checkCorrectlyFilled(input));
+    form.addEventListener("click", (event) => {
+        if (event.target.dataset?.formtype === "radio") {
+            changeSwitchState(event.target);
+            updateChildrenFieldDisplay(event.target);
+        }
+    });
+    formInputs.forEach(input => {
+        if (input.dataset?.formtype === "radio") {
+            updateChildrenFieldDisplay(input);
+        }
+        checkCorrectlyFilled(input);
+    });
+
 
     /**
      * Dynamically update the value in the input from
@@ -57,13 +69,14 @@ forms.forEach(function (form) {
     function changeSubmitState(btn) {
         if (btn !== null) {
             btn.disabled = !areCorrectlyFilled();
-            if (areCorrectlyFilled()) {
-                btn.classList.remove("btn-outline-primary");
-                btn.classList.add("btn-primary");
-            } else {
-                btn.classList.add("btn-outline-primary");
-                btn.classList.remove("btn-primary");
-            }
+            // bootstrap
+            //if (areCorrectlyFilled()) {
+            //    btn.classList.remove("btn-outline-primary");
+            //    btn.classList.add("btn-primary");
+            //} else {
+            //    btn.classList.add("btn-outline-primary");
+            //    btn.classList.remove("btn-primary");
+            //}
         }
     }
 
@@ -101,12 +114,14 @@ forms.forEach(function (form) {
                  */
                 filled = !input.value || !regex || regex.test(input.value);
             }
-            if (filled) {
-                input.classList.add("is-valid");
-                input.classList.remove("is-invalid");
-            } else {
-                input.classList.add("is-invalid");
-                input.classList.remove("is-valid");
+            if (!input.dataset.disabled) {
+                if (filled) {
+                    input.classList.add("is-valid");
+                    input.classList.remove("is-invalid");
+                } else {
+                    input.classList.add("is-invalid");
+                    input.classList.remove("is-valid");
+                }
             }
         }
         return filled;
@@ -128,6 +143,57 @@ forms.forEach(function (form) {
         });
         return filled;
     }
+
+    /**
+     *
+     * @param parentRadio
+     */
+    function updateChildrenFieldDisplay(parentRadio) {
+        const children = form.querySelectorAll("input[data-parent=" + parentRadio.name + "]");
+        children.forEach(child => {
+            if (!parentRadio.value || parentRadio.value === "non") {
+                child.value = child.dataset?.formtype === "radio" ? "non" : "";
+            }
+            /*
+             * We are searching in the form if there's a row corresponding to
+             * where is stored our child.
+             * We will hide it if the parent switch is equal to false or
+             * show it if true
+             */
+            getParents(child).reverse().forEach(row => {
+                if (row.tagName === "TR") {
+                    if (!parentRadio.value || parentRadio.value === "non") {
+                        row.style.display = "none";
+                    } else {
+                        row.style.removeProperty("display");
+                    }
+                }
+            });
+        })
+    }
+
+    /**
+     *
+     * @param target
+     */
+    function changeSwitchState(target) {
+        let switchBtn = null;
+        if (!target.classList.contains("switch")) {
+            getParents(target).reverse().forEach(el => {
+                if (!switchBtn && el.classList?.contains("switch")) {
+                    switchBtn = el;
+                }
+            });
+        } else {
+            switchBtn = target;
+        }
+        if (switchBtn) {
+            const switchRadio = switchBtn.firstElementChild;
+            if (target === switchRadio && !switchRadio.disabled) {
+                switchRadio.value = !switchRadio.value || switchRadio.value === "oui" ? "non" : "oui";
+            }
+        }
+    }
 });
 
 submitFormOnItemSelect();
@@ -146,19 +212,4 @@ function submitFormOnItemSelect() {
             });
         })
     );
-}
-
-/**
- * Return all the element given's parents
- *
- * @param element current element
- * @returns {Element[]} all element's parents
- */
-function getParents(element) {
-    let parents = [];
-    while (element) {
-        parents.unshift(element);
-        element = element.parentNode;
-    }
-    return parents;
 }

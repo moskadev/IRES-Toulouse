@@ -3,6 +3,7 @@
 namespace irestoulouse\controllers;
 
 use exceptions\FailedUserRegistrationException;
+use irestoulouse\elements\Group;
 use irestoulouse\elements\input\UserData;
 use WP_User;
 
@@ -25,10 +26,11 @@ class UserConnection extends Controller {
     public function __construct(string $firstName, string $lastName, string $email) {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
-        $this->email = $email;
+        $this->email = html_entity_decode($email);
 
-        if (empty($firstName) || empty($lastName) || empty($email)) {
-            throw new FailedUserRegistrationException($this->getOriginalLogin(), "Donnée incorrecte");
+        if (empty($firstName) || empty($lastName) || empty($email) ||
+            !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new FailedUserRegistrationException($firstName, $lastName, "Donnée incorrecte");
         }
     }
 
@@ -44,6 +46,7 @@ class UserConnection extends Controller {
     /**
      * Register the new user
      * @return WP_User the registered user
+     *
      * @throws FailedUserRegistrationException if the user couldn't be registered
      */
     public function register() : WP_User {
@@ -61,7 +64,8 @@ class UserConnection extends Controller {
             "display_name" => $login
         ]);
         if (is_wp_error($userId)) {
-            throw new FailedUserRegistrationException($login, $userId->get_error_message());
+            throw new FailedUserRegistrationException($this->firstName,
+                $this->lastName, $userId->get_error_message());
         }
         $user = get_userdata($userId);
         if (isset($password) && !empty($password)) {
@@ -70,6 +74,21 @@ class UserConnection extends Controller {
         UserData::registerExtraMetas($userId);
 
         return $user;
+    }
+
+    /**
+     * @param WP_User $user to delete
+     *
+     * @return bool true if the user has been successfully deleted
+     */
+    public static function delete(WP_User $user) : bool {
+        foreach (UserData::all(false) as $d){
+            $d->delete($user);
+        }
+        foreach (Group::getUserGroups($user) as $g){
+            $g->removeUser($user);
+        }
+        return wp_delete_user($user->ID);
     }
 
     /**
@@ -91,8 +110,8 @@ class UserConnection extends Controller {
      */
     public function countSameLogins() : int {
         return count(get_users([
-            "search" => $this->getOriginalLogin() . "*",
-            "search_columns" => ["user_login"]])
+                "search" => $this->getOriginalLogin() . "*",
+                "search_columns" => ["user_login"]])
         );
     }
 }

@@ -51,24 +51,19 @@ class UserProfileMenu extends IresMenu {
     private array $visibleUsers;
 
     /** @var WP_User */
-    private WP_User $lastRegisteredUser;
-
-    /** @var WP_User */
     private WP_User $editingUser;
 
     /** @var bool */
-    private bool $disableAll;
+    private bool $canEditUser;
+
+    /** @var bool */
+    private bool $locked;
 
     /**
      * Constructing the menu and link to the admin page
      */
     public function __construct() {
-        $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
-        $this->lastRegisteredUser = Identifier::getLastRegisteredUser($this->visibleUsers)
-            ?? wp_get_current_user();
-        $this->disableAll = intval($_POST["confirm-modify"] ?? true);
-
-        parent::__construct("Consulter les informations relatifs à votre profil IRES",
+        parent::__construct("Consulter les informations relatifs de ",
             "Mon profil IRES",
             0,
             "dashicons-id-alt",
@@ -77,45 +72,50 @@ class UserProfileMenu extends IresMenu {
     }
 
     public function analyzeSentData() : void {
-        if (count($this->visibleUsers) > 0) {
-            $this->editingUser = isset($_POST["editingUserId"]) ?
-                get_userdata($_POST["editingUserId"] ?? get_current_user_id()) :
-                $this->lastRegisteredUser;
+        $type_message = $message = "";
+        $this->visibleUsers = Group::getVisibleUsers(wp_get_current_user());
 
-            /**
-             * If admin, it gets the last created user or chosen user
-             * If responsable, verify if he's responsible for the user
-             * else chose itself
-             */
-            if (!in_array($this->editingUser, $this->visibleUsers)) {
-                $this->editingUser = wp_get_current_user(); ?>
-                <div id="message" class="error notice is-dismissible">
-                    <p><strong>Vous n'avez pas la permission de modifier cet
-                            utilisateur.</strong></p>
-                </div>
-            <?php }
-        } else {
+        try {
+            if (count($this->visibleUsers) > 0 && isset($_GET["user_id"])) {
+                if (($this->editingUser = get_userdata($_GET["user_id"])) === false) {
+                    $this->editingUser = get_userdata(get_current_user_id());
+                }
+            } else {
+                $this->editingUser = wp_get_current_user();
+            }
+        } catch(\Exception $e){
             $this->editingUser = wp_get_current_user();
+            $message = "L'utilisateur recherché n'a pas été trouvé";
+            $type_message = "error";
+        }
+        $this->canEditUser = in_array($this->editingUser, $this->visibleUsers);
+        $this->locked = $this->canEditUser ? intval($_GET["lock"] ?? true) : true;
+        if (isset($_POST["action"]) && $_POST["action"] === "modify") {
+            if($this->canEditUser){
+                try {
+                    UserInputData::checkSentData();
+                    foreach ($_POST as $dataId => $dataValue){
+                        if(($data = UserData::fromId($dataId)) !== null){
+                            $data->updateValue($dataValue, $this->editingUser);
+                        }
+                    }
+                    $message = "Modification des informations de l'utilisateur " .
+                        $this->editingUser->user_login . " ont été bien effectuées";
+                    $type_message = "updated";
+                } catch (Exception $e) {
+                    $message = "Erreur : " . $e->getMessage();
+                    $type_message = "error";
+                }
+            } else {
+                $message = "Vous n'avez pas l'autorisation de modifier l'utilisateur" . $this->editingUser->user_login;
+                $type_message = "error";
+            }
         }
 
-        if (isset($_POST["action"]) && $_POST["action"] == "modifyuser") {
-            try {
-                UserInputData::checkSentData();
-                foreach ($_POST as $dataId => $dataValue){
-                    if(($data = UserData::fromId($dataId)) !== null){
-                        $data->updateValue($dataValue, $this->editingUser);
-                    }
-                }?>
-                <div id="message" class="updated notice is-dismissible">
-                    <p><strong>Modification des informations de l'utilisateur
-                            <?php echo $this->editingUser->user_login ?> ont été bien
-                            effectuées </strong></p>
-                </div> <?php
-            } catch (Exception $e) { ?>
-                <div id="message" class="error notice is-dismissible">
-                    <p><strong>Erreur : <?php echo $e->getMessage() ?></strong></p>
-                </div>
-            <?php }
+        if (!empty($message) && !empty($type_message)) { ?>
+            <div id="message" class="<?php echo $type_message ?> notice is-dismissible">
+                <p><strong><?php echo $message ?></strong></p>
+            </div><?php
         }
     }
 
@@ -123,32 +123,26 @@ class UserProfileMenu extends IresMenu {
      * Content of the page
      */
     public function getContent() : void {
-        if (current_user_can("responsable") ||
-            current_user_can('administrator')){
-            $this->chooseUserForm();
-        }
-        $this->showModificationBtn(); ?>
+        $this->chooseUserForm();
+        if($this->canEditUser) {
+            $this->showModificationBtn();
+        } ?>
 
-        <form method='post' name='modify-user' id='modify-user'
-              class='verifiy-form validate' novalidate='novalidate'>
-            <?php
-            $this->saveEditedUser();
-            $this->saveConfirmModification();
-            ?>
-            <input name='action' type='hidden' value='modifyuser'>
+        <form method='post' name='modify' class='verifiy-form'>
+            <input name='action' type='hidden' value='modify'>
             <table class='form-table' role='presentation'><?php
                 foreach (UserData::all() as $data) {
                     $formType = $data->getFormType();
                     $dataId = $data->getId();
                     $isLabel = $formType === "label"; ?>
                     <tr class="form-field form-required">
-                        <th class='<?php if ($isLabel)echo "title-label" ?>'>
+                        <th class='<?php if ($isLabel) echo "title-label" ?>'>
                             <!-- Creating the title of input -->
                             <?php if ($isLabel) {
                                 echo $data->getName();
                             } else { ?>
                                 <label for='<?php echo $dataId ?>'> <?php
-                                    _e($data->getName());
+                                    echo $data->getName();
                                     if ($data->isRequired()) { ?>
                                         <span class='description'><?php _e("(required)") ?></span> <?php
                                     } ?>
@@ -160,74 +154,61 @@ class UserProfileMenu extends IresMenu {
                                 <?php
                                 if ($formType === "text") { ?>
                                     <input <?php echo Dataset::allFrom($data) ?>
-                                            class="form-control"
                                             type='<?php echo htmlspecialchars($formType) ?>'
                                             id='<?php echo $dataId ?>'
                                             name='<?php echo $dataId ?>'
                                             value='<?php echo htmlspecialchars($data->getValue($this->editingUser)); ?>'
-                                            <?php if ($this->disableAll) echo "disabled" ?>>
+                                        <?php if ($this->locked) echo "disabled" ?>>
                                     <?php
                                 } else if($formType === "table" && $dataId === "groupes"){
                                     $groups = $data->getExtraData($this->editingUser);
                                     if(count($groups) > 0){ ?>
-                                        <table class="table groups-data">
+                                        <table class="widefat groups-data striped">
                                             <thead>
-                                                <tr>
-                                                    <th scope="col">Nom du groupe</th>
-                                                    <th scope="col">Type du groupe</th>
-                                                    <th scope="col">Responsables</th>
-                                                    <th scope="col">Responsable de ce groupe</th>
-                                                </tr>
+                                            <tr>
+                                                <th class="row-title">Nom du groupe</th>
+                                                <th class="row-title">Type du groupe</th>
+                                                <th class="row-title">Responsables</th>
+                                                <th class="row-title">Responsable de ce groupe</th>
+                                            </tr>
                                             </thead>
                                             <tbody> <?php
-                                                /** @var Group $group */
-                                                foreach ($groups as $group){
-                                                    $respNames = array_map(function($u) {
-                                                        return $u->first_name . " " . $u->last_name;
-                                                    }, $group->getResponsables()); ?>
-                                                    <tr>
-                                                        <td><a class="text-decoration-none"
-                                                               href="<?php echo get_site_url() ?>/wp-admin/admin.php?page=details_du_groupe&group=<?php echo $group->getId() ?>">
-                                                                <?php echo $group->getName() ?></a></td>
-                                                        <td><?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
-                                                        <td><?php echo implode(", ", $respNames)?></td>
-                                                        <td><?php echo $group->isUserResponsable($this->editingUser) ?
-                                                                "Oui" : "Non" ?></td>
-                                                    </tr>
-                                                <?php }
+                                            /** @var Group $group */
+                                            foreach ($groups as $group){
+                                                $respNames = array_map(function($u) {
+                                                    return "<a href='" . home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+                                                }, $group->getResponsables()); ?>
+                                                <tr>
+                                                    <td><a class="text-decoration-none"
+                                                           href="<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>">
+                                                            <?php echo $group->getName() ?></a></td>
+                                                    <td><?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
+                                                    <td><?php echo implode(", ", $respNames)?></td>
+                                                    <td><?php echo $group->isUserResponsable($this->editingUser) ?
+                                                            "Oui" : "Non" ?></td>
+                                                </tr>
+                                            <?php }
                                             ?> </tbody>
                                         </table> <?php
                                     } else { ?>
                                         <p>L'utilisateur n'appartient à aucun groupe</p>
                                     <?php }
-                                } else if ($formType === "radio") {
-                                    $value = filter_var($data->getValue($this->editingUser),
-                                        FILTER_VALIDATE_BOOLEAN); ?>
-                                    Oui <input <?php echo Dataset::allFrom($data) ?>
-                                            class="form-control"
-                                            type="radio"
-                                            id='<?php echo $dataId ?>_oui'
-                                            name='<?php echo $dataId ?>'
-                                            value="true"
-                                            <?php if ($this->disableAll) echo "disabled" ?>
-                                            <?php if ($value) echo "checked" ?>>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    Non <input <?php echo Dataset::allFrom($data) ?>
-                                            class="form-control"
-                                            type="radio"
-                                            id='<?php echo $dataId ?>_non'
-                                            name='<?php echo $dataId ?>'
-                                            value="false"
-                                            <?php if ($this->disableAll) echo "disabled" ?>
-                                            <?php if (!$value) echo "checked" ?>>
-                                    <?php
+                                } else if ($formType === "radio") { ?>
+                                    <label class="switch">
+                                        <input class="switch-radio"
+                                               <?php echo Dataset::allFrom($data) ?>
+                                               type="radio"
+                                               name="<?php echo $dataId ?>"
+                                               value="<?php echo $data->getValue($this->editingUser) ?>"
+                                            <?php if ($this->locked) echo "disabled" ?>>
+                                        <div class="slider round"></div>
+                                    </label> <?php
                                 } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
-                                    <select <?php if ($formType === "checklist")
-                                        echo "multiple" ?>
+                                    <select <?php echo Dataset::allFrom($data);
+                                            if ($formType === "checklist") echo "multiple" ?>
                                             name='<?php echo $dataId ?>[]'
-                                            class="form-control"
                                             id='<?php echo $dataId ?>'
-                                            <?php if ($this->disableAll) echo "disabled" ?>> <?php
+                                        <?php if ($this->locked) echo "disabled" ?>> <?php
                                         /**
                                          * Extra data are checked individually and put in the dropdown or checklist
                                          * Multiple items can be selected for checklist, so we check if the user
@@ -246,7 +227,7 @@ class UserProfileMenu extends IresMenu {
                                     </select> <?php
                                 }
                                 if (!empty($data->getDescription())) { ?>
-                                    <p class="description"><?php _e($data->getDescription()) ?></p>
+                                    <p class="description"><?php echo $data->getDescription() ?></p>
                                 <?php } ?>
                             </td>
                         <?php } ?>
@@ -254,66 +235,45 @@ class UserProfileMenu extends IresMenu {
                     <?php
                 } ?>
             </table><?php
-            if (!$this->disableAll) { ?>
-                <button class="btn btn-outline-primary menu-submit" type="submit"
+            if (!$this->locked) { ?>
+                <button class="button-primary menu-submit button-large" type="submit"
                         name="profile-page" disabled>
+                    <span class="dashicons dashicons-id"></span>
                     Modifier les informations
                 </button>
             <?php } ?>
         </form> <?php
     }
 
-    private function saveEditedUser() : void{ ?>
-        <input name='editingUserId' type='hidden'
-               value='<?php echo $this->editingUser->ID ?>'> <?php
-    }
-
-    private function saveConfirmModification(){ ?>
-        <input name='confirm-button' type='hidden'
-               value='<?php echo $this->disableAll ?>'> <?php
-    }
-
     private function showModificationBtn() : void { ?>
-        <form method='post' name='confirm-modify-user' id='confirm-modify-user'
-              class='validate' novalidate='novalidate'>
-            <?php $this->saveEditedUser(); ?>
-            <table class='form-table' role='presentation'>
-                <tr>
-                    <td>
-                        <button class="btn btn-primary menu-submit w-100" type="submit"
-                                name="confirm-modify" value="<?php echo !$this->disableAll ?>">
-                            <?php echo $this->disableAll ? "Déverrouiller" : "Verrouiller" ?> les modifications de l'utilisateur
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </form>
+        <table class="data-table">
+            <tr>
+                <td>
+                    <button class="<?php echo $this->locked ? "button-primary" : "button-secondary" ?> button-large"
+                            onclick='location.href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $this->editingUser->ID . "&lock=" . !$this->locked) ?>"'>
+                        <span class='dashicons <?php echo $this->locked ? "dashicons-lock'></span>Déverrouiller" : "dashicons-unlock'></span>Verrouiller" ?> les modifications de l'utilisateur
+                    </button>
+                </td>
+            </tr>
+        </table>
     <?php }
 
-
     private function chooseUserForm() : void { ?>
-        <form method='post' name='to-modify-user' id='to-modify-user'
-              class='validate' novalidate='novalidate'>
-            <table class='form-table' role='presentation'>
-                <tr class="form-field form-required">
-                    <th>
-                        <label for='editingUserId'>
-                            Sélectionnez l'utilisateur à modifier
-                        </label>
-                    </th>
-                    <td>
-                        <select name="editingUserId" class="confirm-item form-control"><?php
-                            foreach ($this->visibleUsers as $user) { ?>
-                                <option value='<?php echo $user->ID ?>'
-                                    <?php if ($user->ID === $this->editingUser->ID)
-                                        echo "selected" ?>>
-                                    <?php echo $user->user_login ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-        </form>
+        <div class="custom-dropdown">
+            <button class="dropdown-btn">
+                <span><?php echo $this->editingUser->user_login ?></span><?php
+                if(count($this->visibleUsers) > 1){?>
+                    <span class="dashicons dashicons-arrow-down"></span>
+                <?php } ?>
+            </button>
+            <div class="dropdown-content"><?php
+                foreach ($this->visibleUsers as $user) { ?>
+                    <a class="<?php if($user->ID === $this->editingUser->ID) echo "dropdown-selected" ?>"
+                       href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $user->ID) ?>">
+                        <?php echo $user->user_login ?>
+                    </a>
+                <?php } ?>
+            </div>
+        </div>
     <?php }
 }

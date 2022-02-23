@@ -18,6 +18,8 @@ class Group extends IresElement {
     public const TYPE_MANIFESTATION = 1;
     public const TYPE_AUTRE = 2;
 
+    public const MAX_RESPONSABLES = 3;
+
     public const TYPE_NAMES = [
         self::TYPE_RECHERCHE_ACTION => "Recherche-action",
         self::TYPE_MANIFESTATION => "Manifestation",
@@ -83,10 +85,16 @@ class Group extends IresElement {
             self::fromName(strtolower($name)) === null
         ) {
             $db = Database::get();
+
             return $db->insert($db->prefix . "groups",
-                ["name" => $name, "type" => $type, "creator_id" => get_current_user_id()]
-            ) !== false;
+                    [
+                        "name" => $name,
+                        "type" => $type,
+                        "creator_id" => get_current_user_id()
+                    ]
+                ) !== false;
         }
+
         return false;
     }
 
@@ -146,15 +154,17 @@ class Group extends IresElement {
      */
     public static function delete(int $id) : bool {
         if (self::exists($id)) {
-            foreach (($g = Group::fromId($id))->getResponsables() as $r){
+            foreach (($g = Group::fromId($id))->getResponsables() as $r) {
                 $g->removeResponsable($r);
             }
             $db = Database::get();
 
             $db->delete($db->prefix . "groups", ["id_group" => $id]);
             $db->delete($db->prefix . "groups_users", ["group_id" => $id]);
+
             return true;
         }
+
         return false;
     }
 
@@ -168,7 +178,7 @@ class Group extends IresElement {
     public static function exists(int $id) : bool {
         try {
             return Group::fromId($id) !== null;
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -183,6 +193,7 @@ class Group extends IresElement {
         $group = array_filter(self::all(), function ($g) use ($id) {
             return $g->id === $id;
         });
+
         return $group[array_key_first($group)] ?? null;
     }
 
@@ -196,7 +207,11 @@ class Group extends IresElement {
         }
         $users = [];
         foreach (Group::allWhereUserResponsable($from) as $group) {
-            $users = array_merge($users, $group->getUsers());
+            foreach ($group->getUsers() as $u){
+                if(!in_array($u, $users)){
+                    $users[] = $u;
+                }
+            }
         }
         $users = array_filter($users, function ($u) use ($from) {
             return !user_can($u, "administrator") ||
@@ -309,19 +324,19 @@ class Group extends IresElement {
      */
     public function addResponsable(WP_User $user) : bool {
         $this->addUser($user);
-        // à confirmer si l'utlisateur peut être responsable plus de 3 groupes
-        //if (count(self::allWhereUserResponsable($user)) > 3) {
+        // à confirmer si l'utlisateur peut être responsable dans plus de 3 groupes
+        //if (count(self::allWhereUserResponsable($user)) > self::MAX_RESPONSABLES) {
         //    return false;
         //}
-        if (!$this->isUserResponsable($user)) {
+        if (!$this->isUserResponsable($user) && count($this->getResponsables()) < self::MAX_RESPONSABLES) {
             $db = Database::get();
             $user->add_role("responsable");
 
             return $db->update($db->prefix . "groups_users",
-                ["is_responsable" => "1"],
-                ["user_id" => $user->ID, "group_id" => $this->id]
-            ) !== false;
+                    ["is_responsable" => "1"],
+                    ["user_id" => $user->ID, "group_id" => $this->id]) !== false;
         }
+
         return false;
     }
 
@@ -364,6 +379,7 @@ class Group extends IresElement {
         $responsable = array_filter($this->getResponsables(), function ($u) use ($search) {
             return $search->ID === $u->ID;
         });
+
         return isset($responsable[array_key_first($responsable)]);
     }
 
@@ -377,10 +393,12 @@ class Group extends IresElement {
     public function addUser(WP_User $user) : bool {
         if (!$this->userExists($user)) {
             $db = Database::get();
-            return $db->insert($db->prefix . "groups_users",
-                ["user_id" => $user->ID, "group_id" => $this->id, "is_responsable" => "0"]
-            ) !== false;
+
+            return $db->insert($db->prefix . "groups_users", [
+                "user_id" => $user->ID, "group_id" => $this->id, "is_responsable" => "0"
+                ]) !== false;
         }
+
         return false;
     }
 
@@ -397,9 +415,9 @@ class Group extends IresElement {
 
             $db = Database::get();
             return $db->delete($db->prefix . "groups_users",
-                ["user_id" => $user->ID, "group_id" => $this->id]
-            ) !== false;
+                    ["user_id" => $user->ID, "group_id" => $this->id]) !== false;
         }
+
         return false;
     }
 
@@ -418,8 +436,10 @@ class Group extends IresElement {
             if (count(self::allWhereUserResponsable($user)) === 0) {
                 $user->remove_role("responsable");
             }
+
             return $request !== false;
         }
+
         return false;
     }
 }

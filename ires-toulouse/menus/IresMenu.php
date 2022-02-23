@@ -4,6 +4,7 @@ namespace irestoulouse\menus;
 
 use irestoulouse\menus\groups\GroupDetailsMenu;
 use irestoulouse\menus\groups\GroupListMenu;
+use irestoulouse\utils\ExcelGenerator;
 use irestoulouse\utils\Identifier;
 use menus\UserListMenu;
 
@@ -44,6 +45,15 @@ abstract class IresMenu {
         $hasAboveRole = current_user_can('responsable') ||
             current_user_can('administrator');
 
+        add_action("admin_init", function () {
+            if(isset($_POST['download_csv'])) {
+                (new ExcelGenerator("ires_utilisateurs"))->generate(
+                    is_numeric($_POST["download_csv"]) ?
+                        [get_userdata($_POST["download_csv"])] :
+                        get_users()
+                );
+            }
+        });
         $mainMenu = $hasAboveRole ? new UserListMenu() : new UserProfileMenu();
         IresMenu::registerSub("admin_menu", $mainMenu,
             $hasAboveRole ?

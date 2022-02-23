@@ -27,12 +27,16 @@ input {
     height: 50px;
 }
 
+.input-register-2 {
+    grid-template-columns: 1fr max-content;
+}
+
 .input-register-3 {
-    grid-template-columns: 1fr 10% 10%;
+    grid-template-columns: 1fr repeat(2, max-content);
 }
 
 .input-register-4 {
-    grid-template-columns: 1fr 30% 10% 10%;
+    grid-template-columns: 1fr 30% repeat(2, max-content);
 }
 
 :not([disabled]).is-valid {

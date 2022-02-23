@@ -236,11 +236,19 @@ class UserProfileMenu extends IresMenu {
                 } ?>
             </table><?php
             if (!$this->locked) { ?>
-                <button class="button-primary menu-submit button-large" type="submit"
-                        name="profile-page" disabled>
-                    <span class="dashicons dashicons-id"></span>
-                    Modifier les informations
-                </button>
+                <div class="input-register-container input-register-2">
+                    <button class="button-primary menu-submit button-large" type="submit"
+                            name="profile-page" disabled>
+                        <span class="dashicons dashicons-id"></span>
+                        Modifier les informations
+                    </button>
+                    <form action="" method="post" style="display: inline-block">
+                        <input type="hidden" class="download_csv" name="download_csv" value="<?php echo $this->editingUser->ID ?>"/>
+                        <button class="button-secondary button-large" type="submit">
+                            Exporter ces données
+                        </button>
+                    </form>
+                </div>
             <?php } ?>
         </form> <?php
     }

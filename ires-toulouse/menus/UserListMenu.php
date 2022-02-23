@@ -7,16 +7,6 @@ use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
 use irestoulouse\utils\ExcelGenerator;
 
-add_action("admin_init", function () {
-    if(isset($_POST['download_csv'])) {
-        (new ExcelGenerator("ires_utilisateurs.csv"))->generate(
-                is_numeric($_POST["download_csv"]) ?
-                    [get_userdata($_POST["download_csv"])] :
-                    get_users()
-        );
-    }
-});
-
 class UserListMenu extends IresMenu {
 
     /** @var \WP_User[] */
@@ -163,8 +153,13 @@ class UserListMenu extends IresMenu {
                             <button type="submit" class="button-link-ires">
                                 <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>">Voir</a>
                             </button>|
-                            <input type="hidden" class="download_csv" name="download_csv" value=""/>
-                            <button type="submit" onclick="document.querySelector('.download_csv').value = <?php echo $user->ID ?>" class="button-link-ires">Exporter</button>
+
+                            <form action="" method="post" style="display: inline-block">
+                                <button class="button-secondary"
+                                        type="submit" name="download_csv">
+                                    Tout exporter
+                                </button>
+                            </form>
                         </form>
                     </td> <!-- Last name -->
                     <td><?php echo $user->first_name; ?></td> <!-- First name -->

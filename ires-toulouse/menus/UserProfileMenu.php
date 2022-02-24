@@ -244,15 +244,13 @@ class UserProfileMenu extends IresMenu {
                     </button>
 
                     <!-- TODO directeur role -->
-                    <form action="" method="post" style="display: inline-block">
-                        <input type="hidden" class="download_csv" name="download_csv" value="<?php echo $this->editingUser->ID ?>"/>
-                        <button class="button-secondary button-large" type="submit">
-                            Exporter ces données
-                        </button>
-                    </form>
-                </div>
-            <?php } ?>
-        </form> <?php
+                    <button class="button-secondary button-large" type="submit"
+                            onclick="downloadExcelFile(this, <?php echo $this->editingUser->ID ?>)">
+                        Exporter ces données
+                    </button>
+                </div><?php
+            } ?>
+        </form><?php
     }
 
     private function showModificationBtn() : void { ?>

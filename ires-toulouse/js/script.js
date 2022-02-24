@@ -19,6 +19,24 @@ function executeCustomDropdownEvents() {
     });
 }
 
+/**
+ * Download Excel data file
+ *
+ * HACK dégueulasse mais on fait avec
+ */
+function downloadExcelFile(btn, userId = "") {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "download_excel";
+    input.value = userId;
+    btn.after(input);
+
+    // on supprime pour éviter qu'il interfere avec les autres boutons
+    setTimeout(() => {
+        input.remove();
+    }, 10);
+}
+
 
 /**
  * Return all the element given's parents

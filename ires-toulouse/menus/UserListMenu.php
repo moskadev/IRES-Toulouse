@@ -93,8 +93,8 @@ class UserListMenu extends IresMenu {
                     </button>
                     <!-- TODO directeur role -->
                     <form action="" method="post" style="display: inline-block">
-                        <button class="button-secondary"
-                            type="submit" name="download_csv">
+                        <button class="button-secondary" type="submit"
+                                onclick="downloadExcelFile(this)">
                             Tout exporter
                         </button>
                     </form><?php
@@ -157,8 +157,10 @@ class UserListMenu extends IresMenu {
 
                             <!-- TODO directeur role -->
                             <form action="" method="post" style="display: inline-block">
-                                <input type="hidden" class="download_csv" name="download_csv" value="<?php echo $user->ID ?>"/>
-                                <button class="button-link-ires" type="submit">Exporter</button>
+                                <button class="button-link-ires" type="submit"
+                                        onclick="downloadExcelFile(this, <?php echo $user->ID ?>)">
+                                    Exporter
+                                </button>
                             </form>
                         </form>
                     </td> <!-- Last name -->

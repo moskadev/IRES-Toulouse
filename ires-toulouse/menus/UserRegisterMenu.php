@@ -27,7 +27,7 @@ class UserRegisterMenu extends IresMenu {
         parent::__construct(
             "Création d'un profil IRES", // Page title when the menu is selected
             "Ajouter un compte", // Name of the menu
-            2, // Menu access security level
+            3, // Menu access security level
             "dashicons-admin-users", // Menu icon
             3 // Page position in the list
         );

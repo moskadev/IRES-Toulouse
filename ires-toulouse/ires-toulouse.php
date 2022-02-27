@@ -50,11 +50,19 @@ register_activation_hook(__FILE__, function () {
         "read" => true,
         "level_0" => true,
         "level_1" => true,
+        "level_2" => true,
+        "level_3" => true
+    ]);
+    add_role("direction", "Direction IRES", [
+        "read" => true,
+        "level_0" => true,
+        "level_1" => true,
         "level_2" => true
     ]);
 });
 register_deactivation_hook(__FILE__, function () {
     remove_role("responsable");
+    remove_role("direction");
 });
 
 UserData::registerExtraMetas(get_current_user_id());

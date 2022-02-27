@@ -230,7 +230,7 @@ class UserProfileMenu extends IresMenu {
                                         } ?>
                                     </select> <?php
                                 }
-                                if (!empty($data->getDescription())) { ?>
+                                if (strlen($data->getDescription()) > 0) { ?>
                                     <p class="description"><?php echo $data->getDescription() ?></p>
                                 <?php } ?>
                             </td>

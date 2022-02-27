@@ -68,7 +68,7 @@ class UserConnection extends Controller {
                 $this->lastName, $userId->get_error_message());
         }
         $user = get_userdata($userId);
-        if (isset($password) && !empty($password)) {
+        if (isset($password) && strlen($password) > 0) {
             (new EmailSender($user))->confirm($password);
         }
         UserData::registerExtraMetas($userId);

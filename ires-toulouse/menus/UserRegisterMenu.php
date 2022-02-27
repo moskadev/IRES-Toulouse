@@ -35,9 +35,9 @@ class UserRegisterMenu extends IresMenu {
 
     public function analyzeSentData() : void {
         $message = $type_message = "";
-        if (!empty($_POST["first_name"]) &&
-            !empty($_POST["last_name"]) &&
-            !empty($_POST["user_email"])
+        if (strlen($_POST["first_name"] ?? "") > 0 &&
+            strlen($_POST["last_name"] ?? "") > 0 &&
+            strlen($_POST["user_email"] ?? "") > 0
         ) {
             try {
                 $connection = new UserConnection(
@@ -112,7 +112,7 @@ class UserRegisterMenu extends IresMenu {
                                     name='<?php echo $dataId ?>'
                                     value='<?php echo $value ?>'>
                             <?php
-                            if (!empty($data->getDescription())) { ?>
+                            if (strlen($data->getDescription()) > 0) { ?>
                                 <p class="description"><?php _e($data->getDescription()) ?></p>
                             <?php } ?>
                         </td>

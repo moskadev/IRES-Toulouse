@@ -22,7 +22,6 @@ class ExcelGenerator {
     }
 
     /**
-     * TODO réadapter
      * @param array $users
      */
     public function generate(array $users) {

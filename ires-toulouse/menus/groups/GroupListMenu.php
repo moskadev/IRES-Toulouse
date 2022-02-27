@@ -23,11 +23,10 @@ class GroupListMenu extends IresMenu {
      */
     public function analyzeSentData() : void {
         $message = $type_message = "";
-
         /*
          * Supprime un groupe
          */
-        if (!empty($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
+        if (strlen($_POST['delete'] ?? "") > 0 && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
             $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
             $type_message = "error";
             if (Group::delete($deletedGroup->getId())) {
@@ -39,15 +38,18 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (!empty($_POST['addGroup']) && !empty($_POST['typeAddGroup'])) {
+        if (Group::isValid($_POST['addGroup'] ?? "", $_POST['typeAddGroup'] ?? -1)) {
             $message = "Impossible de créer le groupe " . esc_attr($_POST['addGroup']);
             $type_message = "error";
             try {
                 Group::createTable();
                 if(Group::register(esc_attr($_POST['addGroup']), intval(esc_attr($_POST['typeAddGroup'])))){
+                    $create = Group::fromName(esc_attr($_POST['addGroup']));
+
                     $type_message = "updated";
-                    $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
-                        ", dénommé " . $_POST['addGroup'] . ", a été créé.";
+                    $message = "Le groupe de " . $create->getName() .
+                        ", dénommé <a href=" . home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $create->getId()) .
+                        ">" . $create->getName() . "</a>, a été créé.";
                 }
             } catch (\Exception $e){
                 // do nothing, the error message is already set

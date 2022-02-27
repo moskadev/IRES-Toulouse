@@ -35,7 +35,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est ajouté
              */
-            if (!empty($_POST['submitMember'])) {
+            if (strlen($_POST['submitMember'] ?? "") > 0) {
                 $newMemberLogin = $_POST['submitMember'];
 
                 $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il est déjà présent dans le groupe.";
@@ -51,7 +51,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est retiré du groupe
              */
-            if (!empty($_POST['removeMember'])) {
+            if (strlen($_POST['removeMember'] ?? "") > 0) {
                 $message = "Une erreur s'est produite lors de la suppression d'un membre.";
                 $type_message = "error";
                 try {
@@ -67,7 +67,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un responsable est supprimé
              */
-            if (!empty($_POST['deleteResp'])) {
+            if (strlen($_POST['deleteResp'] ?? "") > 0) {
                 $message = "Une erreur s'est produite lors de la suppression d'un responsable.";
                 $type_message = "error";
                 try {
@@ -84,7 +84,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (!empty($_POST['submitResponsable'])) {
+            if (strlen($_POST['submitResponsable'] > "") > 0) {
                 $newResponsableLogin = $_POST['submitResponsable'];
                 $newResponsable = get_user_by("login", $newResponsableLogin);
 

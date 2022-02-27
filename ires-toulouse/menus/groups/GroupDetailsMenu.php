@@ -84,7 +84,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (strlen($_POST['submitResponsable'] > "") > 0) {
+            if (strlen($_POST['submitResponsable'] ?? "") > 0) {
                 $newResponsableLogin = $_POST['submitResponsable'];
                 $newResponsable = get_user_by("login", $newResponsableLogin);
 

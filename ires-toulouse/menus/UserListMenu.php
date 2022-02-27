@@ -92,8 +92,9 @@ class UserListMenu extends IresMenu {
                             type="submit"
                             onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=ajouter_un_compte") ?>'">
                         Ajouter un membre
-                    </button>
-                    <!-- TODO directeur role -->
+                    </button> <?php
+                }
+                if (current_user_can('direction') || current_user_can('administrator')) { ?>
                     <form action="" method="post" style="display: inline-block">
                         <button class="button-secondary" type="submit"
                                 onclick="downloadExcelFile(this)">
@@ -157,15 +158,16 @@ class UserListMenu extends IresMenu {
                             <button type="submit" class="button-link-ires">
                                 <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
                                     "&lock=" . Locker::STATE_UNLOCKABLE) ?>">Voir</a>
-                            </button>
+                            </button> <?php
 
-                            <!-- TODO directeur role -->
-                            <form action="" method="post" style="display: inline-block">
-                                <button class="button-link-ires" type="submit"
-                                        onclick="downloadExcelFile(this, <?php echo $user->ID ?>)">
-                                    Exporter
-                                </button>
-                            </form>
+                            if (current_user_can('direction') || current_user_can('administrator')) { ?>
+                                <form action="" method="post" style="display: inline-block">
+                                    <button class="button-link-ires" type="submit"
+                                            onclick="downloadExcelFile(this, <?php echo $user->ID ?>)">
+                                        Exporter
+                                    </button>
+                                </form> <?php
+                            } ?>
                         </form>
                     </td> <!-- Last name -->
                     <td><?php echo $user->first_name; ?></td> <!-- First name -->

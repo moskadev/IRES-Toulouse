@@ -238,22 +238,22 @@ class UserProfileMenu extends IresMenu {
                     </tr>
                     <?php
                 } ?>
-            </table><?php
-            if ($this->lockedState === Locker::STATE_UNLOCKED) { ?>
-                <div class="input-register-container input-register-2">
+            </table>
+            <div class="input-register-container input-register-2"> <?php
+                if ($this->lockedState === Locker::STATE_UNLOCKED) { ?>
                     <button class="button-primary menu-submit button-large" type="submit"
                             name="profile-page" disabled>
                         <span class="dashicons dashicons-id"></span>
                         Modifier les informations
-                    </button>
-
-                    <!-- TODO directeur role -->
+                    </button> <?php
+                }
+                if (current_user_can("direction") || current_user_can("administrator")) { ?>
                     <button class="button-secondary button-large" type="submit"
                             onclick="downloadExcelFile(this, <?php echo $this->editingUser->ID ?>)">
                         Exporter ces données
-                    </button>
-                </div><?php
-            } ?>
+                    </button> <?php
+                } ?>
+            </div>
         </form><?php
     }
 

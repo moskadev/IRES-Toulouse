@@ -46,5 +46,7 @@ class ExcelGenerator {
 
         echo $this->container;
         ob_end_flush();
+
+        exit();
     }
 }

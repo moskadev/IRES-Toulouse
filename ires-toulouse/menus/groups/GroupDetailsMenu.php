@@ -4,6 +4,7 @@ namespace irestoulouse\menus\groups;
 
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\utils\Locker;
 
 class GroupDetailsMenu extends IresMenu {
 
@@ -177,12 +178,14 @@ class GroupDetailsMenu extends IresMenu {
                             <td class="hide-actions">
                                 <form action="" method="post">
                                     <button type="button" class="button-secondary"
-                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID . "&lock=1") ?>'">
+                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID .
+                                                "&lock=" . Locker::STATE_UNLOCKABLE) ?>'">
                                         Voir
                                     </button> <?php
                                     if (current_user_can("administrator")) { ?>
                                         <button type="button" class="button-secondary"
-                                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID . "&lock=0") ?>'">
+                                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID .
+                                                    "&lock=" . Locker::STATE_UNLOCKED) ?>'">
                                             Modifier
                                         </button>
                                         <button type="submit" value="<?php echo $resp->ID; ?>"
@@ -249,12 +252,14 @@ class GroupDetailsMenu extends IresMenu {
                         <td class="hide-actions">
                             <form action="" method="post">
                                 <button type="button" class="button-secondary"
-                                        onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>'">
+                                        onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                            "&lock=" . Locker::STATE_UNLOCKABLE) ?>'">
                                     Voir
                                 </button> <?php
                                 if ($this->group->isUserResponsable(wp_get_current_user()) || current_user_can('administrator')) { ?>
                                     <button type="button" class="button-secondary"
-                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>'">
+                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                                "&lock=" . Locker::STATE_UNLOCKED) ?>'">
                                         Modifier
                                     </button>
                                     <button type="submit" name="removeMember" value="<?php echo $user->ID ?>"

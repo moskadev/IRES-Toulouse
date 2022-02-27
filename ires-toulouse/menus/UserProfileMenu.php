@@ -10,6 +10,7 @@ use irestoulouse\elements\Group;
 use irestoulouse\elements\input\UserData;
 use irestoulouse\utils\Dataset;
 use irestoulouse\utils\Identifier;
+use irestoulouse\utils\Locker;
 use WP_User;
 
 /**
@@ -56,8 +57,8 @@ class UserProfileMenu extends IresMenu {
     /** @var bool */
     private bool $canEditUser;
 
-    /** @var bool */
-    private bool $locked;
+    /** @var int */
+    private int $lockedState;
 
     /**
      * Constructing the menu and link to the admin page
@@ -89,7 +90,9 @@ class UserProfileMenu extends IresMenu {
             $type_message = "error";
         }
         $this->canEditUser = in_array($this->editingUser, $this->visibleUsers);
-        $this->locked = $this->canEditUser ? intval($_GET["lock"] ?? true) : true;
+        $this->lockedState = $this->canEditUser ? 
+            intval($_GET["lock"] ?? Locker::STATE_LOCKED) :
+            Locker::STATE_LOCKED;
         if (isset($_POST["action"]) && $_POST["action"] === "modify") {
             if($this->canEditUser){
                 try {
@@ -124,7 +127,7 @@ class UserProfileMenu extends IresMenu {
      */
     public function getContent() : void {
         $this->chooseUserForm();
-        if($this->canEditUser) {
+        if($this->canEditUser && $this->lockedState !== Locker::STATE_UNLOCKABLE) {
             $this->showModificationBtn();
         } ?>
 
@@ -158,7 +161,7 @@ class UserProfileMenu extends IresMenu {
                                             id='<?php echo $dataId ?>'
                                             name='<?php echo $dataId ?>'
                                             value='<?php echo htmlspecialchars($data->getValue($this->editingUser)); ?>'
-                                        <?php if ($this->locked) echo "disabled" ?>>
+                                        <?php if ($this->lockedState >= Locker::STATE_LOCKED) echo "disabled" ?>>
                                     <?php
                                 } else if($formType === "table" && $dataId === "groupes"){
                                     $groups = $data->getExtraData($this->editingUser);
@@ -176,7 +179,8 @@ class UserProfileMenu extends IresMenu {
                                             /** @var Group $group */
                                             foreach ($groups as $group){
                                                 $respNames = array_map(function($u) {
-                                                    return "<a href='" . home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+                                                    return "<a href='" . home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $u->ID .
+                                                            "&lock=" . Locker::STATE_LOCKED) . "'>" . $u->first_name . " " . $u->last_name . "</a>";
                                                 }, $group->getResponsables()); ?>
                                                 <tr>
                                                     <td><a class="text-decoration-none"
@@ -200,15 +204,15 @@ class UserProfileMenu extends IresMenu {
                                                type="radio"
                                                name="<?php echo $dataId ?>"
                                                value="<?php echo $data->getValue($this->editingUser) ?>"
-                                            <?php if ($this->locked) echo "disabled" ?>>
-                                        <div class="slider round"></div>
+                                            <?php if ($this->lockedState >= Locker::STATE_LOCKED) echo "disabled" ?>>
+                                        <span class="slider round"></span>
                                     </label> <?php
                                 } else if (in_array($formType, ["dropdown", "checklist"])) { ?>
                                     <select <?php echo Dataset::allFrom($data);
                                             if ($formType === "checklist") echo "multiple" ?>
                                             name='<?php echo $dataId ?>[]'
                                             id='<?php echo $dataId ?>'
-                                        <?php if ($this->locked) echo "disabled" ?>> <?php
+                                        <?php if ($this->lockedState >= Locker::STATE_LOCKED) echo "disabled" ?>> <?php
                                         /**
                                          * Extra data are checked individually and put in the dropdown or checklist
                                          * Multiple items can be selected for checklist, so we check if the user
@@ -235,7 +239,7 @@ class UserProfileMenu extends IresMenu {
                     <?php
                 } ?>
             </table><?php
-            if (!$this->locked) { ?>
+            if ($this->lockedState === Locker::STATE_UNLOCKED) { ?>
                 <div class="input-register-container input-register-2">
                     <button class="button-primary menu-submit button-large" type="submit"
                             name="profile-page" disabled>
@@ -257,9 +261,9 @@ class UserProfileMenu extends IresMenu {
         <table class="data-table">
             <tr>
                 <td>
-                    <button class="<?php echo $this->locked ? "button-primary" : "button-secondary" ?> button-large"
-                            onclick='location.href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $this->editingUser->ID . "&lock=" . !$this->locked) ?>"'>
-                        <span class='dashicons <?php echo $this->locked ? "dashicons-lock'></span>Déverrouiller" : "dashicons-unlock'></span>Verrouiller" ?> les modifications de l'utilisateur
+                    <button class="<?php echo $this->lockedState ? "button-primary" : "button-secondary" ?> button-large"
+                            onclick='location.href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $this->editingUser->ID . "&lock=" . !$this->lockedState) ?>"'>
+                        <span class='dashicons <?php echo $this->lockedState ? "dashicons-lock'></span>Déverrouiller" : "dashicons-unlock'></span>Verrouiller" ?> les modifications de l'utilisateur
                     </button>
                 </td>
             </tr>

@@ -4,6 +4,7 @@ namespace irestoulouse\menus\groups;
 
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\utils\Locker;
 
 class GroupListMenu extends IresMenu {
 
@@ -188,7 +189,8 @@ class GroupListMenu extends IresMenu {
     private function printGroup(Group $group) {
         $currentUser = wp_get_current_user();
         $respNames = array_map(function($u) {
-            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID .
+                    "&lock=" . Locker::STATE_LOCKED) . "'>" . $u->first_name . " " . $u->last_name . "</a>";
         }, $group->getResponsables());
 
         ?>

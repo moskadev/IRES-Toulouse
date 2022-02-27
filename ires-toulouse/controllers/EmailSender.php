@@ -2,6 +2,7 @@
 
 namespace irestoulouse\controllers;
 
+use irestoulouse\utils\Locker;
 use WP_User;
 
 class EmailSender extends Controller {
@@ -42,7 +43,8 @@ class EmailSender extends Controller {
             $this->toUser->user_login,
             $password,
             home_url("/wp-login.php?action=rp&key=$passwordReset&login={$this->toUser->user_login}"),
-            home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->toUser->ID . "&lock=0'")
+            home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->toUser->ID .
+                "&lock=" . Locker::STATE_UNLOCKED)
         );
         $email = apply_filters("invited_user_email", $email, $this->toUser, $this->toUser->roles[0], $password);
 

@@ -37,6 +37,7 @@ require_once("elements/sql/SqlRequest.php");
 require_once("utils/Identifier.php");
 require_once("utils/Dataset.php");
 require_once("utils/ExcelGenerator.php");
+require_once("utils/Locker.php");
 
 include_once(__DIR__ . "/../../../wp-includes/pluggable.php");
 include_once(__DIR__ . "/../../../wp-includes/functions.php");

@@ -5,7 +5,9 @@ namespace menus;
 use irestoulouse\controllers\UserConnection;
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\menus\UserProfileMenu;
 use irestoulouse\utils\ExcelGenerator;
+use irestoulouse\utils\Locker;
 
 class UserListMenu extends IresMenu {
 
@@ -145,15 +147,17 @@ class UserListMenu extends IresMenu {
                         <form class="hide-actions" method="post" action=""><?php
                             if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
                                 <button type="submit" class="button-link-ires">
-                                    <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>">Modifier</a>
-                                </button>|<?php
+                                    <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                        "&lock=" . Locker::STATE_UNLOCKED) ?>">Modifier</a>
+                                </button> <?php
                             }
                             if (current_user_can('administrator') && !user_can($user, "administrator")) { ?>
-                                <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button>|<?php
+                                <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button> <?php
                             }?>
                             <button type="submit" class="button-link-ires">
-                                <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>">Voir</a>
-                            </button>|
+                                <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                    "&lock=" . Locker::STATE_UNLOCKABLE) ?>">Voir</a>
+                            </button>
 
                             <!-- TODO directeur role -->
                             <form action="" method="post" style="display: inline-block">

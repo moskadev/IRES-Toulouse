@@ -1,9 +1,8 @@
+console.log("ajax");
 jQuery(function($) {
     $('.search-field').autocomplete({
-        // request contain information about input value (request.term)
-        // response : function called for recuperate data
         source: function(request, response) {
-            console.log('sending');
+            console.log("requete");
             $.ajax({
                 dataType: 'json',
                 url: AutocompleteSearch.ajax_url,
@@ -13,7 +12,7 @@ jQuery(function($) {
                     security: AutocompleteSearch.ajax_nonce,
                 },
                 success: function(data) {
-                    console.log('reponse');
+                    console.log(data);
                     response(data);
                 }
             });

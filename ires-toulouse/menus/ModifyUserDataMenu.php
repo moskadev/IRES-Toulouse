@@ -318,20 +318,8 @@ class ModifyUserDataMenu extends IresMenu {
         return $users;
     }
 
-    /**
-     * Initialise the scripts for ajax search bar
-     */
-    function search_bar() {
-        wp_enqueue_script('autocomplete-search', plugins_url('ires-toulouse/js/ScriptModifyUserDataMenu.js'),
-            ['jquery', 'jquery-ui-autocomplete'], null, true);
-        wp_localize_script('autocomplete-search', 'AutocompleteSearch', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'ajax_nonce' => wp_create_nonce('autocompleteSearchNonce')
-        ]);
-        $wp_scripts = wp_scripts();
-        wp_enqueue_style('jquery-ui-css',
-            '//ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-autocomplete']->ver . '/themes/smoothness/jquery-ui.css',
-            false, null, false
-        );
+    public function analyzeSentData(): void
+    {
+        // TODO: Implement analyzeSentData() method.
     }
 }

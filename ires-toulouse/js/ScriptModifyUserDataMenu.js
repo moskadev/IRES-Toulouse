@@ -2,7 +2,6 @@ console.log("ajax");
 jQuery(function($) {
     $('.search-field').autocomplete({
         source: function(request, response) {
-            console.log("requete");
             $.ajax({
                 dataType: 'json',
                 url: AutocompleteSearch.ajax_url,
@@ -12,7 +11,6 @@ jQuery(function($) {
                     security: AutocompleteSearch.ajax_nonce,
                 },
                 success: function(data) {
-                    console.log(data);
                     response(data);
                 }
             });

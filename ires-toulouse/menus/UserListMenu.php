@@ -20,10 +20,6 @@ add_action('admin_enqueue_scripts', function() {
 });
 add_action('wp_ajax_nopriv_autocompleteSearch', ['menus\UserListMenu','awp_autocomplete_search']);
 add_action('wp_ajax_autocompleteSearch', ['menus\UserListMenu','awp_autocomplete_search']);
-//if(wp_script_is('autocomplete-search')) {
- //   add_action('wp_ajax_nopriv_autocompleteSearch', 'awp_autocomplete_search');
-   // add_action('wp_ajax_autocompleteSearch', 'awp_autocomplete_search');
-//}
 class UserListMenu extends IresMenu {
     public function __construct() {
         parent::__construct(

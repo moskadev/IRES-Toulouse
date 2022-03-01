@@ -4,6 +4,7 @@ namespace irestoulouse\menus\groups;
 
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\utils\Locker;
 
 class GroupListMenu extends IresMenu {
 
@@ -22,11 +23,10 @@ class GroupListMenu extends IresMenu {
      */
     public function analyzeSentData() : void {
         $message = $type_message = "";
-
         /*
          * Supprime un groupe
          */
-        if (!empty($_POST['delete']) && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
+        if (strlen($_POST['delete'] ?? "") > 0 && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
             $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
             $type_message = "error";
             if (Group::delete($deletedGroup->getId())) {
@@ -38,15 +38,18 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (!empty($_POST['addGroup']) && !empty($_POST['typeAddGroup'])) {
+        if (Group::isValid($_POST['addGroup'] ?? "", $_POST['typeAddGroup'] ?? -1)) {
             $message = "Impossible de créer le groupe " . esc_attr($_POST['addGroup']);
             $type_message = "error";
             try {
                 Group::createTable();
                 if(Group::register(esc_attr($_POST['addGroup']), intval(esc_attr($_POST['typeAddGroup'])))){
+                    $create = Group::fromName(esc_attr($_POST['addGroup']));
+
                     $type_message = "updated";
-                    $message = "Le groupe de " . Group::TYPE_NAMES[$_POST['typeAddGroup']] .
-                        ", dénommé " . $_POST['addGroup'] . ", a été créé.";
+                    $message = "Le groupe de " . $create->getName() .
+                        ", dénommé <a href=" . home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $create->getId()) .
+                        ">" . $create->getName() . "</a>, a été créé.";
                 }
             } catch (\Exception $e){
                 // do nothing, the error message is already set
@@ -70,7 +73,26 @@ class GroupListMenu extends IresMenu {
      * Allows to :
      *      - create a group of user if you are admin
      */
-    function getContent() : void {
+    function getContent() : void { ?>
+        <!-- Confirmation popup for deletion of a group -->
+        <div class="popup">
+            <div class="popup-element">
+                <div class="popup-header">
+                    <p class="title popup-title"></p>
+                    <button data-close-button class="close-button">&times;</button>
+                </div>
+                <div class="popup-body">
+                    <p>Êtes-vous sûr de vouloir supprimer ce groupe ?</p>
+                    <form action="" method="post">
+                        <input type="hidden" id="groupId" name="delete" value="">
+                        <button class="confirm-delete button-primary button-delete" type="submit">Confirmer</button>
+                        <button class="button-secondary" type="button" data-close-button>Annuler</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <?php
         /*
          * Formulaire pour ajouter un groupe
          *  - Nom du groupe
@@ -188,7 +210,8 @@ class GroupListMenu extends IresMenu {
     private function printGroup(Group $group) {
         $currentUser = wp_get_current_user();
         $respNames = array_map(function($u) {
-            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID . "&lock=1") . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID .
+                    "&lock=" . Locker::STATE_LOCKED) . "'>" . $u->first_name . " " . $u->last_name . "</a>";
         }, $group->getResponsables());
 
         ?>
@@ -216,9 +239,10 @@ class GroupListMenu extends IresMenu {
                             Modifier
                         </button> <?php
                         if (current_user_can('administrator')) {?>
-                            <button type="submit" id="delete" name="delete" value="<?php echo $group->getId() ?>"
+                            <button type="button" id="delete" name="" value="<?php echo $group->getId() ?>"
                                 class="button-secondary button-secondary-delete"
-                                onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group->getName() ?> ?');">
+                                onclick="setGroupInfo('<?php echo $group->getName() ?>', '<?php echo $group->getId() ?>')"
+                                data-popup-target>
                                 Supprimer
                             </button><?php
                         } ?>

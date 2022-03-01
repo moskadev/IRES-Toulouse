@@ -4,6 +4,7 @@ namespace irestoulouse\menus\groups;
 
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\utils\Locker;
 
 class GroupDetailsMenu extends IresMenu {
 
@@ -34,7 +35,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est ajouté
              */
-            if (!empty($_POST['submitMember'])) {
+            if (strlen($_POST['submitMember'] ?? "") > 0) {
                 $newMemberLogin = $_POST['submitMember'];
 
                 $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il est déjà présent dans le groupe.";
@@ -50,7 +51,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est retiré du groupe
              */
-            if (!empty($_POST['removeMember'])) {
+            if (strlen($_POST['removeMember'] ?? "") > 0) {
                 $message = "Une erreur s'est produite lors de la suppression d'un membre.";
                 $type_message = "error";
                 try {
@@ -66,7 +67,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un responsable est supprimé
              */
-            if (!empty($_POST['deleteResp'])) {
+            if (strlen($_POST['deleteResp'] ?? "") > 0) {
                 $message = "Une erreur s'est produite lors de la suppression d'un responsable.";
                 $type_message = "error";
                 try {
@@ -83,7 +84,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (!empty($_POST['submitResponsable'])) {
+            if (strlen($_POST['submitResponsable'] ?? "") > 0) {
                 $newResponsableLogin = $_POST['submitResponsable'];
                 $newResponsable = get_user_by("login", $newResponsableLogin);
 
@@ -118,11 +119,31 @@ class GroupDetailsMenu extends IresMenu {
     /**
      * @inheritDoc
      */
-    public function getContent() : void {
+    public function getContent() : void { 
+        var_dump($_POST);       
         if ($this->group === null) {
             return;
         }
         $responsables = $this->group->getResponsables(); ?>
+
+        <!-- Confirmation popup for deletion of a user from the group -->
+        <div class="popup">
+            <div class="popup-element">
+                <div class="popup-header">
+                    <p class="title popup-title"></p>
+                    <button data-close-button class="close-button">&times;</button>
+                </div>
+                <div class="popup-body">
+                    <p id="text">Êtes-vous sûr de vouloir retirer cet utilisateur de ce groupe ?</p>
+                    <form action="" method="post">
+                        <input type="hidden" id="removeMember" name="removeMember" value="">
+                        <input type="hidden" id="deleteResp" name="deleteResp" value="">
+                        <button class="confirm-delete button-primary button-delete" type="submit">Confirmer</button>
+                        <button class="button-secondary" type="button" data-close-button>Annuler</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Bouton retour & titre de la page -->
         <form action="<?php echo home_url("/wp-admin/admin.php?page=groupes_ires") ?>" method="post">
@@ -177,18 +198,21 @@ class GroupDetailsMenu extends IresMenu {
                             <td class="hide-actions">
                                 <form action="" method="post">
                                     <button type="button" class="button-secondary"
-                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID . "&lock=1") ?>'">
+                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID .
+                                                "&lock=" . Locker::STATE_UNLOCKABLE) ?>'">
                                         Voir
                                     </button> <?php
                                     if (current_user_can("administrator")) { ?>
                                         <button type="button" class="button-secondary"
-                                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID . "&lock=0") ?>'">
+                                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $resp->ID .
+                                                    "&lock=" . Locker::STATE_UNLOCKED) ?>'">
                                             Modifier
                                         </button>
-                                        <button type="submit" value="<?php echo $resp->ID; ?>"
+                                        <button type="button" value="<?php echo $resp->ID; ?>"
                                                 name="deleteResp"
                                                 class="button-secondary button-secondary-delete"
-                                                onclick="return confirm('Êtes vous sur de vouloir supprimer le responsable <?php echo $resp->user_login ?> ?');">
+                                                onclick="setResponsableInfo('<?php echo $resp-> ID ?>', '<?php echo $resp->user_login ?>')"
+                                                data-popup-target>
                                             Supprimer
                                         </button><?php
                                     } ?>
@@ -249,17 +273,20 @@ class GroupDetailsMenu extends IresMenu {
                         <td class="hide-actions">
                             <form action="" method="post">
                                 <button type="button" class="button-secondary"
-                                        onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=1") ?>'">
+                                        onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                            "&lock=" . Locker::STATE_UNLOCKABLE) ?>'">
                                     Voir
                                 </button> <?php
                                 if ($this->group->isUserResponsable(wp_get_current_user()) || current_user_can('administrator')) { ?>
                                     <button type="button" class="button-secondary"
-                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID . "&lock=0") ?>'">
+                                            onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                                "&lock=" . Locker::STATE_UNLOCKED) ?>'">
                                         Modifier
                                     </button>
-                                    <button type="submit" name="removeMember" value="<?php echo $user->ID ?>"
+                                    <button type="button" value="<?php echo $user->ID ?>"
                                             class="button-secondary button-secondary-delete"
-                                            onclick="return confirm('Êtes vous sur de vouloir retirer <?php echo $first_name . " " . $last_name ?> du groupe : <?php echo $this->group->getName(); ?> ?');">
+                                            onclick="setDeletionInfo('<?php echo $user->ID ?>', '<?php echo $user->user_login ?>')"
+                                            data-popup-target>
                                         Retirer
                                     </button> <?php
                                 } ?>

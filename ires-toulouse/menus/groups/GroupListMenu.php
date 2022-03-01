@@ -73,7 +73,26 @@ class GroupListMenu extends IresMenu {
      * Allows to :
      *      - create a group of user if you are admin
      */
-    function getContent() : void {
+    function getContent() : void { ?>
+        <!-- Confirmation popup for deletion of a group -->
+        <div class="popup">
+            <div class="popup-element">
+                <div class="popup-header">
+                    <p class="title popup-title"></p>
+                    <button data-close-button class="close-button">&times;</button>
+                </div>
+                <div class="popup-body">
+                    <p>Êtes-vous sûr de vouloir supprimer ce groupe ?</p>
+                    <form action="" method="post">
+                        <input type="hidden" id="groupId" name="delete" value="">
+                        <button class="confirm-delete button-primary button-delete" type="submit">Confirmer</button>
+                        <button class="button-secondary" type="button" data-close-button>Annuler</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <?php
         /*
          * Formulaire pour ajouter un groupe
          *  - Nom du groupe
@@ -220,9 +239,10 @@ class GroupListMenu extends IresMenu {
                             Modifier
                         </button> <?php
                         if (current_user_can('administrator')) {?>
-                            <button type="submit" id="delete" name="delete" value="<?php echo $group->getId() ?>"
+                            <button type="button" id="delete" name="" value="<?php echo $group->getId() ?>"
                                 class="button-secondary button-secondary-delete"
-                                onclick="return confirm('Êtes vous sur de vouloir supprimer le groupe : <?php echo $group->getName() ?> ?');">
+                                onclick="setGroupInfo('<?php echo $group->getName() ?>', '<?php echo $group->getId() ?>')"
+                                data-popup-target>
                                 Supprimer
                             </button><?php
                         } ?>

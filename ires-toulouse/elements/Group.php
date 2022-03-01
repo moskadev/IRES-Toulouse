@@ -302,7 +302,7 @@ class Group extends IresElement {
      * Get the users (if exist) in charge of the group given in parameter
      * @return WP_User[] the user(s) in charge of the group
      */
-    public function getResponsables() {
+    public function getResponsables() : array {
         $db = Database::get();
 
         return array_map(function ($u) {

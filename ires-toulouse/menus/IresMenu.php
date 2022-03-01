@@ -47,19 +47,25 @@ abstract class IresMenu {
 
         add_action("admin_init", function () {
             if(isset($_POST["download_excel"])) {
-                $excelName = "ires_";
-                $users = get_users();
-                if(is_numeric($_POST["download_excel"])){
-                    if(($u = get_userdata($_POST["download_excel"])) !== false){
-                        $excelName .= $u->user_login;
-                        $users = [get_userdata($_POST["download_excel"])];
-                    } else {
-                        $excelName .= "utilisateurs";
+                $excelName = "ires_utilisateur";
+                $users = [];
+
+                $userIds = explode(",", $_POST["download_excel"]);
+                if(strlen($userIds[0] ?? "") > 0 && count($userIds) > 0){
+                    foreach ($userIds as $id){
+                        if(is_numeric($id)){
+                            if(($u = get_userdata($id)) !== false){
+                                //$excelName .= $u->user_login;
+                                $users[] = get_userdata($id);
+                            }
+                        }
                     }
                 } else {
-                    $excelName .= "utilisateurs";
+                    $users = get_users();
                 }
-
+                if(count($users) > 1){
+                    $excelName .= "s";
+                }
                 (new ExcelGenerator($excelName))->generate($users);
             }
         });

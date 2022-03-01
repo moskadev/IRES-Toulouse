@@ -100,6 +100,10 @@ class UserListMenu extends IresMenu {
                                 onclick="downloadExcelFile(this)">
                             Tout exporter
                         </button>
+                        <button class="button-secondary export-selection" type="submit"
+                                onclick="downloadExcelFile(this, 'export-selection')" disabled>
+                            Exporter la sélection
+                        </button>
                     </form><?php
                 }?>
             </div>
@@ -117,6 +121,13 @@ class UserListMenu extends IresMenu {
         <table class="widefat striped users-list">
             <thead>
                 <tr>
+                    <?php 
+                    if (current_user_can('responsable') || current_user_can('administrator') || current_user_can('direction')) { ?>
+                    <td class="manage-column column-cb check-column">
+                        <input type="checkbox" onclick="document.querySelector('.export-selection').disabled = !document.querySelector('.export-selection').disabled">
+                    </td>
+                    <?php
+                    } ?>
                     <th class="manage-column column-username column-primary sortable <?php echo $this->getOrder() ?>">
                         <a href="<?php echo home_url("/wp-admin/admin.php?page=comptes_ires&orderby=last_name&order=" . $this->getOrder(true)) ?>"><!-- order = asc ou desc-->
                             <span>Nom</span>
@@ -136,14 +147,18 @@ class UserListMenu extends IresMenu {
             </thead>
             <tbody> <?php
             foreach ($this->searchedMembers as $user) {
-                if($user->ID === get_current_user_id()){
-                    continue;
-                }
                 $groupNames = array_map(function ($g){
                     return "<a href='" . home_url("/wp-admin/admin.php?page=details_du_groupe&group=" .
                         $g->getId()) . "'>" . $g->getName() . "</a>";
                 }, Group::getUserGroups($user)); ?>
                 <tr>
+                    <?php
+                    if (current_user_can('responsable') || current_user_can('administrator') || current_user_can('direction')) { ?>
+                    <th scope="row" class="check-column">
+                        <input type="checkbox" class="checkbox-excel" value="<?php echo $user->ID; ?>">
+                    </th>
+                    <?php
+                    } ?>
                     <td class="name"><?php echo $user->last_name; ?><br/>
                         <form class="hide-actions" method="post" action=""><?php
                             if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
@@ -152,7 +167,7 @@ class UserListMenu extends IresMenu {
                                         "&lock=" . Locker::STATE_UNLOCKED) ?>">Modifier</a>
                                 </button> <?php
                             }
-                            if (current_user_can('administrator') && !user_can($user, "administrator")) { ?>
+                            if (current_user_can('administrator') && !user_can($user, "administrator") || $user->ID !== get_current_user_id()) { ?>
                                 <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button> <?php
                             }?>
                             <button type="submit" class="button-link-ires">

@@ -236,6 +236,14 @@ tr:hover .hide-actions {
     pointer-events: auto;
 }
 
+/**
+ * Autocomplete and dropdown height
+ */
+.ui-autocomplete, .dropdown-content {
+    max-height: 400px !important;
+    overflow-y: scroll;
+}
+
 /*
  * Custom dropdown
  */
@@ -273,9 +281,6 @@ tr:hover .hide-actions {
     border: #8c8f94 1px solid;
     border-radius: 5px;
     z-index: 1;
-
-    max-height: 400px;
-    overflow-y: scroll;
 }
 
 .dropdown-content a {

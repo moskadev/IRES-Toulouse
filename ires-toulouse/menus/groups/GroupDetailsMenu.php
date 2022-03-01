@@ -157,7 +157,8 @@ class GroupDetailsMenu extends IresMenu {
             <form action="" method="post"> <?php
                 if (isset($_POST["modifResponsable"])) { ?>
                     <div class="input-register-container input-register-3">
-                        <input type="text" placeholder="Identifiant du responsable à ajouter"
+
+                        <input type="text" class="search-field" placeholder="Identifiant du responsable à ajouter"
                                name="submitResponsable">
                         <button class="button-primary" type="submit">Ajouter</button>
                         <button class="button-secondary" type="button" onclick="reloadPage()">Annuler</button>
@@ -232,7 +233,7 @@ class GroupDetailsMenu extends IresMenu {
             <form action="" method="post"> <?php
                 if (isset($_POST["addMember"])) { ?>
                     <div class="input-register-container input-register-3">
-                        <input type="text" placeholder="Identifiant du membre à ajouter"
+                        <input type="text" class="search-field" placeholder="Identifiant du membre à ajouter"
                                name="submitMember">
                         <button class="button-primary" type="submit">Ajouter</button>
                         <button class="button-secondary" type="button" onclick="reloadPage()">Annuler</button>

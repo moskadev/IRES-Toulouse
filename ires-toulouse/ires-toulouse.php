@@ -68,6 +68,18 @@ register_deactivation_hook(__FILE__, function () {
 UserData::registerExtraMetas(get_current_user_id());
 IresMenu::init();
 
+wp_enqueue_script("autocomplete-search", "/wp-content/plugins/ires-toulouse/js/auto-fill-search.js",
+    ["jquery", "jquery-ui-autocomplete"], null, true);
+wp_localize_script("autocomplete-search", "AutocompleteSearch", [
+    "ajax_url" => admin_url("admin-ajax.php"),
+    "ajax_nonce" => wp_create_nonce("autocompleteSearchNonce")
+]);
+$wp_scripts = wp_scripts();
+wp_enqueue_style('jquery-ui-css',
+    '//ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-autocomplete']->ver . '/themes/smoothness/jquery-ui.css',
+    false, null, false
+);
+
 add_action("admin_enqueue_scripts", function () {
     wp_enqueue_style("ires-style", "/wp-content/plugins/ires-toulouse/style/ires.css");
     wp_enqueue_script("ires-script", "/wp-content/plugins/ires-toulouse/js/script.js", [], false, true);

@@ -84,7 +84,6 @@ class UserListMenu extends IresMenu {
             </div>
         </div>
 
-
         <div class="action-list-bar">
             <div><?php
                 if (current_user_can('responsable') || current_user_can('administrator')) { ?>
@@ -109,7 +108,7 @@ class UserListMenu extends IresMenu {
             </div>
             <form action="" method="get">
                 <input type="hidden" name="page" value="<?php echo $this->getId() ?>"/>
-                <input type="text" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
+                <input type="text" class="search-field" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
                 <button class="button-secondary" type="submit">Rechercher des comptes</button>
                 <button class="button-secondary button-secondary-delete"
                         type="submit"
@@ -151,13 +150,11 @@ class UserListMenu extends IresMenu {
                     return "<a href='" . home_url("/wp-admin/admin.php?page=details_du_groupe&group=" .
                         $g->getId()) . "'>" . $g->getName() . "</a>";
                 }, Group::getUserGroups($user)); ?>
-                <tr>
-                    <?php
+                <tr> <?php
                     if (current_user_can('responsable') || current_user_can('administrator') || current_user_can('direction')) { ?>
                     <th scope="row" class="check-column">
                         <input type="checkbox" class="checkbox-excel" value="<?php echo $user->ID; ?>">
-                    </th>
-                    <?php
+                    </th> <?php
                     } ?>
                     <td class="name"><?php echo $user->last_name; ?><br/>
                         <form class="hide-actions" method="post" action=""><?php

@@ -35,11 +35,10 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est ajouté
              */
-            if (strlen($_POST['submitMember'] ?? "") > 0) {
-                $newMemberLogin = $_POST['submitMember'];
-
+            if (strlen($newMemberLogin = trim($_POST['submitMember'] ?? "")) > 0) {
                 $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il est déjà présent dans le groupe.";
                 $type_message = "error";
+
                 if (($newMember = get_user_by("login", $newMemberLogin)) === false) {
                     $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il n'existe pas.";
                 } else if ($this->group->addUser($newMember)) {
@@ -51,11 +50,11 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un membre est retiré du groupe
              */
-            if (strlen($_POST['removeMember'] ?? "") > 0) {
+            if (strlen($remove = trim($_POST['removeMember'] ?? "")) > 0) {
                 $message = "Une erreur s'est produite lors de la suppression d'un membre.";
                 $type_message = "error";
                 try {
-                    if ($this->group->removeUser($user = get_userdata($_POST['removeMember']))) {
+                    if ($this->group->removeUser($user = get_userdata($remove))) {
                         $message = "L'utilisateur {$user->user_login} a été supprimé du groupe.";
                         $type_message = "updated";
                     }
@@ -67,11 +66,11 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un responsable est supprimé
              */
-            if (strlen($_POST['deleteResp'] ?? "") > 0) {
+            if (strlen($delete = trim($_POST['deleteResp'] ?? "")) > 0) {
                 $message = "Une erreur s'est produite lors de la suppression d'un responsable.";
                 $type_message = "error";
                 try {
-                    $deletedResponsable = get_userdata($_POST['deleteResp']);
+                    $deletedResponsable = get_userdata($delete);
                     if ($deletedResponsable !== false && $this->group->removeResponsable($deletedResponsable)) {
                         $message = $deletedResponsable->user_login . " a été retiré des responsables du groupe.";
                         $type_message = "updated";
@@ -84,8 +83,7 @@ class GroupDetailsMenu extends IresMenu {
             /*
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
-            if (strlen($_POST['submitResponsable'] ?? "") > 0) {
-                $newResponsableLogin = $_POST['submitResponsable'];
+            if (strlen($newResponsableLogin = trim($_POST['submitResponsable'] ?? "")) > 0) {
                 $newResponsable = get_user_by("login", $newResponsableLogin);
 
                 $message = "Erreur, l'utilisateur $newResponsableLogin n'a pas pu être ajouté car il est déjà responsable.";
@@ -119,8 +117,7 @@ class GroupDetailsMenu extends IresMenu {
     /**
      * @inheritDoc
      */
-    public function getContent() : void { 
-        var_dump($_POST);       
+    public function getContent() : void {
         if ($this->group === null) {
             return;
         }
@@ -163,7 +160,7 @@ class GroupDetailsMenu extends IresMenu {
                         <input type="text" placeholder="Identifiant du responsable à ajouter"
                                name="submitResponsable">
                         <button class="button-primary" type="submit">Ajouter</button>
-                        <button class="button-secondary" type="submit">Annuler</button>
+                        <button class="button-secondary" type="button" onclick="reloadPage()">Annuler</button>
                     </div>
                 <?php
                 } else { ?>
@@ -238,7 +235,7 @@ class GroupDetailsMenu extends IresMenu {
                         <input type="text" placeholder="Identifiant du membre à ajouter"
                                name="submitMember">
                         <button class="button-primary" type="submit">Ajouter</button>
-                        <button class="button-secondary" type="submit">Annuler</button>
+                        <button class="button-secondary" type="button" onclick="reloadPage()">Annuler</button>
                     </div>
                 <?php } else { ?>
                     <button type="submit" name="addMember"

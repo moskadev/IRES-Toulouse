@@ -35,15 +35,12 @@ class UserRegisterMenu extends IresMenu {
 
     public function analyzeSentData() : void {
         $message = $type_message = "";
-        if (strlen($_POST["first_name"] ?? "") > 0 &&
-            strlen($_POST["last_name"] ?? "") > 0 &&
-            strlen($_POST["user_email"] ?? "") > 0
+        if (strlen($nom = trim($_POST["first_name"] ?? "")) > 0 &&
+            strlen($prenom = trim($_POST["last_name"] ?? "")) > 0 &&
+            strlen($email = trim($_POST["user_email"] ?? "")) > 0
         ) {
             try {
-                $connection = new UserConnection(
-                    $_POST["first_name"],
-                    $_POST["last_name"],
-                    $_POST["user_email"]);
+                $connection = new UserConnection($nom, $prenom, $email);
 
                 UserInputData::checkSentData();
                 $this->loggedUser = $connection->register();

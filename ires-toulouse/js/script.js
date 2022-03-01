@@ -56,6 +56,16 @@ function activateExportSelection(){
 }
 
 /**
+ * Reload the page
+ */
+function reloadPage() {
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+    window.location = window.location.href;
+}
+
+/**
  * Return all the element given's parents
  *
  * @param element current element

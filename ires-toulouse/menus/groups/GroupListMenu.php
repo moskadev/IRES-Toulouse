@@ -26,7 +26,8 @@ class GroupListMenu extends IresMenu {
         /*
          * Supprime un groupe
          */
-        if (strlen($_POST['delete'] ?? "") > 0 && ($deletedGroup = Group::fromId($_POST['delete'])) !== null) {
+        if (strlen($delete = trim($_POST['delete'] ?? "")) > 0 &&
+            ($deletedGroup = Group::fromId($delete)) !== null) {
             $message = "Le groupe " . $deletedGroup->getName() . " n'a pas pu être supprimé.";
             $type_message = "error";
             if (Group::delete($deletedGroup->getId())) {
@@ -38,13 +39,13 @@ class GroupListMenu extends IresMenu {
         /*
          * Ajoute un groupe si possible
          */
-        if (Group::isValid($_POST['addGroup'] ?? "", $_POST['typeAddGroup'] ?? -1)) {
-            $message = "Impossible de créer le groupe " . esc_attr($_POST['addGroup']);
+        if (Group::isValid($nom = trim($_POST['addGroup'] ?? ""), $type = $_POST['typeAddGroup'] ?? -1)) {
+            $message = "Impossible de créer le groupe " . esc_attr($nom);
             $type_message = "error";
             try {
                 Group::createTable();
-                if(Group::register(esc_attr($_POST['addGroup']), intval(esc_attr($_POST['typeAddGroup'])))){
-                    $create = Group::fromName(esc_attr($_POST['addGroup']));
+                if(Group::register(esc_attr($nom), intval(esc_attr($type)))){
+                    $create = Group::fromName(esc_attr($nom));
 
                     $type_message = "updated";
                     $message = "Le groupe de " . $create->getName() .
@@ -109,7 +110,7 @@ class GroupListMenu extends IresMenu {
                             <?php } ?>
                         </select>
                         <button class="button-primary" type="submit">Ajouter</button>
-                        <button class="button-secondary" type="submit">Annuler</button>
+                        <button class="button-secondary" type="button" onclick="reloadPage()">Annuler</button>
                     </div>
                 <?php } else {?>
                     <button type="submit" name="submitGroup"

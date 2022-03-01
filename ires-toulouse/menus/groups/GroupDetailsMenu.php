@@ -4,6 +4,7 @@ namespace irestoulouse\menus\groups;
 
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
+use irestoulouse\utils\Identifier;
 use irestoulouse\utils\Locker;
 
 class GroupDetailsMenu extends IresMenu {
@@ -39,7 +40,7 @@ class GroupDetailsMenu extends IresMenu {
                 $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il est déjà présent dans le groupe.";
                 $type_message = "error";
 
-                if (($newMember = get_user_by("login", $newMemberLogin)) === false) {
+                if (($newMember = get_user_by("login", Identifier::extractLogin($newMemberLogin))) === false) {
                     $message = "Erreur, l'utilisateur $newMemberLogin n'a pas pu être ajouté car il n'existe pas.";
                 } else if ($this->group->addUser($newMember)) {
                     $message = "L'utilisateur $newMemberLogin a été ajouté au groupe " . $this->group->getName() . ".";
@@ -84,7 +85,7 @@ class GroupDetailsMenu extends IresMenu {
              * Poste un message si un nouveau responsable est tenté d'être créé
              */
             if (strlen($newResponsableLogin = trim($_POST['submitResponsable'] ?? "")) > 0) {
-                $newResponsable = get_user_by("login", $newResponsableLogin);
+                $newResponsable = get_user_by("login", Identifier::extractLogin($newResponsableLogin));
 
                 $message = "Erreur, l'utilisateur $newResponsableLogin n'a pas pu être ajouté car il est déjà responsable.";
                 $type_message = "error";

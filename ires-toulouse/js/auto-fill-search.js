@@ -1,4 +1,6 @@
 jQuery(function($) {
+    const parent =  $('.search-field').parent();
+
     $('.search-field').autocomplete({
         source: function(request, response) {
             $.ajax({
@@ -14,5 +16,14 @@ jQuery(function($) {
                 }
             });
         },
+    }).on("keydown", e => {
+        const key = e.keyCode || e.charCode;
+        if(key === 8 || key === 46) {
+            $('.search-field').val("");
+        }
+    });
+    parent.on("submit", (e) => {
+        e.preventDefault();
+        window.location = encodeURI(parent.attr("action").replace(/user_id=.*?&/g, "user_id=" + $('.search-field').val() + "&"));
     });
 });

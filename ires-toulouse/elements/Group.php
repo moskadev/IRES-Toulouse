@@ -45,7 +45,7 @@ class Group extends IresElement {
         $sql_create_group = "CREATE TABLE $table_name (
                 id_group bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                 name char(" . self::NAME_LENGTH . ") NOT NULL,
-                type int(1) NOT NULL DEFAULT " . self::TYPE_AUTRE . ",
+                type int(1) NOT NULL DEFAULT " . self::TYPE_RECHERCHE_ACTION . ",
                 time_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 creator_id bigint(20) UNSIGNED NOT NULL,
                 FOREIGN KEY (creator_id) REFERENCES wp_users(ID),
@@ -67,7 +67,7 @@ class Group extends IresElement {
 
         // TEMPORAIRE pour l'ajout du type sans casser la table
         if (!isset($db->get_row("SELECT * FROM {$db->prefix}groups")->type)) {
-            $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT " . self::TYPE_AUTRE);
+            $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT " . self::TYPE_RECHERCHE_ACTION);
         }
     }
 
@@ -79,7 +79,7 @@ class Group extends IresElement {
      * @return bool true if the group is created, else false
      * @throws \Exception
      */
-    public static function register(string $name, int $type = self::TYPE_AUTRE) : bool {
+    public static function register(string $name, int $type = self::TYPE_RECHERCHE_ACTION) : bool {
         if (self::isValid($name, $type) &&
             self::fromName($name) === null &&
             self::fromName(strtolower($name)) === null
@@ -137,7 +137,7 @@ class Group extends IresElement {
             return new Group(
                 $group->id_group,
                 $group->name,
-                $group->type ?? self::TYPE_AUTRE,
+                $group->type ?? self::TYPE_RECHERCHE_ACTION,
                 $group->time_created,
                 get_userdata($group->creator_id)
             );

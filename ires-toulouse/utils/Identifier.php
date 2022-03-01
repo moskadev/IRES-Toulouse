@@ -26,21 +26,15 @@ class Identifier {
         );
     }
 
-    /**
-     * @param array $users
-     *
-     * @return WP_User|null
-     */
-    public static function getLastRegisteredUser(array $users = []) : ?WP_User {
-        if($users === []){
-            $users = get_users();
+    public static function extractLogin(string $fullName) : string{
+        if(preg_match("/^[A-ZÀ-ÿa-zà-ÿ\-_0-9]+\s[A-ZÀ-ÿa-zà-ÿ\-_0-9]+\s\([A-ZÀ-ÿa-zà-ÿ\-_0-9]+\)$/", $fullName)){
+            $firstPos = stripos($fullName, "(") + 1;
+            return substr($fullName, $firstPos, stripos($fullName, ")") - $firstPos);
         }
-        $maxId = get_current_user_id();
-        foreach ($users as $user){
-            if($user instanceof WP_User) {
-                $maxId = $user->ID > $maxId ? $user->ID : $maxId;
-            }
-        }
-        return ($user = get_userdata($maxId)) === false ? null : $user;
+        return $fullName;
+    }
+
+    public static function generateFullName(WP_User $user) : string{
+        return $user->last_name . " " . $user->first_name . " (" . $user->user_login . ")";
     }
 }

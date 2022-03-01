@@ -78,8 +78,15 @@ class UserProfileMenu extends IresMenu {
 
         try {
             if (count($this->visibleUsers) > 0 && isset($_GET["user_id"])) {
-                if (($this->editingUser = get_userdata($_GET["user_id"])) === false) {
+                $id = is_numeric($_GET["user_id"]) ?
+                    get_userdata($_GET["user_id"]) :
+                    get_user_by("login", Identifier::extractLogin($_GET["user_id"]));
+                if ($id === false) {
                     $this->editingUser = get_userdata(get_current_user_id());
+                    $message = "L'utilisateur recherché n'a pas été trouvé";
+                    $type_message = "error";
+                } else {
+                    $this->editingUser = $id;
                 }
             } else {
                 $this->editingUser = wp_get_current_user();
@@ -271,21 +278,11 @@ class UserProfileMenu extends IresMenu {
     <?php }
 
     private function chooseUserForm() : void { ?>
-        <div class="custom-dropdown">
-            <button class="dropdown-btn">
-                <span><?php echo $this->editingUser->user_login ?></span><?php
-                if(count($this->visibleUsers) > 1){?>
-                    <span class="dashicons dashicons-arrow-down"></span>
-                <?php } ?>
-            </button>
-            <div class="dropdown-content"><?php
-                foreach ($this->visibleUsers as $user) { ?>
-                    <a class="<?php if($user->ID === $this->editingUser->ID) echo "dropdown-selected" ?>"
-                       href="<?php echo home_url("/wp-admin/admin.php?page=" . $this->getId() . "&user_id=" . $user->ID) ?>">
-                        <?php echo $user->user_login ?>
-                    </a>
-                <?php } ?>
-            </div>
-        </div>
+        <form style="display: inline-block"
+              action="<?php echo home_url("/wp-admin/admin.php") ?>?page=<?php echo $this->getId() ?>&user_id=<?php echo get_current_user_id() ?>&lock=<?php echo Locker::STATE_LOCKED ?>" method="get">
+            <input type="text" class="search-field user-field-login"
+                   value="<?php echo Identifier::generateFullName($this->editingUser) ?>"
+                <?php if ($this->lockedState >= Locker::STATE_LOCKED || count($this->visibleUsers) <= 1) echo "disabled" ?>>
+        </form>
     <?php }
 }

@@ -1,24 +1,4 @@
-let hideContent = true;
-executeCustomDropdownEvents();
 activateExportSelection();
-
-/**
- * Custom dropdowns
- */
-function executeCustomDropdownEvents() {
-    document.onclick = function(){
-        if(hideContent)
-            document.querySelectorAll(".dropdown-content").forEach(drop => drop.style.display = "none")
-        hideContent = true;
-    };
-
-    document.querySelectorAll(".dropdown-btn").forEach(btn => {
-        btn.onclick = () => {
-            hideContent = false;
-            btn.nextElementSibling.style.display = "block";
-        }
-    });
-}
 
 /**
  * Download Excel data file

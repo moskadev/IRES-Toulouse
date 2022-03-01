@@ -7,6 +7,7 @@ use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
 use irestoulouse\menus\UserProfileMenu;
 use irestoulouse\utils\ExcelGenerator;
+use irestoulouse\utils\Identifier;
 use irestoulouse\utils\Locker;
 
 class UserListMenu extends IresMenu {
@@ -187,9 +188,6 @@ class UserListMenu extends IresMenu {
                     <td><?php echo $user->user_login; ?></td> <!-- User login -->
                     <td><?php echo count($groupNames) > 0 ? implode(", ", $groupNames) : "Aucun" ?></td>
                 </tr>
-                <form id="deleteMember" action="" method="post">
-                    <input type="hidden" value="<?php echo $user->ID; ?>">
-                </form>
                 <?php
             }
             ?>

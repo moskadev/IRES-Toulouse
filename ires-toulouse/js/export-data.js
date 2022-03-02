@@ -6,10 +6,12 @@ onDropdownExportClick();
  * If a checkbox is checked than the button to export the selection is enabled
  */
 function activateExportSelection(){
-    document.querySelectorAll(".checkbox-export").forEach(c => {
+    const checkboxesExport = [...document.querySelectorAll(".checkbox-export"),
+        document.querySelector(".checkbox-export-all")];
+    checkboxesExport.forEach(c => {
         c.addEventListener("change", () => {
             document.querySelector(".export-selection").disabled =
-                document.querySelectorAll(".checkbox-export:checked").length === 0;
+                document.querySelectorAll(".checkbox-export:checked").length === 0
         });
     });
 }

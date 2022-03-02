@@ -126,7 +126,7 @@ class UserListMenu extends IresMenu {
                     <?php 
                     if (current_user_can('responsable') || current_user_can('administrator') || current_user_can('direction')) { ?>
                     <td class="manage-column column-cb check-column">
-                        <input type="checkbox" onclick="document.querySelector('.export-selection').disabled = !document.querySelector('.export-selection').disabled">
+                        <input type="checkbox" class="checkbox-export-all">
                     </td>
                     <?php
                     } ?>

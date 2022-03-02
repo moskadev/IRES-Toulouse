@@ -43,7 +43,7 @@ class GroupListMenu extends IresMenu {
             $message = "Impossible de créer le groupe " . esc_attr($nom);
             $type_message = "error";
             try {
-                Group::createTable();
+                Group::init();
                 if(Group::register(esc_attr($nom), intval(esc_attr($type)))){
                     $create = Group::fromName(esc_attr($nom));
 

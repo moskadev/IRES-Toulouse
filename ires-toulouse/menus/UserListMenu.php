@@ -175,16 +175,7 @@ class UserListMenu extends IresMenu {
                                     <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
                                         "&lock=" . Locker::STATE_UNLOCKABLE) ?>">Voir</a>
                                 </button>
-                            </form> <?php
-                            if (current_user_can('direction') || current_user_can('administrator')) { ?>
-                                <form action="" method="post">
-                                    <select class="export-dropdown button-link-ires">
-                                        <option selected disabled>Exporter</option>
-                                        <option data-type="excel" data-user-ids="<?php echo $user->ID ?>">Exporter en Excel</option>
-                                        <option data-type="csv" data-user-ids="<?php echo $user->ID ?>">Exporter en CSV</option>
-                                    </select>
-                                </form> <?php
-                            } ?>
+                            </form>
                         </div>
                     </td> <!-- Last name -->
                     <td><?php echo $user->first_name; ?></td> <!-- First name -->

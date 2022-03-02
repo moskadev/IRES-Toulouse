@@ -36,7 +36,7 @@ class Group extends IresElement {
     /**
      * Looking if groups and groups_user table have been created and if they not, create then
      */
-    public static function createTable() {
+    public static function init() {
         require_once ABSPATH . "wp-admin/includes/upgrade.php";
         $db = Database::get();
 
@@ -69,6 +69,8 @@ class Group extends IresElement {
         if (!isset($db->get_row("SELECT * FROM {$db->prefix}groups")->type)) {
             $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT " . self::TYPE_RECHERCHE_ACTION);
         }
+
+
     }
 
     /**

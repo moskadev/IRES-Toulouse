@@ -115,6 +115,14 @@ input {
     margin: 7px;
 }
 
+.export-dropdown.button-large {
+    max-width: 100%;
+}
+
+.input-register-2 .export-dropdown:first-child {
+    padding-left: 41%;
+}
+
 .button-delete {
     background-color: #d30e0e !important;
     border-color: #d30e0e !important;
@@ -166,9 +174,6 @@ input {
     font-size: 14px !important;
 }
 
-.export-dropdown.button-large {
-    max-width: 100%;
-}
 
 /*
  * Users list

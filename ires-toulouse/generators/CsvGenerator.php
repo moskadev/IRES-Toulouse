@@ -38,15 +38,7 @@ class CsvGenerator extends FileGenerator {
          */
         $this->output = fopen('php://output', 'w');
 
-
-        $this->createRow(array_map(function ($data) {
-            return $data->getName();
-        }, UserData::all()));
-        foreach ($users as $user){
-            $this->createRow(array_map(function ($data) use ($user) {
-                return $data->getValue($user);
-            }, UserData::all()));
-        }
+        parent::generate($users);
 
         fclose($this->output);
         exit();

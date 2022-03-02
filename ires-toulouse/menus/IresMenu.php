@@ -68,16 +68,16 @@ abstract class IresMenu {
         add_action('wp_ajax_nopriv_autocompleteSearch', [get_class(), 'awp_autocomplete_search']);
         add_action('wp_ajax_autocompleteSearch', [get_class(), 'awp_autocomplete_search']);
         add_action("admin_init", function () {
-            if(isset($_POST["download_excel"])) {
-                $excelName = "ires_utilisateur";
+            if(isset($_POST["export_users"]) && isset($_POST["export_type"])) {
+                $fileName = "ires_utilisateur";
                 $users = [];
 
-                $userIds = explode(",", $_POST["download_excel"]);
+                $userIds = explode(",", $_POST["export_users"]);
                 if(strlen($userIds[0] ?? "") > 0 && count($userIds) > 0){
                     foreach ($userIds as $id){
                         if(is_numeric($id)){
                             if(($u = get_userdata($id)) !== false){
-                                //$excelName .= $u->user_login;
+                                //$fileName .= $u->user_login;
                                 $users[] = get_userdata($id);
                             }
                         }
@@ -86,9 +86,11 @@ abstract class IresMenu {
                     $users = get_users();
                 }
                 if(count($users) > 1){
-                    $excelName .= "s";
+                    $fileName .= "s";
                 }
-                (new CsvGenerator($excelName))->generate($users);
+                ($_POST["export_type"] === "excel" ?
+                    new ExcelGenerator($fileName) :
+                    new CsvGenerator($fileName))->generate($users);
             }
         });
         $mainMenu = $hasAboveRole ? new UserListMenu() : new UserProfileMenu();

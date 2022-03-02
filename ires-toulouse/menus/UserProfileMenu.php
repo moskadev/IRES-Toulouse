@@ -254,11 +254,12 @@ class UserProfileMenu extends IresMenu {
                         Modifier les informations
                     </button> <?php
                 }
-                if (current_user_can("direction") || current_user_can("administrator")) { ?>
-                    <button class="button-secondary button-large" type="submit"
-                            onclick="downloadExcelFile(this, <?php echo $this->editingUser->ID ?>)">
-                        Exporter ces données
-                    </button> <?php
+                if (current_user_can("direction") || current_user_can("administrator")) {  ?>
+                    <select class="export-dropdown button-secondary button-large">
+                        <option selected disabled>Exporter ces données</option>
+                        <option data-type="excel" data-user-ids="<?php echo $this->editingUser->ID ?>">Exporter en Excel</option>
+                        <option data-type="csv" data-user-ids="<?php echo $this->editingUser->ID ?>">Exporter en CSV</option>
+                    </select> <?php
                 } ?>
             </div>
         </form><?php

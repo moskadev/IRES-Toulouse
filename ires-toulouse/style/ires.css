@@ -137,11 +137,37 @@ input {
     cursor: pointer;
 }
 
+.button-link-ires.export-dropdown {
+    width: 55px !important;
+}
+
+.button-link-ires:focus {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.button-link-ires:hover, .button-link-ires:hover {
+    color: #135e96 !important;
+}
+
 .button-link-ires {
-    border: none;
-    background: none;
-    color: #0d66c2;
+    padding: 0 !important;
+    margin: 0;
+
+    min-height: unset !important;
+    max-width: unset !important;
+    line-height: unset !important;
+
+    border: none !important;
+    background: none !important;
+    color: rgb(34, 113, 177) !important;
+
     cursor: pointer;
+    font-size: 14px !important;
+}
+
+.export-dropdown.button-large {
+    max-width: 100%;
 }
 
 /*

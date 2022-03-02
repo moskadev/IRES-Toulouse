@@ -20,5 +20,14 @@ abstract class FileGenerator {
     /**
      * @param array $users
      */
-    public abstract function generate(array $users);
+    public function generate(array $users) {
+        $this->createRow(array_map(function ($data) {
+            return $data->getName();
+        }, UserData::all()));
+        foreach ($users as $user){
+            $this->createRow(array_map(function ($data) use ($user) {
+                return $data->getValue($user);
+            }, UserData::all()));
+        }
+    }
 }

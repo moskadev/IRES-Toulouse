@@ -96,14 +96,16 @@ class UserListMenu extends IresMenu {
                 }
                 if (current_user_can('direction') || current_user_can('administrator')) { ?>
                     <form action="" method="post" style="display: inline-block">
-                        <button class="button-secondary" type="submit"
-                                onclick="downloadExcelFile(this)">
-                            Tout exporter
-                        </button>
-                        <button class="button-secondary export-selection" type="submit"
-                                onclick="downloadExcelFile(this, 'export-selection')" disabled>
-                            Exporter la sélection
-                        </button>
+                        <select class="export-dropdown button-secondary">
+                            <option selected disabled>Tout exporter</option>
+                            <option data-type="excel" data-user-ids="">Exporter en Excel</option>
+                            <option data-type="csv" data-user-ids="">Exporter en CSV</option>
+                        </select>
+                        <select disabled class="export-dropdown export-selection button-secondary">
+                            <option selected disabled>Exporter la sélection</option>
+                            <option data-type="excel" data-user-ids="export-selection">Exporter en Excel</option>
+                            <option data-type="csv" data-user-ids="export-selection">Exporter en CSV</option>
+                        </select>
                     </form><?php
                 }?>
             </div>
@@ -154,34 +156,36 @@ class UserListMenu extends IresMenu {
                 <tr> <?php
                     if (current_user_can('responsable') || current_user_can('administrator') || current_user_can('direction')) { ?>
                     <th scope="row" class="check-column">
-                        <input type="checkbox" class="checkbox-excel" value="<?php echo $user->ID; ?>">
+                        <input type="checkbox" class="checkbox-export" value="<?php echo $user->ID; ?>">
                     </th> <?php
                     } ?>
                     <td class="name"><?php echo $user->last_name; ?><br/>
-                        <form class="hide-actions" method="post" action=""><?php
-                            if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
+                        <div class="hide-actions" style="display: grid; grid-template-columns: repeat(2, max-content); grid-column-gap: 10px">
+                            <form method="post" action=""><?php
+                                if (in_array($user, Group::getVisibleUsers(wp_get_current_user()))) { ?>
+                                    <button type="submit" class="button-link-ires">
+                                        <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
+                                            "&lock=" . Locker::STATE_UNLOCKED) ?>">Modifier</a>
+                                    </button> <?php
+                                }
+                                if (current_user_can('administrator') && (!user_can($user, "administrator") || $user->ID !== get_current_user_id())) { ?>
+                                    <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button> <?php
+                                }?>
                                 <button type="submit" class="button-link-ires">
                                     <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
-                                        "&lock=" . Locker::STATE_UNLOCKED) ?>">Modifier</a>
-                                </button> <?php
-                            }
-                            if (current_user_can('administrator') && (!user_can($user, "administrator") || $user->ID !== get_current_user_id())) { ?>
-                                <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button> <?php
-                            }?>
-                            <button type="submit" class="button-link-ires">
-                                <a href="<?php echo home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $user->ID .
-                                    "&lock=" . Locker::STATE_UNLOCKABLE) ?>">Voir</a>
-                            </button> <?php
-
+                                        "&lock=" . Locker::STATE_UNLOCKABLE) ?>">Voir</a>
+                                </button>
+                            </form> <?php
                             if (current_user_can('direction') || current_user_can('administrator')) { ?>
-                                <form action="" method="post" style="display: inline-block">
-                                    <button class="button-link-ires" type="submit"
-                                            onclick="downloadExcelFile(this, <?php echo $user->ID ?>)">
-                                        Exporter
-                                    </button>
+                                <form action="" method="post">
+                                    <select class="export-dropdown button-link-ires">
+                                        <option selected disabled>Exporter</option>
+                                        <option data-type="excel" data-user-ids="<?php echo $user->ID ?>">Exporter en Excel</option>
+                                        <option data-type="csv" data-user-ids="<?php echo $user->ID ?>">Exporter en CSV</option>
+                                    </select>
                                 </form> <?php
                             } ?>
-                        </form>
+                        </div>
                     </td> <!-- Last name -->
                     <td><?php echo $user->first_name; ?></td> <!-- First name -->
                     <td><a href="mailto:<?php echo $user->user_email; ?>"><?php echo $user->user_email; ?></a></td> <!-- Email -->

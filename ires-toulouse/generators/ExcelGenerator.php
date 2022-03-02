@@ -27,14 +27,7 @@ class ExcelGenerator extends FileGenerator {
         header("Expires: 0");
         header("Pragma: public");
 
-        $this->createRow(array_map(function ($data) {
-            return $data->getName();
-        }, UserData::all()));
-        foreach ($users as $user){
-            $this->createRow(array_map(function ($data) use ($user) {
-                return $data->getValue($user);
-            }, UserData::all()));
-        }
+        parent::generate($users);
 
         echo $this->container;
         ob_end_flush();

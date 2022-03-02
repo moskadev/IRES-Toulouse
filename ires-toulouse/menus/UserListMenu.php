@@ -165,7 +165,7 @@ class UserListMenu extends IresMenu {
                                         "&lock=" . Locker::STATE_UNLOCKED) ?>">Modifier</a>
                                 </button> <?php
                             }
-                            if (current_user_can('administrator') && !user_can($user, "administrator") || $user->ID !== get_current_user_id()) { ?>
+                            if (current_user_can('administrator') && (!user_can($user, "administrator") || $user->ID !== get_current_user_id())) { ?>
                                 <button type="button" data-popup-target class="delete-link" onclick="setUserInfo(<?php echo "'" . $user->ID  . '\',\'' . $user->first_name . '\',\'' . $user->last_name .'\''; ?>)">Supprimer</button> <?php
                             }?>
                             <button type="submit" class="button-link-ires">

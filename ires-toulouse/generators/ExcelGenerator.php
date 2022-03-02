@@ -1,17 +1,10 @@
 <?php
 
-namespace irestoulouse\utils;
+namespace irestoulouse\generators;
 
 use irestoulouse\elements\input\UserData;
 
-class ExcelGenerator {
-
-    private string $fileName;
-    private string $container = "";
-
-    public function __construct(string $fileName) {
-        $this->fileName = $fileName;
-    }
+class ExcelGenerator extends FileGenerator {
 
     public function createRow(array $data) {
         $this->container .= implode("\t", $data) . "\n";
@@ -36,11 +29,11 @@ class ExcelGenerator {
 
         $this->createRow(array_map(function ($data) {
             return $data->getName();
-        }, UserData::all(false)));
+        }, UserData::all()));
         foreach ($users as $user){
             $this->createRow(array_map(function ($data) use ($user) {
                 return $data->getValue($user);
-            }, UserData::all(false)));
+            }, UserData::all()));
         }
 
         echo $this->container;

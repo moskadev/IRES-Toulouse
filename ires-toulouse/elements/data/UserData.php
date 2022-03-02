@@ -102,7 +102,7 @@ class UserData extends IresElement {
     /**
      * @return UserData[] all the user's necessary data
      */
-    public static function all(bool $labelIncluded = true) : array {
+    public static function all(bool $labelIncluded = false) : array {
         $userData = [];
         $jsonData = json_decode(file_get_contents(__DIR__ . "/user_data.json"), true);
         foreach ($jsonData as $d) {

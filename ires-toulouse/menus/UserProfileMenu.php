@@ -141,7 +141,7 @@ class UserProfileMenu extends IresMenu {
         <form method='post' name='modify' class='verifiy-form'>
             <input name='action' type='hidden' value='modify'>
             <table class='form-table' role='presentation'><?php
-                foreach (UserData::all() as $data) {
+                foreach (UserData::all(true) as $data) {
                     $formType = $data->getFormType();
                     $dataId = $data->getId();
                     $isLabel = $formType === "label"; ?>

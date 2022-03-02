@@ -31,12 +31,15 @@ require_once("menus/UserListMenu.php");
 require_once("exceptions/InvalidInputValueException.php");
 require_once("exceptions/FailedUserRegistrationException.php");
 
+require_once("generators/FileGenerator.php");
+require_once("generators/ExcelGenerator.php");
+require_once("generators/CsvGenerator.php");
+
 require_once("elements/sql/Database.php");
 require_once("elements/sql/SqlRequest.php");
 
 require_once("utils/Identifier.php");
 require_once("utils/Dataset.php");
-require_once("utils/ExcelGenerator.php");
 require_once("utils/Locker.php");
 
 include_once(__DIR__ . "/../../../wp-includes/pluggable.php");
@@ -44,6 +47,8 @@ include_once(__DIR__ . "/../../../wp-includes/functions.php");
 
 use irestoulouse\elements\input\UserData;
 use irestoulouse\menus\IresMenu;
+
+date_default_timezone_set("UTC");
 
 register_activation_hook(__FILE__, function () {
     add_role("responsable", "Responsable", [

@@ -2,8 +2,6 @@
 
 namespace irestoulouse\generators;
 
-use irestoulouse\elements\input\UserData;
-
 class ExcelGenerator extends FileGenerator {
 
     public function createRow(array $data) {

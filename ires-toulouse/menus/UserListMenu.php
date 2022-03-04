@@ -111,7 +111,7 @@ class UserListMenu extends IresMenu {
             </div>
             <form action="" method="get">
                 <input type="hidden" name="page" value="<?php echo $this->getId() ?>"/>
-                <input type="text" class="search-field" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
+                <input type="text" placeholder="Recherche" name="search" value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
                 <button class="button-secondary" type="submit">Rechercher des comptes</button>
                 <button class="button-secondary button-secondary-delete"
                         type="submit"

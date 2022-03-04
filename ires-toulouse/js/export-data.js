@@ -9,7 +9,7 @@ function activateExportSelection(){
     const checkboxesExport = [...document.querySelectorAll(".checkbox-export"),
         document.querySelector(".checkbox-export-all")];
     checkboxesExport.forEach(c => {
-        c.addEventListener("change", () => {
+        c?.addEventListener("change", () => {
             document.querySelector(".export-selection").disabled =
                 document.querySelectorAll(".checkbox-export:checked").length === 0
         });

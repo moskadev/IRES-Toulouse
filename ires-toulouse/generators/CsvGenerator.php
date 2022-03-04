@@ -8,17 +8,19 @@ use irestoulouse\generators\FileGenerator;
 
 class CsvGenerator extends FileGenerator {
 
+    const SEPARATOR = ";";
+
     private $output = false;
 
     public function createRow(array $data) {
         if($this->output !== false){
-            fputcsv($this->output, $data);
+            fputcsv($this->output, $data, self::SEPARATOR);
         }
     }
 
     public function createBlankLines(int $quantity = 1) {
         while ($quantity > 0 && $this->output !== false){
-            fputcsv($this->output, []);
+            fputcsv($this->output, [], self::SEPARATOR);
             $quantity--;
         }
     }

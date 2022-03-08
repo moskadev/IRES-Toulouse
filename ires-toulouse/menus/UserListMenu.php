@@ -144,7 +144,7 @@ class UserListMenu extends IresMenu {
                     </th>
                     <th>Email</th>
                     <th>Identifiant</th>
-                    <th>Groupe</th>
+                    <th>Groupes</th>
                 </tr>
             </thead>
             <tbody> <?php
@@ -181,7 +181,9 @@ class UserListMenu extends IresMenu {
                     <td><?php echo $user->first_name; ?></td> <!-- First name -->
                     <td><a href="mailto:<?php echo $user->user_email; ?>"><?php echo $user->user_email; ?></a></td> <!-- Email -->
                     <td><?php echo $user->user_login; ?></td> <!-- User login -->
-                    <td><?php echo count($groupNames) > 0 ? implode(", ", $groupNames) : "Aucun" ?></td>
+                    <td style="max-width: 300px">
+                        <?php echo count($groupNames) > 0 ? implode(", ", $groupNames) : "Aucun" ?>
+                    </td>
                 </tr>
                 <?php
             }
@@ -194,7 +196,7 @@ class UserListMenu extends IresMenu {
                         <th>Prénom</th>
                         <th>Email</th>
                         <th>Identifiant</th>
-                        <th>Groupe</th>
+                        <th>Groupes</th>
                     </tr><?php
                 } ?>
             </tfoot>

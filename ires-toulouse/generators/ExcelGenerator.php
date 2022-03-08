@@ -30,6 +30,6 @@ class ExcelGenerator extends FileGenerator {
         echo $this->container;
         ob_end_flush();
 
-        exit();
+        wp_die();
     }
 }

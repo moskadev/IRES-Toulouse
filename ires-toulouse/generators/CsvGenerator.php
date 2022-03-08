@@ -43,6 +43,6 @@ class CsvGenerator extends FileGenerator {
         parent::generate($users);
 
         fclose($this->output);
-        exit();
+        wp_die();
     }
 }

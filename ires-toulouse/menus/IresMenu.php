@@ -41,32 +41,29 @@ abstract class IresMenu {
     }
 
     /**
-     * TODO changer l'endroit de la méthode
-     */
-    public static function awp_autocomplete_search() {
-        check_ajax_referer("autocompleteSearchNonce", "security");
-        echo json_encode(strlen($_REQUEST["term"] ?? "") > 0 ?
-            array_map(function($u) {
-                return Identifier::generateFullName($u);
-            }, array_filter(get_users([
-                "search" => "*{$_REQUEST["term"]}*",
-                "search_columns" => ["user_login", "first_name", "last_name", "user_email"]
-            ]), function ($u) {
-                return in_array($u, Group::getVisibleUsers(wp_get_current_user()));
-            })) : []
-        );
-        wp_die();
-    }
-
-    /**
      * Initialize all menus
      */
     public static function init() : void {
         $hasAboveRole = current_user_can('responsable') ||
             current_user_can('administrator');
 
-        add_action('wp_ajax_nopriv_autocompleteSearch', [get_class(), 'awp_autocomplete_search']);
-        add_action('wp_ajax_autocompleteSearch', [get_class(), 'awp_autocomplete_search']);
+        // auto-complete of search bars
+        add_action('wp_ajax_autocompleteSearch', function () {
+            check_ajax_referer("autocompleteSearchNonce", "security");
+            echo json_encode(strlen($_REQUEST["term"] ?? "") > 0 ?
+                array_map(function($u) {
+                    return Identifier::generateFullName($u);
+                }, array_filter(get_users([
+                    "search" => "*{$_REQUEST["term"]}*",
+                    "search_columns" => ["user_login", "first_name", "last_name", "user_email"]
+                ]), function ($u) {
+                    return !user_can($u, "administrator");
+                })) : []
+            );
+            wp_die();
+        });
+
+        // exportation of excel/csv file
         add_action("admin_init", function () {
             if(isset($_POST["export_users"]) && isset($_POST["export_type"])) {
                 $fileName = "ires_utilisateur";
@@ -101,6 +98,7 @@ abstract class IresMenu {
         );
         IresMenu::register("admin_menu", new GroupDetailsMenu(), true);
 
+        // change some specific menus name
         add_action("admin_menu", function () use ($hasAboveRole, $mainMenu){
             global $menu;
             global $submenu;

@@ -148,13 +148,18 @@ class GroupDetailsMenu extends IresMenu {
             <button class="button-secondary">< Retour à la page des groupes</button>
         </form>
 
+        <h3>Légende : </h3>
+        <p>
+            <mark class="underline-blue">Le surlignage bleu permet de repérer votre profil</mark><br>
+            <mark class="underline-orange">Le surlignage orange permet de repérer les profils des responsables</mark>
+        </p>
+
         <h2 class="title-label">Responsable<?php if (count($responsables) >= 2)
                 echo "s" ?> :</h2>
 
         <!-- Bouton de l'ajout d'un nouveau responsable -->
         <?php
-        if (count($responsables) < Group::MAX_RESPONSABLES && (current_user_can("administrator") ||
-                $this->group->isUserResponsable(wp_get_current_user()))) { ?>
+        if (count($responsables) < Group::MAX_RESPONSABLES && current_user_can("administrator")) { ?>
             <form action="" method="post"> <?php
                 if (isset($_POST["modifResponsable"])) { ?>
                     <div class="input-register-container input-register-3">
@@ -190,7 +195,7 @@ class GroupDetailsMenu extends IresMenu {
                     foreach ($this->group->getResponsables() as $resp) {
                         $first_name = $resp->first_name;
                         $last_name = $resp->last_name; ?>
-                        <tr class="<?php if($resp->ID === get_current_user_id()) echo "row-hover" ?>">
+                        <tr class="<?php echo $resp->ID === get_current_user_id() ? "row-hover" : "is-resp" ?>">
                             <td><?php echo $last_name ?></td>
                             <td><?php echo $first_name ?></td>
                             <td><?php echo $resp->user_login ?></td>
@@ -265,7 +270,9 @@ class GroupDetailsMenu extends IresMenu {
                 foreach ($this->group->getUsers() as $user) {
                     $first_name = $user->first_name;
                     $last_name = $user->last_name; ?>
-                    <tr class="<?php if($user->ID === get_current_user_id()) echo "row-hover" ?>">
+                    <tr class="<?php
+                    if ($user->ID === get_current_user_id()) echo "row-hover ";
+                    else if ($this->group->isUserResponsable($user)) echo "is-resp" ?>">
                         <td><?php echo $last_name; ?></td>
                         <td><?php echo $first_name ?></td>
                         <td><?php echo $user->user_login; ?></td>

@@ -53,12 +53,10 @@ abstract class IresMenu {
             echo json_encode(strlen($_REQUEST["term"] ?? "") > 0 ?
                 array_map(function($u) {
                     return Identifier::generateFullName($u);
-                }, array_filter(get_users([
+                }, get_users([
                     "search" => "*{$_REQUEST["term"]}*",
                     "search_columns" => ["user_login", "first_name", "last_name", "user_email"]
-                ]), function ($u) {
-                    return !user_can($u, "administrator");
-                })) : []
+                ])) : []
             );
             wp_die();
         });

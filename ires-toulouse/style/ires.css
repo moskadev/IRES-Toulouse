@@ -91,13 +91,22 @@ input {
     padding: 10px !important;
 }
 
-.striped .row-hover:nth-child(2n) {
-    background-color: #dde7f5 !important;
+.striped .is-resp:nth-child(odd), .underline-orange {
+    background-color: #ffdcb8 !important;
 }
 
-.striped .row-hover:nth-child(2n+1) {
-    background-color: #d2deee !important;
+.striped .is-resp:nth-child(even) {
+    background-color: #f5d0a9 !important;
 }
+
+.striped .row-hover:nth-child(odd), .underline-blue {
+    background-color: #bfdaff !important;
+}
+
+.striped .row-hover:nth-child(even) {
+    background-color: #b1cff5 !important;
+}
+
 
 /*
  * Buttons

@@ -92,6 +92,12 @@ class GroupListMenu extends IresMenu {
             </div>
         </div>
 
+        <h3>Légende : </h3>
+        <p>
+            <mark class="underline-blue">Le surlignage bleu signifie que vous êtes membre du groupe</mark><br>
+            <mark class="underline-orange">Le surlignage orange signifie que vous êtes membre et responsable du groupe</mark>
+        </p>
+
         <?php
         /*
          * Formulaire pour ajouter un groupe
@@ -129,33 +135,21 @@ class GroupListMenu extends IresMenu {
          * && count($groups) > 9
          */
         if (count(Group::getUserGroups(wp_get_current_user())) > 0) { ?>
-            <h2 class="title-label">Vos groupes : </h2>
-            <table class="widefat data-table striped">
-                <thead>
-                <tr>
-                    <th class="row-title">Nom</th>
-                    <th class="row-title">Type</th>
-                    <th class="row-title" style="width: 300px;">Responsable(s)</th>
-                    <th class="row-title">Date de création</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                /*
-                 * Affichage de chaque ligne
-                 */
-                foreach (Group::getUserGroups(wp_get_current_user()) as $group) {
-                    $this->printGroup($group);
-                }
-                ?>
-                </tbody>
-            </table>
-            <?php
-        }
-        ?>
+            <h2 class="title-label">Vos groupes : </h2> <?php
+            self::printGroups(Group::getUserGroups(wp_get_current_user()));
+        }  ?>
 
-        <h2 class="title-label">Groupes : </h2>
+        <h2 class="title-label">Groupes : </h2> <?php
+        self::printGroups(Group::all());
+    }
+
+    /**
+     * Print the row of a table for the group given in parameter
+     *
+     * @param $groups Group[] groups to print
+     */
+    private function printGroups(array $groups) {
+        $currentUser = wp_get_current_user(); ?>
         <table class="widefat data-table striped">
             <thead>
             <tr>
@@ -167,20 +161,60 @@ class GroupListMenu extends IresMenu {
             </tr>
             </thead>
             <tbody>
-                <?php
-                $groups = Group::all();
-                /*
-                 * Affichage d'un message si aucun groupe n'existe
-                 */
-                if (count($groups) === 0) { ?>
-                    <tr>
-                        <td colspan="4">Aucun groupe n'existe</td>
-                    </tr> <?php
-                } else {
-                    foreach ($groups as $group) {
-                        self::printGroup($group);
-                    }
-                }?>
+            <?php
+            /*
+             * Affichage d'un message si aucun groupe n'existe
+             */
+            if (count($groups) === 0) { ?>
+                <tr>
+                    <td colspan="4">Aucun groupe n'existe</td>
+                </tr> <?php
+            } else {
+                foreach ($groups as $group) {
+                    $respNames = array_map(function($u) {
+                        return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID .
+                                "&lock=" . Locker::STATE_LOCKED) . "'>" . $u->first_name . " " . $u->last_name . "</a>";
+                    }, $group->getResponsables()); ?>
+                    <tr class="<?php
+                        if ($group->isUserResponsable($currentUser)) echo "is-resp ";
+                        else if ($group->userExists($currentUser)) echo "row-hover"?>">
+                        <!-- Name of the group -->
+                        <th>
+                            <a class="text-decoration-none"
+                               href="<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>">
+                                <?php echo $group->getName() ?>
+                            </a>
+                        </th>
+                        <!-- Group's type -->
+                        <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
+                        <!-- Name of the users in charge of the group -->
+                        <td> <?php echo implode(", ", $respNames) ?></td>
+                        <!-- Date -->
+                        <td><?php echo $group->getCreationTime() ?></td>
+                        <td class="hide-actions">
+                            <?php
+                            if (current_user_can('administrator') || $group->isUserResponsable($currentUser)) {?>
+                                <form method="post">
+                                <button type="button" id="modify" name="modify" value="<?php echo $group->getId() ?>"
+                                        class="button-secondary"
+                                        onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>'">
+                                    Modifier
+                                </button> <?php
+                                if (current_user_can('administrator')) {?>
+                                <button type="button" id="delete" name="" value="<?php echo $group->getId() ?>"
+                                        class="button-secondary button-secondary-delete"
+                                        onclick="setGroupInfo('<?php echo $group->getName() ?>', '<?php echo $group->getId() ?>')"
+                                        data-popup-target>
+                                        Supprimer
+                                    </button><?php
+                                } ?>
+                                </form><?php
+                            }
+                            ?>
+                        </td>
+                    </tr><?php
+                }
+            } ?>
             </tbody>
             <?php
 
@@ -189,68 +223,17 @@ class GroupListMenu extends IresMenu {
              */
             if (count($groups) > 9) { ?>
                 <tfoot>
-                    <tr>
-                        <th class="row-title">Nom</th>
-                        <th class="row-title">Type</th>
-                        <th class="row-title">Responsable(s)</th>
-                        <th class="row-title">Date de création</th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th class="row-title">Nom</th>
+                    <th class="row-title">Type</th>
+                    <th class="row-title">Responsable(s)</th>
+                    <th class="row-title">Date de création</th>
+                    <th></th>
+                </tr>
                 </tfoot>
             <?php }  ?>
         </table> <!-- Fin du tableau de l'affichage de tous les groupes -->
-        <?php
-    }
 
-    /**
-     * Print the row of a table for the group given in parameter
-     *
-     * @param $group Group the group to print
-     */
-    private function printGroup(Group $group) {
-        $currentUser = wp_get_current_user();
-        $respNames = array_map(function($u) {
-            return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID .
-                    "&lock=" . Locker::STATE_LOCKED) . "'>" . $u->first_name . " " . $u->last_name . "</a>";
-        }, $group->getResponsables());
-
-        ?>
-        <tr class="<?php if ($group->userExists($currentUser)) echo "row-hover" ?>">
-            <!-- Name of the group -->
-            <th>
-                <a class="text-decoration-none"
-                   href="<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>">
-                    <?php echo $group->getName() ?>
-                </a>
-            </th>
-            <!-- Group's type -->
-            <td> <?php echo Group::TYPE_NAMES[$group->getType()] ?></td>
-            <!-- Name of the users in charge of the group -->
-            <td> <?php echo implode(", ", $respNames) ?></td>
-            <!-- Date -->
-            <td><?php echo $group->getCreationTime() ?></td>
-            <td class="hide-actions">
-                <?php
-                if (current_user_can('administrator') || $group->isUserResponsable($currentUser)) {?>
-                    <form method="post">
-                        <button type="button" id="modify" name="modify" value="<?php echo $group->getId() ?>"
-                                class="button-secondary"
-                                onclick="location.href='<?php echo home_url("/wp-admin/admin.php?page=details_du_groupe&group=" . $group->getId()) ?>'">
-                            Modifier
-                        </button> <?php
-                        if (current_user_can('administrator')) {?>
-                            <button type="button" id="delete" name="" value="<?php echo $group->getId() ?>"
-                                class="button-secondary button-secondary-delete"
-                                onclick="setGroupInfo('<?php echo $group->getName() ?>', '<?php echo $group->getId() ?>')"
-                                data-popup-target>
-                                Supprimer
-                            </button><?php
-                        } ?>
-                    </form><?php
-                }
-                ?>
-            </td>
-        </tr>
         <?php
     }
 }

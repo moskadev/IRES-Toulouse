@@ -191,8 +191,8 @@ class GroupDetailsMenu extends IresMenu {
                         $first_name = $resp->first_name;
                         $last_name = $resp->last_name; ?>
                         <tr class="<?php if($resp->ID === get_current_user_id()) echo "row-hover" ?>">
-                            <td><?php echo $first_name ?></td>
                             <td><?php echo $last_name ?></td>
+                            <td><?php echo $first_name ?></td>
                             <td><?php echo $resp->user_login ?></td>
                             <td class="hide-actions">
                                 <form action="" method="post">
@@ -266,8 +266,8 @@ class GroupDetailsMenu extends IresMenu {
                     $first_name = $user->first_name;
                     $last_name = $user->last_name; ?>
                     <tr class="<?php if($user->ID === get_current_user_id()) echo "row-hover" ?>">
-                        <td><?php echo $first_name; ?></td>
                         <td><?php echo $last_name; ?></td>
+                        <td><?php echo $first_name; ?></td>
                         <td><?php echo $user->user_login; ?></td>
                         <td class="hide-actions">
                             <form action="" method="post">

@@ -5,7 +5,7 @@ namespace irestoulouse\menus;
 use Exception;
 use irestoulouse\controllers\UserConnection;
 use irestoulouse\controllers\UserInputData;
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 use irestoulouse\utils\Dataset;
 
 use WP_User;

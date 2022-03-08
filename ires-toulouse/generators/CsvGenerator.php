@@ -3,7 +3,7 @@
 namespace generators;
 
 use irestoulouse\controllers\UserInputData;
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 use irestoulouse\generators\FileGenerator;
 
 class CsvGenerator extends FileGenerator {

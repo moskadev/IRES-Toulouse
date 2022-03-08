@@ -2,7 +2,7 @@
 
 namespace irestoulouse\utils;
 
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 
 class Dataset {
 

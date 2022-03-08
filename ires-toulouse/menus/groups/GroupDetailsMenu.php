@@ -267,7 +267,7 @@ class GroupDetailsMenu extends IresMenu {
                     $last_name = $user->last_name; ?>
                     <tr class="<?php if($user->ID === get_current_user_id()) echo "row-hover" ?>">
                         <td><?php echo $last_name; ?></td>
-                        <td><?php echo $first_name; ?></td>
+                        <td><?php echo $first_name ?></td>
                         <td><?php echo $user->user_login; ?></td>
                         <td class="hide-actions">
                             <form action="" method="post">

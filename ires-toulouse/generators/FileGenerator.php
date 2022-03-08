@@ -2,7 +2,7 @@
 
 namespace irestoulouse\generators;
 
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 
 abstract class FileGenerator {
 

@@ -7,7 +7,7 @@ include_once("IresMenu.php");
 use Exception;
 use irestoulouse\controllers\UserInputData;
 use irestoulouse\elements\Group;
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 use irestoulouse\utils\Dataset;
 use irestoulouse\utils\Identifier;
 use irestoulouse\utils\Locker;

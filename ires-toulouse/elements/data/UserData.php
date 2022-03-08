@@ -1,6 +1,6 @@
 <?php
 
-namespace irestoulouse\elements\input;
+namespace irestoulouse\elements\data;
 
 use Exception;
 use irestoulouse\elements\Group;

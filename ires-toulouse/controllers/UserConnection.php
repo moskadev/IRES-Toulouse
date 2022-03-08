@@ -4,7 +4,7 @@ namespace irestoulouse\controllers;
 
 use exceptions\FailedUserRegistrationException;
 use irestoulouse\elements\Group;
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 use WP_User;
 
 class UserConnection extends Controller {

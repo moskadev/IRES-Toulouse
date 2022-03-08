@@ -65,12 +65,19 @@ class Group extends IresElement {
             ) $charset_collate;";
         maybe_create_table($table_name, $sql_create_user_group);
 
-        // TEMPORAIRE pour l'ajout du type sans casser la table
-        if (!isset($db->get_row("SELECT * FROM {$db->prefix}groups")->type)) {
-            $db->query("ALTER TABLE {$db->prefix}groups ADD type INT(1) NOT NULL DEFAULT " . self::TYPE_RECHERCHE_ACTION);
+        global $wp_roles;
+        // remove responsable from all groups from users who do not have
+        // a responsable role in the wp database
+        // responsable are not remove if the role responsable doesn't exist
+        // to avoid losing all data in groups
+        foreach (get_users() as $user){
+            if(isset($wp_roles->get_names()["responsable"]) &&
+                !user_can($user, "responsable")) {
+                foreach (Group::allWhereUserResponsable($user) as $g) {
+                    $g->removeResponsable($user, false);
+                }
+            }
         }
-
-
     }
 
     /**
@@ -84,17 +91,13 @@ class Group extends IresElement {
     public static function register(string $name, int $type = self::TYPE_RECHERCHE_ACTION) : bool {
         if (self::isValid($name, $type) &&
             self::fromName($name) === null &&
-            self::fromName(strtolower($name)) === null
-        ) {
+            self::fromName(strtolower($name)) === null) {
             $db = Database::get();
 
-            return $db->insert($db->prefix . "groups",
-                    [
-                        "name" => $name,
-                        "type" => $type,
-                        "creator_id" => get_current_user_id()
-                    ]
-                ) !== false;
+            return $db->insert($db->prefix . "groups", [
+                "name" => $name,
+                "type" => $type,
+                "creator_id" => get_current_user_id()]) !== false;
         }
 
         return false;
@@ -203,7 +206,7 @@ class Group extends IresElement {
      * Get all the users for who $user_id is responsible
      * @return WP_User[] all the id of the users
      */
-    public static function getVisibleUsers(WP_User $from) {
+    public static function getVisibleUsers(WP_User $from) : array {
         if (user_can($from, "administrator")) {
             return get_users();
         }
@@ -227,9 +230,9 @@ class Group extends IresElement {
     }
 
     /**
-     * @return array|null containing all the groups where an user is responsable
+     * @return Group[] containing all the groups where an user is responsable
      */
-    public static function allWhereUserResponsable(WP_User $user) : ?array {
+    public static function allWhereUserResponsable(WP_User $user) : array {
         $groups = [];
         foreach (self::getUserGroups($user) as $g) {
             if (in_array($user, $g->getResponsables())) {
@@ -244,6 +247,7 @@ class Group extends IresElement {
      * @param $user WP_User the user that we're looking for
      *
      * @return Group[] all the group(s) of this user
+     * @throws \Exception
      */
     public static function getUserGroups(WP_User $user) : array {
         $db = Database::get();
@@ -326,10 +330,6 @@ class Group extends IresElement {
      */
     public function addResponsable(WP_User $user) : bool {
         $this->addUser($user);
-        // à confirmer si l'utlisateur peut être responsable dans plus de 3 groupes
-        //if (count(self::allWhereUserResponsable($user)) > self::MAX_RESPONSABLES) {
-        //    return false;
-        //}
         if (!$this->isUserResponsable($user) && count($this->getResponsables()) < self::MAX_RESPONSABLES) {
             $db = Database::get();
             $user->add_role("responsable");
@@ -428,14 +428,14 @@ class Group extends IresElement {
      *
      * @return bool
      */
-    public function removeResponsable(WP_User $user) : bool {
+    public function removeResponsable(WP_User $user, bool $removeRole = true) : bool {
         if ($this->userExists($user) && $this->isUserResponsable($user)) {
             $db = Database::get();
             $request = $db->update($db->prefix . "groups_users",
                 ["is_responsable" => "0"],
                 ["user_id" => $user->ID, "group_id" => $this->id]
             );
-            if (count(self::allWhereUserResponsable($user)) === 0) {
+            if ($removeRole && count(self::allWhereUserResponsable($user)) === 0) {
                 $user->remove_role("responsable");
             }
 

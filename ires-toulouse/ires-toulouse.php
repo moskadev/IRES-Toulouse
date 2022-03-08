@@ -16,7 +16,6 @@ require_once("controllers/UserConnection.php");
 require_once("controllers/UserInputData.php");
 
 require_once("elements/IresElement.php");
-require_once("elements/Discipline.php");
 require_once("elements/Group.php");
 require_once("elements/IresElement.php");
 require_once("elements/data/UserData.php");
@@ -36,7 +35,6 @@ require_once("generators/ExcelGenerator.php");
 require_once("generators/CsvGenerator.php");
 
 require_once("elements/sql/Database.php");
-require_once("elements/sql/SqlRequest.php");
 
 require_once("utils/Identifier.php");
 require_once("utils/Dataset.php");
@@ -45,7 +43,8 @@ require_once("utils/Locker.php");
 include_once(__DIR__ . "/../../../wp-includes/pluggable.php");
 include_once(__DIR__ . "/../../../wp-includes/functions.php");
 
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
+use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
 
 date_default_timezone_set("UTC");
@@ -72,6 +71,7 @@ register_deactivation_hook(__FILE__, function () {
 
 UserData::registerExtraMetas(get_current_user_id());
 IresMenu::init();
+Group::init();
 
 wp_enqueue_script("autocomplete-search", "/wp-content/plugins/ires-toulouse/js/auto-fill-search.js",
     ["jquery", "jquery-ui-autocomplete"], null, true);

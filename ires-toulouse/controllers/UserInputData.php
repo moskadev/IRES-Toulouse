@@ -2,7 +2,7 @@
 
 namespace irestoulouse\controllers;
 
-use irestoulouse\elements\input\UserData;
+use irestoulouse\elements\data\UserData;
 use irestoulouse\exceptions\InvalidInputValueException;
 use WP_User;
 

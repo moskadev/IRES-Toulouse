@@ -23,9 +23,9 @@ require_once("elements/data/UserData.php");
 require_once("menus/IresMenu.php");
 require_once("menus/groups/GroupListMenu.php");
 require_once("menus/groups/GroupDetailsMenu.php");
-require_once("menus/UserRegisterMenu.php");
-require_once("menus/UserProfileMenu.php");
-require_once("menus/UserListMenu.php");
+require_once("menus/users/UserRegisterMenu.php");
+require_once("menus/users/UserProfileMenu.php");
+require_once("menus/users/UserListMenu.php");
 
 require_once("exceptions/InvalidInputValueException.php");
 require_once("exceptions/FailedUserRegistrationException.php");
@@ -47,6 +47,7 @@ include_once(__DIR__ . "/../../../wp-includes/functions.php");
 
 use irestoulouse\elements\data\UserData;
 use irestoulouse\elements\Group;
+use irestoulouse\elements\sql\Database;
 use irestoulouse\menus\IresMenu;
 
 date_default_timezone_set("UTC");
@@ -94,3 +95,8 @@ add_action("admin_enqueue_scripts", function () {
     wp_enqueue_script("ires-script-popups", "/wp-content/plugins/ires-toulouse/js/popups.js", [], false, true);
     wp_enqueue_script("ires-script-export", "/wp-content/plugins/ires-toulouse/js/export-data.js", [], false, true);
 });
+
+$list_of_table = Database::get()->get_results("SHOW TABLE STATUS WHERE Engine != 'INNODB'");
+foreach($list_of_table as $table) {
+    $repair_db = Database::get()->query("ALTER TABLE {$table->Name} ENGINE=INNODB");
+}

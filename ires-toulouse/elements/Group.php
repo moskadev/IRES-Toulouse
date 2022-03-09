@@ -40,7 +40,7 @@ class Group extends IresElement {
         require_once ABSPATH . "wp-admin/includes/upgrade.php";
         $db = Database::get();
 
-        $charset_collate = $db->get_charset_collate();
+        $charset_collate = $db->get_charset_collate() . " ENGINE = innoDB";;
         $table_name = $db->prefix . "groups";
         $sql_create_group = "CREATE TABLE $table_name (
                 id_group bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ class Group extends IresElement {
                 user_id bigint(20) UNSIGNED NOT NULL,
                 group_id bigint(20) UNSIGNED NOT NULL,
                 is_responsable int(1) NOT NULL DEFAULT '0',
-                FOREIGN KEY (user_id) REFERENCES wp_users(ID),
+                FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE,
                 FOREIGN KEY (group_id) REFERENCES wp_groups(id_group),
                 PRIMARY KEY (ID)
             ) $charset_collate;";

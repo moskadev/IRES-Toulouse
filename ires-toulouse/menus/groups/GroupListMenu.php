@@ -149,27 +149,20 @@ class GroupListMenu extends IresMenu {
      * @param $groups Group[] groups to print
      */
     private function printGroups(array $groups) {
-        $currentUser = wp_get_current_user(); ?>
-        <table class="widefat data-table striped">
-            <thead>
-            <tr>
-                <th class="row-title">Nom</th>
-                <th class="row-title">Type</th>
-                <th class="row-title" style="width: 300px;">Responsable(s)</th>
-                <th class="row-title">Date de création</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
-            /*
-             * Affichage d'un message si aucun groupe n'existe
-             */
-            if (count($groups) === 0) { ?>
+        $currentUser = wp_get_current_user();
+        if (count($groups) > 0) {?>
+            <table class="widefat data-table striped">
+                <thead>
                 <tr>
-                    <td colspan="4">Aucun groupe n'existe</td>
-                </tr> <?php
-            } else {
+                    <th class="row-title">Nom</th>
+                    <th class="row-title">Type</th>
+                    <th class="row-title" style="width: 300px;">Responsable(s)</th>
+                    <th class="row-title">Date de création</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
                 foreach ($groups as $group) {
                     $respNames = array_map(function($u) {
                         return "<a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $u->ID .
@@ -213,27 +206,27 @@ class GroupListMenu extends IresMenu {
                             ?>
                         </td>
                     </tr><?php
-                }
-            } ?>
-            </tbody>
-            <?php
+                } ?>
+                </tbody>
+                <?php
 
-            /*
-             * Affichage du bas de page si il y a plus de 9 groupes
-             */
-            if (count($groups) > 9) { ?>
-                <tfoot>
-                <tr>
-                    <th class="row-title">Nom</th>
-                    <th class="row-title">Type</th>
-                    <th class="row-title">Responsable(s)</th>
-                    <th class="row-title">Date de création</th>
-                    <th></th>
-                </tr>
-                </tfoot>
-            <?php }  ?>
-        </table> <!-- Fin du tableau de l'affichage de tous les groupes -->
-
-        <?php
+                /*
+                 * Affichage du bas de page si il y a plus de 9 groupes
+                 */
+                if (count($groups) > 9) { ?>
+                    <tfoot>
+                    <tr>
+                        <th class="row-title">Nom</th>
+                        <th class="row-title">Type</th>
+                        <th class="row-title">Responsable(s)</th>
+                        <th class="row-title">Date de création</th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                <?php }  ?>
+            </table> <?php
+        } else { ?>
+            <p>Aucun groupe n'existe</p>
+        <?php }
     }
 }

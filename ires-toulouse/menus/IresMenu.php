@@ -3,12 +3,13 @@
 namespace irestoulouse\menus;
 
 use generators\CsvGenerator;
-use irestoulouse\elements\Group;
 use irestoulouse\menus\groups\GroupDetailsMenu;
 use irestoulouse\menus\groups\GroupListMenu;
 use irestoulouse\generators\excel\ExcelGenerator;
+use irestoulouse\menus\users\UserListMenu;
+use irestoulouse\menus\users\UserProfileMenu;
+use irestoulouse\menus\users\UserRegisterMenu;
 use irestoulouse\utils\Identifier;
-use menus\UserListMenu;
 
 abstract class IresMenu {
 

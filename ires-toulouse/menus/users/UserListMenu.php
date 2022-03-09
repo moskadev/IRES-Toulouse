@@ -1,12 +1,10 @@
 <?php
 
-namespace menus;
+namespace irestoulouse\menus\users;
 
 use irestoulouse\controllers\UserConnection;
 use irestoulouse\elements\Group;
 use irestoulouse\menus\IresMenu;
-use irestoulouse\menus\UserProfileMenu;
-use irestoulouse\utils\ExcelGenerator;
 use irestoulouse\utils\Identifier;
 use irestoulouse\utils\Locker;
 
@@ -34,11 +32,11 @@ class UserListMenu extends IresMenu {
             try {
                 $deletedUser = get_userdata($_POST['delete']);
                 if($deletedUser !== false) {
-                    $fullName = "{$deletedUser->last_name} {$deletedUser->first_name} ({$deletedUser->user_login})";
+                    $fullName = Identifier::generateFullName($deletedUser);
 
                     $message = "Erreur : L'utilisateur $fullName n'a pas pu être supprimé";
                     $type_message = "error";
-                    if (UserConnection::delete($deletedUser)) {
+                    if (wp_delete_user($deletedUser->ID)) {
                         $message = "L'utilisateur $fullName a bien été supprimé";
                         $type_message = "updated";
                     }

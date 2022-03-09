@@ -1,13 +1,12 @@
 <?php
 
-namespace irestoulouse\menus;
-
-include_once("IresMenu.php");
+namespace irestoulouse\menus\users;
 
 use Exception;
 use irestoulouse\controllers\UserInputData;
 use irestoulouse\elements\Group;
 use irestoulouse\elements\data\UserData;
+use irestoulouse\menus\IresMenu;
 use irestoulouse\utils\Dataset;
 use irestoulouse\utils\Identifier;
 use irestoulouse\utils\Locker;

@@ -77,21 +77,6 @@ class UserConnection extends Controller {
     }
 
     /**
-     * @param WP_User $user to delete
-     *
-     * @return bool true if the user has been successfully deleted
-     */
-    public static function delete(WP_User $user) : bool {
-        foreach (UserData::all(false) as $d){
-            $d->delete($user);
-        }
-        foreach (Group::getUserGroups($user) as $g){
-            $g->removeUser($user);
-        }
-        return wp_delete_user($user->ID);
-    }
-
-    /**
      * We verify if the same user login, and so we count the quantity of users
      * with the same user's login by deleting the numbers
      * We also reduce it by 1 because the current user is already in the array too,

@@ -1,11 +1,12 @@
 <?php
 
-namespace irestoulouse\menus;
+namespace irestoulouse\menus\users;
 
 use Exception;
 use irestoulouse\controllers\UserConnection;
 use irestoulouse\controllers\UserInputData;
 use irestoulouse\elements\data\UserData;
+use irestoulouse\menus\IresMenu;
 use irestoulouse\utils\Dataset;
 
 use WP_User;

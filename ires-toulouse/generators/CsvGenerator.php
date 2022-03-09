@@ -2,17 +2,22 @@
 
 namespace generators;
 
-use irestoulouse\controllers\UserInputData;
-use irestoulouse\elements\data\UserData;
 use irestoulouse\generators\FileGenerator;
 
 class CsvGenerator extends FileGenerator {
 
     const SEPARATOR = ";";
 
-    private $output = false;
+    private $output;
 
-    public function createRow(array $data) {
+    public function __construct(string $fileName) {
+        parent::__construct($fileName);
+
+        $this->container = "";
+        $this->output = false;
+    }
+
+    public function createRow(array $data, bool $boldFont = false) {
         if($this->output !== false){
             fputcsv($this->output, $data, self::SEPARATOR);
         }

@@ -31,7 +31,9 @@ require_once("exceptions/InvalidInputValueException.php");
 require_once("exceptions/FailedUserRegistrationException.php");
 
 require_once("generators/FileGenerator.php");
-require_once("generators/ExcelGenerator.php");
+require_once("generators/excel/ExcelGenerator.php");
+require_once("generators/excel/XLSXWriterBufferedWriter.php");
+require_once("generators/excel/XLSXWriter.php");
 require_once("generators/CsvGenerator.php");
 
 require_once("elements/sql/Database.php");

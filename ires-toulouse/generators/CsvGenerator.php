@@ -35,9 +35,11 @@ class CsvGenerator extends FileGenerator {
         header("Expires: 0");
         header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
         header("Cache-Control: private", false);
-        header("Content-Type: application/csv");
+        header("Content-Type: text/csv; charset=UTF-8");
         header("Content-Disposition: attachment; filename={$this->fileName}.csv");
         header("Content-Transfer-Encoding: binary");
+        header('Content-Encoding: UTF-8');
+        echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
         /**
          * create a file pointer connected to the output stream
@@ -48,6 +50,6 @@ class CsvGenerator extends FileGenerator {
         parent::generate($users);
 
         fclose($this->output);
-        wp_die();
+        exit();
     }
 }

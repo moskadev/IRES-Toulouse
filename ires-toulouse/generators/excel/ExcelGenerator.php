@@ -20,6 +20,7 @@ class ExcelGenerator extends FileGenerator {
         $styles["border"] = ["left,right,top,bottom"];
         if($boldFont){
             $styles["font-style"] = "bold";
+            $styles["fill"] = "#D7D7D7";
         }
         $this->writer->writeSheetRow("Utilisateurs", $data, $styles);
     }

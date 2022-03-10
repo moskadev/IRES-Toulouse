@@ -16,9 +16,9 @@ class ExcelGenerator extends FileGenerator {
         $this->writer = new XLSXWriter();
     }
 
-    public function createRow(array $data, bool $boldFont = false) {
+    public function createRow(array $data, bool $title = false) {
         $styles["border"] = ["left,right,top,bottom"];
-        if($boldFont){
+        if($title){
             $styles["font-style"] = "bold";
             $styles["fill"] = "#D7D7D7";
         }

@@ -13,7 +13,7 @@ abstract class FileGenerator {
         $this->fileName = $fileName . "_" . date('d-m-Y');
     }
 
-    public abstract function createRow(array $data, bool $boldFont = false);
+    public abstract function createRow(array $data, bool $title = false);
 
     public abstract function createBlankLines(int $quantity = 1);
 

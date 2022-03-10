@@ -17,7 +17,7 @@ class CsvGenerator extends FileGenerator {
         $this->output = false;
     }
 
-    public function createRow(array $data, bool $boldFont = false) {
+    public function createRow(array $data, bool $title = false) {
         if($this->output !== false){
             fputcsv($this->output, $data, self::SEPARATOR);
         }

@@ -3,63 +3,65 @@
 namespace irestoulouse\menus\users;
 
 use Exception;
-use irestoulouse\controllers\UserConnection;
-use irestoulouse\controllers\UserInputData;
-use irestoulouse\elements\data\UserData;
-use irestoulouse\menus\IresMenu;
+use irestoulouse\controllers\InputDataController;
+use irestoulouse\controllers\UserConnectionController;
+use irestoulouse\data\UserCustomDataFactory;
+use irestoulouse\menus\Menu;
+use irestoulouse\menus\MenuFactory;
+use irestoulouse\menus\MenuIds;
 use irestoulouse\utils\Dataset;
-
 use WP_User;
 
 /**
- * Creation of the plugin page
  * This page will allow you to add a user by a manager
  * The manager will have to fill in the following information:
  *      - E-mail
  *      - First name
  *      - Last name
+ *
+ * @version 2.0
  */
-class UserRegisterMenu extends IresMenu {
+class UserRegisterMenu extends Menu {
 
     /** @var WP_User|null */
     private ?WP_User $loggedUser = null;
 
+    /**
+     * Initializing the menu
+     */
     public function __construct() {
-        parent::__construct(
-            "Création d'un profil IRES", // Page title when the menu is selected
-            "Ajouter un compte", // Name of the menu
-            3, // Menu access security level
-            "dashicons-admin-users", // Menu icon
-            3 // Page position in the list
+        parent::__construct(MenuIds::USER_REGISTER_MENU, "Ajouter un compte",
+            "Création d'un profil IRES", 3, "dashicons-admin-users", 3
         );
     }
 
-    public function analyzeSentData() : void {
-        $message = $type_message = "";
-        if (strlen($nom = trim($_POST["first_name"] ?? "")) > 0 &&
-            strlen($prenom = trim($_POST["last_name"] ?? "")) > 0 &&
-            strlen($email = trim($_POST["user_email"] ?? "")) > 0
+    /**
+     * Checking if a user can be created, if a first name, last name and
+     * e-mail has been sent. It calls a controller and it will try to
+     * register from the following given params the user
+     *
+     * @param array $params $_GET and $_POST combined
+     */
+    public function analyzeParams(array $params) : void {
+        if (strlen($nom = trim($params["first_name"] ?? "")) > 0 &&
+            strlen($prenom = trim($params["last_name"] ?? "")) > 0 &&
+            strlen($email = trim($params["user_email"] ?? "")) > 0
         ) {
             try {
-                $connection = new UserConnection($nom, $prenom, $email);
+                $connection = new UserConnectionController($nom, $prenom, $email);
 
-                UserInputData::checkSentData();
+                InputDataController::checkSentData();
                 $this->loggedUser = $connection->register();
 
-                $message = "L'utilisateur " . $this->loggedUser->user_login . "  a été bien enregistré, 
-                    <a href='" . home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->loggedUser->ID) . "'>
+                $this->showNoticeMessage("updated",
+                    "L'utilisateur " . $this->loggedUser->user_login . "  a été bien enregistré, 
+                    <a href='" . MenuFactory::fromId(MenuIds::USER_PROFILE_MENU)->getPageUrl($this->loggedUser->ID) . "'>
                         vous pouvez renseigner ses informations ici
-                    </a>";
-                $type_message = "updated";
+                    </a>"
+                );
             } catch (Exception $e) {
-                $message = $e->getMessage();
-                $type_message = "error";
+                $this->showNoticeMessage("error", $e->getMessage());
             }
-        }
-        if (!empty($message) && !empty($type_message)) { ?>
-            <div id="message" class="<?php echo $type_message ?> notice is-dismissible">
-                <p><strong><?php echo $message ?></strong></p>
-            </div><?php
         }
     }
 
@@ -71,11 +73,11 @@ class UserRegisterMenu extends IresMenu {
      *          first letter of the first name concatenated with the last name all in lower case
      *      - Add the user to the database
      */
-    public function getContent() : void {?>
+    public function showContent() : void { ?>
         <form method='post' class='verifiy-form'>
             <table class='form-table' role='presentation'>
                 <?php
-                foreach (UserData::all() as $data) {
+                foreach (UserCustomDataFactory::all() as $data) {
                     $formType = $data->getFormType();
                     $dataId = $data->getId();
 
@@ -85,9 +87,9 @@ class UserRegisterMenu extends IresMenu {
                     }
 
                     $value = "";
-                    if(isset($_POST[$dataId])){
+                    if (isset($_POST[$dataId])) {
                         $value = $_POST[$dataId];
-                    } else if($this->loggedUser !== null) {
+                    } else if ($this->loggedUser !== null) {
                         $value = $data->getValue($this->loggedUser);
                     }
                     ?>

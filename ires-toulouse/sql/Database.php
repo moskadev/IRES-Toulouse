@@ -1,7 +1,12 @@
 <?php
 
-namespace irestoulouse\elements\sql;
+namespace irestoulouse\sql;
 
+/**
+ * IRES de Toulouse's database
+ *
+ * @version 2.0
+ */
 class Database {
 
     const PREFIX = "ires_";
@@ -11,6 +16,7 @@ class Database {
      */
     public static function get() {
         global $wpdb;
+
         return $wpdb;
     }
 }

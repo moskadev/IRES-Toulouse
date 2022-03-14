@@ -153,7 +153,16 @@
     "formType": "dropdown",
     "parent": "info_complementaires",
     "id": "discipline_enseignee",
-    "extraData": "disciplines"
+    "extraData": [
+      "Mathématiques",
+      "Maths-PC",
+      "Physique",
+      "Chimie",
+      "SVT",
+      "Documentaliste",
+      "Informatique",
+      "Autres"
+    ]
   },
   {
     "name": "Formations",

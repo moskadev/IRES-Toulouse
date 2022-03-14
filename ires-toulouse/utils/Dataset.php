@@ -2,20 +2,25 @@
 
 namespace irestoulouse\utils;
 
-use irestoulouse\elements\data\UserData;
+use irestoulouse\data\UserCustomData;
 
+/**
+ * Data conversion related to HTML
+ *
+ * @version 2.0
+ */
 class Dataset {
 
     /**
-     * Hacky way to get all the data
+     * Convert the given user's data to an HTML format
      *
-     * @param UserData $userData the datas to convert
+     * @param UserCustomData $d the data that should be converted
      *
-     * @return string
+     * @return string all HTML datasets
      */
-    public static function allFrom(UserData $userData) : string {
+    public static function allFrom(UserCustomData $d) : string {
         $datasetHtml = "";
-        foreach ($userData->toArray() as $name => $value) {
+        foreach ($d->toArray() as $name => $value) {
             $datasetHtml .= "data-$name='" . htmlspecialchars(is_array($value) ? implode(",", $value) : $value) . "' ";
         }
 

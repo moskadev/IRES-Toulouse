@@ -2,6 +2,9 @@
 
 namespace irestoulouse\generators\excel;
 
+/**
+ * FROM : https://github.com/mk-j/PHP_XLSXWriter
+ */
 class XLSXWriterBufferedWriter {
     protected $fd = null;
     protected string $buffer = '';
@@ -33,6 +36,18 @@ class XLSXWriterBufferedWriter {
         }
     }
 
+    protected static function isValidUTF8($string) : bool {
+        if (function_exists('mb_check_encoding')) {
+            return mb_check_encoding($string, 'UTF-8');
+        }
+
+        return (bool) preg_match("//u", $string);
+    }
+
+    public function __destruct() {
+        $this->close();
+    }
+
     public function close() {
         $this->purge();
         if ($this->fd) {
@@ -41,32 +56,23 @@ class XLSXWriterBufferedWriter {
         }
     }
 
-    public function __destruct() {
-        $this->close();
-    }
-
     public function ftell() {
         if ($this->fd) {
             $this->purge();
 
             return ftell($this->fd);
         }
-        return -1;
+
+        return - 1;
     }
 
     public function fseek($pos) {
         if ($this->fd) {
             $this->purge();
+
             return fseek($this->fd, $pos);
         }
-        return -1;
-    }
 
-    protected static function isValidUTF8($string) : bool {
-        if (function_exists('mb_check_encoding')) {
-            return mb_check_encoding($string, 'UTF-8');
-        }
-
-        return (bool) preg_match("//u", $string);
+        return - 1;
     }
 }

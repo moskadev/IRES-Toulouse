@@ -2,18 +2,37 @@
 
 namespace irestoulouse\controllers;
 
+use irestoulouse\menus\MenuFactory;
+use irestoulouse\menus\MenuIds;
 use irestoulouse\utils\Locker;
 use WP_User;
 
-class EmailSender extends Controller {
+/**
+ * Controller of e-mails for confirmation and sending
+ *
+ * @version 2.0
+ */
+class EmailController extends Controller {
 
     /** @var WP_User */
     private WP_User $toUser;
 
+    /**
+     * @param WP_User $to the user to whom we will manipulate the e-mail
+     */
     public function __construct(WP_User $to) {
         $this->toUser = $to;
     }
 
+    /**
+     * When this method is called, an e-mail will be sent to the
+     * user to confirm it. The password given as an argument should
+     * be a fully generated password from WP
+     *
+     * @param string $password the user's password
+     *
+     * @return bool true if the confirmation e-mail has been sent
+     */
     public function confirm(string $password) : bool {
         $message = 'Bonjour,
            
@@ -43,14 +62,22 @@ class EmailSender extends Controller {
             $this->toUser->user_login,
             $password,
             home_url("/wp-login.php?action=rp&key=$passwordReset&login={$this->toUser->user_login}"),
-            home_url("/wp-admin/admin.php?page=mon_profil_ires&user_id=" . $this->toUser->ID .
-                "&lock=" . Locker::STATE_UNLOCKED)
+            MenuFactory::fromId(MenuIds::USER_PROFILE_MENU)->getPageUrl($this->toUser->ID, Locker::STATE_UNLOCKED)
         );
         $email = apply_filters("invited_user_email", $email, $this->toUser, $this->toUser->roles[0], $password);
 
         return $this->send($email["subject"], $email["message"]);
     }
 
+    /**
+     * Same as wp_mail from WP or mail() from PHP, we are just
+     * directly including the user's e-mail to these methods
+     *
+     * @param string $subject The e-mail's subject
+     * @param string $message the e-mail's message
+     *
+     * @return bool true if the e-mail has been sent
+     */
     public function send(string $subject, string $message) : bool {
         return wp_mail($this->toUser->user_email, $subject, $message);
     }

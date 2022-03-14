@@ -5,7 +5,7 @@ onDropdownExportClick();
 /**
  * If a checkbox is checked than the button to export the selection is enabled
  */
-function activateExportSelection(){
+function activateExportSelection() {
     const checkboxesExport = [...document.querySelectorAll(".checkbox-export"),
         document.querySelector(".checkbox-export-all")];
     checkboxesExport.forEach(c => {
@@ -19,11 +19,11 @@ function activateExportSelection(){
 /**
  * Download Excel data file
  *
- * HACK dégueulasse mais on fait avec
+ * Horrible hack but working nicely
  */
 function exportData(elem, type = "csv", userIds = "") {
     const authorizedTypes = ["csv", "excel"];
-    if(userIds === "export-selection"){
+    if (userIds === "export-selection") {
         userIds = [...document.querySelectorAll('.checkbox-export:checked')]
             .map(u => u.value).join(",");
     }
@@ -47,6 +47,9 @@ function exportData(elem, type = "csv", userIds = "") {
     }, 10);
 }
 
+/**
+ * Start the export on an option lick
+ */
 function onDropdownExportClick() {
     let firstOption = null;
     document.querySelectorAll(".export-dropdown").forEach(dropdown =>

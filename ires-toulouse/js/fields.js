@@ -63,20 +63,13 @@ forms.forEach(function (form) {
     }
 
     /**
-     *
-     * @param btn
+     * Change the stat of all given button if all the data
+     * has been correctly filled
+     * @param btn the button to change
      */
     function changeSubmitState(btn) {
         if (btn !== null) {
             btn.disabled = !areCorrectlyFilled();
-            // bootstrap
-            //if (areCorrectlyFilled()) {
-            //    btn.classList.remove("btn-outline-primary");
-            //    btn.classList.add("btn-primary");
-            //} else {
-            //    btn.classList.add("btn-outline-primary");
-            //    btn.classList.remove("btn-primary");
-            //}
         }
     }
 
@@ -145,8 +138,8 @@ forms.forEach(function (form) {
     }
 
     /**
-     *
-     * @param parentRadio
+     * Hide the parent row if a switch is off and this data has this child
+     * @param parentRadio the parent switch
      */
     function updateChildrenFieldDisplay(parentRadio) {
         const children = form.querySelectorAll("input[data-parent=" + parentRadio.name + "]");
@@ -173,8 +166,8 @@ forms.forEach(function (form) {
     }
 
     /**
-     *
-     * @param target
+     * Change the switch state on off or on when the user clicks on it
+     * @param target the switch element
      */
     function changeSwitchState(target) {
         let switchBtn = null;

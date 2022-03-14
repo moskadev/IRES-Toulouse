@@ -1,8 +1,14 @@
 <?php
 
-namespace irestoulouse\elements;
+namespace irestoulouse;
 
-class IresElement {
+/**
+ * An element can be anything relating to anything else,
+ * like a data for a user, a group, a class, etc.
+ *
+ * @version 2.0
+ */
+class Element {
 
     /** @var string */
     protected string $name;
@@ -11,8 +17,11 @@ class IresElement {
     protected $id;
 
     /**
-     * @param string $name
-     * @param mixed $id
+     * The element is initialized with an identifier and
+     * an optional name
+     *
+     * @param string $name the element's name
+     * @param mixed $id the element's identifier
      */
     public function __construct($id, string $name = "") {
         $this->name = $name;
@@ -42,5 +51,4 @@ class IresElement {
     public function getId() {
         return $this->id;
     }
-
 }
